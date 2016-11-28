@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+  <metadata>
+    <id>RACoN</id>
+    <version>0.0.2.1</version>
+    <title>RACoN</title>
+    <authors>Okan Topçu</authors>
+    <owners>Okan Topçu</owners>
+    <projectUrl>https://sites.google.com/site/okantopcu/racon</projectUrl>
+    <iconUrl>http://www.ceng.metu.edu.tr/~otopcu/racon/images/image001.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>High Level Architecture (HLA) Runtime Infrastructure (RTI) Abstraction Layer for MS.NET</description>
+    <summary>The RTI abstraction component for MS.NET (RACoN) deals with the High Level Architecture (HLA) runtime infrastructure (RTI) communication in order to access the federation-wide data (actually, the objects and interactions exchanged in federation). RTI is middleware broker software that manages the federation execution and object exchange through a federation execution. The RACoN provides the .NET wrapper classes for the RTI and RTI-specific data structures. As it offers more maintainable, robust, and portable methods, developing an abstraction layer (wrapper) over RTI is a popular approach in many HLA-based projects.</summary>
+    <releaseNotes>
+    </releaseNotes>
+    <copyright>Copyright © 2009-2016 Okan Topçu</copyright>
+    <tags>Distributed Simulation; HLA</tags>
+  </metadata>
+</package>

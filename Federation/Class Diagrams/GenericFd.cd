@@ -1,0 +1,45 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1" GroupingSetting="Access">
+  <Class Name="RACoN.Federation.CGenericFederate" Collapsed="true">
+    <Position X="2" Y="3.25" Width="5.75" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+      <Compartment Name="Properties" Collapsed="true" />
+      <Compartment Name="Methods" Collapsed="true" />
+      <Compartment Name="Events" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>waxFkcJA05gbpgmACACEQgQMDQBCu1qwCMuuaYBQcKs=</HashCode>
+      <FileName>Federation\GenericFederate.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="_som" />
+      <Property Name="RtiAmb" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="RACoN.RTILayer.CFdAmb" Collapsed="true">
+    <Position X="4" Y="0.5" Width="1.75" />
+    <Compartments>
+      <Compartment Name="Methods" Collapsed="true" />
+      <Compartment Name="Events" Collapsed="true" />
+      <Compartment Name="Fields" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier />
+  </Class>
+  <Class Name="RACoN.RTILayer.CRtiAmb" Collapsed="true">
+    <Position X="6" Y="0.5" Width="1.75" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="RACoN.RTILayer.CHlaObjectModel" Collapsed="true">
+    <Position X="2" Y="0.5" Width="1.75" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="RACoN.ObjectModel.CObjectModel" Collapsed="true">
+    <Position X="2" Y="2" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAACAAAAAAAAABBAAAAAAQAAABAA=</HashCode>
+      <FileName>ObjectModel\ObjectModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

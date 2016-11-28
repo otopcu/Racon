@@ -1,0 +1,65 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="Racon.ObjectModel.CObjectModel" Collapsed="true">
+    <Position X="0.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAACAAAAAAAAABBAAAAAAQAAABAA=</HashCode>
+      <FileName>ObjectModel\ObjectModel.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsCollectionAssociation>
+      <Field Name="RSList" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Class Name="Racon.ObjectModel.CRoutingSpace" Collapsed="true">
+    <Position X="0.5" Y="2.25" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>AAAAAQIAAAAAAAAAAAAAAAYAAAAAAAIAAAAAQAAAAAA=</HashCode>
+      <FileName>ObjectModel\RoutingSpace.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsCollectionAssociation>
+      <Field Name="Dimensions" />
+      <Field Name="Regions" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Class Name="Racon.ObjectModel.CDimension" Collapsed="true">
+    <Position X="2.5" Y="4" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAACIAAAAAAAAAAAAAAAQAAAAAAAIAAAAAQAAAAAA=</HashCode>
+      <FileName>ObjectModel\Dimension.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Space" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="Racon.RtiLayer.CRtiAmb" Collapsed="true">
+    <Position X="6.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="Racon.ObjectModel.CRegion" Collapsed="true">
+    <Position X="4" Y="2.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAACIIAAAAQAAAAAAAAAAAgAAAAAAAAAAAQAAAAAA=</HashCode>
+      <FileName>ObjectModel\Region.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Space" />
+    </ShowAsAssociation>
+    <ShowAsCollectionAssociation>
+      <Field Name="Extents" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Class Name="Racon.ObjectModel.CExtent" Collapsed="true">
+    <Position X="6.5" Y="2.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAABAAAAAAAAAAEAQAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ObjectModel\Extent.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Dimension" />
+    </ShowAsAssociation>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>
