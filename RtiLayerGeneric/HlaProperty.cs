@@ -62,7 +62,7 @@ namespace Racon.RtiLayer
 
     #region Methods
     /// <summary>
-    /// Data Marshaling (Decoding)
+    /// Data Unmarshaling
     /// IntPtr - pointer for unmanaged memory (void *)
     /// </summary>
     public void AddValue(IntPtr value)
@@ -70,8 +70,7 @@ namespace Racon.RtiLayer
       Value = value;
     }
     /// <summary>
-    /// Data Marshaling (Encoding)
-    /// Reference Types: (1) class (2) interface (3) delegate
+    /// Data Marshaling
     /// String
     /// </summary>
     public void AddValue(string value)
@@ -80,8 +79,7 @@ namespace Racon.RtiLayer
       Length = value.Length + 1;
     }
     /// <summary>
-    /// Data Marshaling (Encoding)
-    /// Reference Types: (1) class (2) interface (3) delegate
+    /// Data Marshaling
     /// DateTime - non-blittable
     /// </summary>
     public void AddValue(DateTime value)
@@ -101,12 +99,22 @@ namespace Racon.RtiLayer
     //}
 
     /// <summary>
-    /// Data Marshaling (Encoding)
-    /// Value Types (Only Blittables): (1) Structs (2) Enumerations
-    /// Structs: (1) Numeric Types (2) bool (System.Boolean) (3) User-defined Structs
-    /// Numeric Types: (1) Integral types (2) Floating-point Types (3) decimal (System.Decimal)
-    /// Integral Types: sbyte, byte, char, short, ushort, int, uint, long, ulong 
-    /// Floating-point Types: float (System.Single), double (System.Double) 
+    /// Data Marshaling
+    /// 
+    /// Value Types (Only Blittables): 
+    /// (1) Structs (2) Enumerations
+    /// 
+    /// Structs: 
+    /// (1) Numeric Types (2) bool (System.Boolean) (3) User-defined Structs
+    /// 
+    /// Numeric Types: 
+    /// (1) Integral types (2) Floating-point Types (3) decimal (System.Decimal)
+    /// 
+    /// Integral Types: 
+    /// sbyte, byte, char, short, ushort, int, uint, long, ulong 
+    /// 
+    /// Floating-point Types: 
+    /// float (System.Single), double (System.Double) 
     /// </summary>
     public void AddValue<_type>(_type value) where _type : struct
     {
