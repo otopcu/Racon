@@ -33,6 +33,9 @@ using System.Threading.Tasks;
 
 namespace Racon.Logger
 {
+  /// <summary>
+  /// test
+  /// </summary>
   internal class LogEntry
   {
     #region Fields
