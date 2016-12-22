@@ -65,7 +65,7 @@ namespace Racon
 
   /// <summary>
   /// Enum debugging and information level
-  /// ALL < TRACE < INFO < OFF
+  /// ALL < TRACE < INFO < WARN < ERROR < OFF
   /// </summary>
   public enum LogLevel
   {

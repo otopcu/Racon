@@ -39,98 +39,99 @@ along with this program.If not, see <http://www.gnu.org/licenses/>.
 namespace Racon
 {
 	namespace RtiLayer {
-		ref class CHlaRegion;
-		ref class HlaInteraction;
-		
-		public ref class RtiAmb_OpenRti_1516e : public RtiAmb_Hla1516e {
+		namespace Native {
+			ref class CHlaRegion;
+			ref class HlaInteraction;
+
+			public ref class RtiAmb_OpenRti_1516e : public RtiAmb_Hla1516e {
 
 #pragma region Fields
 #pragma endregion			
 
 #pragma region Constructors
-		public:
-			RtiAmb_OpenRti_1516e(CallbackManager^);
-			~RtiAmb_OpenRti_1516e()
-			{
-				this->!RtiAmb_OpenRti_1516e();
-			};
-			!RtiAmb_OpenRti_1516e()
-			{
-				delete rti;
-				rti = 0;
-				delete _nativeFdAmb;
-			};
+			public:
+				RtiAmb_OpenRti_1516e(CallbackManager^);
+				~RtiAmb_OpenRti_1516e()
+				{
+					this->!RtiAmb_OpenRti_1516e();
+				};
+				!RtiAmb_OpenRti_1516e()
+				{
+					delete rti;
+					rti = 0;
+					delete _nativeFdAmb;
+				};
 #pragma endregion						
 
 #pragma region Methods
 #pragma region Fedaration Management
-		public:
-			void joinFederation(String^, String^) override;
+			public:
 #pragma endregion			
 
 #pragma region Declaration Management
-		public:
+			public:
 #pragma endregion	// Declaration Management		
 
 #pragma region Object Management
-		public:
-			bool registerObject(HlaObject ^) override;
-			bool registerObject(HlaObject ^, String^) override;
+			public:
+				bool registerObject(HlaObject ^) override;
+				bool registerObject(HlaObject ^, String^) override;
 #pragma endregion	// Object Management
 
 #pragma region Ownership Management
-		public:
+			public:
 #pragma endregion // Ownership Management
 
 #pragma region Data Distribution Management
-		public:
+			public:
 #pragma endregion	// Data Distribution Management
 
 #pragma region Time Management
-		public:
+			public:
 #pragma endregion
 
 #pragma region Support Services
-		public:
-			virtual void getAttributeHandlesFromRti(HlaObjectClass ^) override;// deprecated
-			virtual void getClassHandleFromRti(HlaInteractionClass ^) override; // deprecated
-			virtual void getClassHandleFromRti(HlaObjectClass ^) override;// deprecated
-			void getParameterHandlesFromRti(HlaInteractionClass ^) override;// deprecated
+			public:
+				virtual void getAttributeHandlesFromRti(HlaObjectClass ^) override;// deprecated
+				virtual void getClassHandleFromRti(HlaInteractionClass ^) override; // deprecated
+				virtual void getClassHandleFromRti(HlaObjectClass ^) override;// deprecated
+				void getParameterHandlesFromRti(HlaInteractionClass ^) override;// deprecated
 #pragma endregion
 
 #pragma region Helpers
-		protected:
-			rti1516e::ObjectClassHandle getObjectClassHandle(HlaObjectClass ^) override;
-			rti1516e::InteractionClassHandle getInteractionClassHandle(HlaInteractionClass ^) override;	
-			rti1516e::AttributeHandle getAttributeHandle(HlaAttribute^, rti1516e::ObjectClassHandle) override;
-			rti1516e::ParameterHandle getParameterHandle(HlaParameter^, rti1516e::InteractionClassHandle) override;
-			// Conversions for handle - OpenRTI specific 
-			 ULong Handle2Long(rti1516e::ObjectClassHandle handle) override {
-				return toULong(gcnew String(handle.toString().c_str())) ;
-			}
-			 ULong Handle2Long(rti1516e::InteractionClassHandle handle) override {
-				return toULong(gcnew String(handle.toString().c_str()));
-			}
-			 ULong Handle2Long(rti1516e::AttributeHandle handle) override {
-				return toULong(gcnew String(handle.toString().c_str()));
-			}
-			 ULong Handle2Long(rti1516e::ParameterHandle handle) override {
-				return toULong(gcnew String(handle.toString().c_str()));
-			}
-			 ULong Handle2Long(rti1516e::ObjectInstanceHandle handle) override {
-				return toULong(gcnew String(handle.toString().c_str())) ;
-			}
-			 ULong Handle2Long(rti1516e::FederateHandle handle) override {
-				return toULong(gcnew String(handle.toString().c_str()));
-			}
-			 ULong Handle2Long(rti1516e::RegionHandle handle) override {
-				return toULong(gcnew String(handle.toString().c_str()));
-			}
+			protected:
+				rti1516e::ObjectClassHandle getObjectClassHandle(HlaObjectClass ^) override;
+				rti1516e::InteractionClassHandle getInteractionClassHandle(HlaInteractionClass ^) override;
+				rti1516e::AttributeHandle getAttributeHandle(HlaAttribute^, rti1516e::ObjectClassHandle) override;
+				rti1516e::ParameterHandle getParameterHandle(HlaParameter^, rti1516e::InteractionClassHandle) override;
+				// Conversions for handle - OpenRTI specific 
+				ULong Handle2Long(rti1516e::ObjectClassHandle handle) override {
+					return toULong(gcnew String(handle.toString().c_str()));
+				}
+				ULong Handle2Long(rti1516e::InteractionClassHandle handle) override {
+					return toULong(gcnew String(handle.toString().c_str()));
+				}
+				ULong Handle2Long(rti1516e::AttributeHandle handle) override {
+					return toULong(gcnew String(handle.toString().c_str()));
+				}
+				ULong Handle2Long(rti1516e::ParameterHandle handle) override {
+					return toULong(gcnew String(handle.toString().c_str()));
+				}
+				ULong Handle2Long(rti1516e::ObjectInstanceHandle handle) override {
+					return toULong(gcnew String(handle.toString().c_str()));
+				}
+				ULong Handle2Long(rti1516e::FederateHandle handle) override {
+					return toULong(gcnew String(handle.toString().c_str()));
+				}
+				ULong Handle2Long(rti1516e::RegionHandle handle) override {
+					return toULong(gcnew String(handle.toString().c_str()));
+				}
 #pragma endregion
 
 #pragma endregion
 
-		};
+			};
+		}
 	}
 }
 

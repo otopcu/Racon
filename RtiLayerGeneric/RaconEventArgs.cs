@@ -24,10 +24,19 @@ using System.ComponentModel;
 
 namespace Racon.RtiLayer
 {
+  /// <summary>
+  /// Event types 
+  /// </summary>
   public enum RaconEventTypes
   {
     NA, // The event type is not important - used for RTIAmb and Racon events. The others are used for FdAmb events
     // FM
+    ConnectionLost,
+    FederationExecutionsReported,
+    SynchronizationPointRegistrationSucceeded,
+    synchronizationPointRegistrationFailed,
+    SynchronizationPointAnnounced,
+    FederationSynchronized,
     InitiateFederateSave,
     InitiateFederateRestore,
     FederationRestorationRequestConfirmed,
@@ -98,125 +107,42 @@ namespace Racon.RtiLayer
   }
 
   /// <summary>
-  /// HlaInteractionEventArgs 
+  /// HlaFederationManagementEventArgs 
   /// </summary>
-  public class HlaInteractionEventArgs : RaconEventArgs
+  public class HlaFederationManagementEventArgs : RaconEventArgs
   {
     #region Properties
     /// <summary>
-    /// interaction instance
+    /// Federation synchronization point label
     /// </summary>
-    public HlaInteraction Interaction { get; set; }
+    public string Label { get; set; }
     /// <summary>
-    ///  Retraction Handle
+    /// Reason. A string value for services such as ConnectionLost
     /// </summary>
-    public EventRetractionHandle RetractionHandle { get; set; }
+    public string Reason { get; set; }
+    /// <summary>
+    /// Success/Failure. Return value for callbacks such as: requestFederationRestoreSuccedded, synchronizationPointRegistrationFailed
+    /// </summary>
+    public bool Success { get; set; }
+    /// <summary>
+    /// Tag for announceSynchronizationPoint
+    /// </summary>
+    public string Tag { get; set; }
+    /// <summary>
+    /// Handle of the Federate
+    /// </summary>
+    public uint FederateHandle { get; set; }
     #endregion
 
     #region Constructors
     /// <summary>
     /// Constructor
     /// </summary>
-    public HlaInteractionEventArgs()
+    public HlaFederationManagementEventArgs()
     {
-      Interaction = new HlaInteraction();
-      RetractionHandle = new EventRetractionHandle();
-    }
-    #endregion
-
-    #region Methods
-    /// <summary>
-    /// Is value updated?
-    /// </summary>
-    /// <param name="parameter">parameter</param>
-    public bool IsValueUpdated(HlaParameter parameter)
-    {
-      foreach (var item in Interaction.Parameters)
-        if (item.Handle == parameter.Handle)
-          return true;
-      return false;
-    }
-
-    /// <summary>
-    /// Gets parameter value specified by parameter reference. This function simplifies parameter decoding, so that the user does not need to iterate all parameters of an interaction 
-    /// </summary>
-    /// <param name="parameter">Parameter</param>
-    public T GetParameterValue<T>(HlaParameter parameter)
-    {
-      T result = default(T);
-      foreach (var item in Interaction.Parameters)
-      {
-        if (item.Handle == parameter.Handle)
-        {
-          result = item.GetValue<T>();
-          break;
-        }
-      }
-      return result;
-    }
-    #endregion
-  }
-
-  /// <summary>
-  /// HlaObjectEventArgs 
-  /// </summary>
-  public class HlaObjectEventArgs : RaconEventArgs
-  {
-    #region Properties
-    /// <summary>
-    /// Object instance
-    /// </summary>
-    public HlaObject ObjectInstance { get; set; }
-    /// <summary>
-    /// ObjectClassHandle
-    /// </summary>
-    public uint ClassHandle { get; set; }
-    /// <summary>
-    ///  Retraction Handle
-    /// </summary>
-    public EventRetractionHandle RetractionHandle { get; set; }
-    #endregion
-
-    #region Constructors
-    /// <summary>
-    /// Constructor
-    /// </summary>
-    public HlaObjectEventArgs()
-    {
-      ObjectInstance = new HlaObject();
-      RetractionHandle = new EventRetractionHandle();
-    }
-    #endregion
-
-    #region Methods
-    /// <summary>
-    /// Is value updated?
-    /// </summary>
-    /// <param name="attribute">attribute</param>
-    public bool IsValueUpdated(HlaAttribute attribute)
-    {
-      foreach (var item in ObjectInstance.Attributes)
-        if (item.Handle == attribute.Handle)
-          return true;
-      return false;
-    }
-
-    /// <summary>
-    /// Gets attribute value specified by attribute reference. This function simplifies decoding value of an attribute, so that the user does not need to iterate all attributes of an object instance.
-    /// </summary>
-    /// <param name="attribute">attribute</param>
-    public T GetAttributeValue<T>(HlaAttribute attribute)
-    {
-      T result = default(T);
-      foreach (var item in ObjectInstance.Attributes)
-      {
-        if (item.Handle == attribute.Handle)
-        {
-          result = item.GetValue<T>();
-          break;
-        }
-      }
-      return result;
+      Success = false;
+      FederateHandle = 0;
+      Tag = "";
     }
     #endregion
   }
@@ -244,41 +170,6 @@ namespace Racon.RtiLayer
     #endregion
   }
 
-  /// <summary>
-  /// HlaFederationManagementEventArgs 
-  /// </summary>
-  public class HlaFederationManagementEventArgs : RaconEventArgs
-  {
-    #region Properties
-    /// <summary>
-    /// Label
-    /// </summary>
-    public string Label { get; set; }
-    /// <summary>
-    /// Reason
-    /// </summary>
-    public string Reason { get; set; }
-    /// <summary>
-    /// Success/Failure. Return value for callbacks such as: requestFederationRestoreSuccedded
-    /// </summary>
-    public bool Success { get; set; }
-    /// <summary>
-    /// Handle of the Federate
-    /// </summary>
-    public uint FederateHandle { get; set; }
-    #endregion
-
-    #region Constructors
-    /// <summary>
-    /// Constructor
-    /// </summary>
-    public HlaFederationManagementEventArgs()
-    {
-      Success = false;
-      FederateHandle = 0;
-    }
-    #endregion
-  }
 
   /// <summary>
   /// CHlaDeclarationManagementEventArgs 

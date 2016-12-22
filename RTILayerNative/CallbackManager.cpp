@@ -23,148 +23,159 @@ along with this program.If not, see <http://www.gnu.org/licenses/>.
 #include "CallbackManager.h"
 
 // Constructor
-CallbackManager::CallbackManager()
+CallbackManager2::CallbackManager2()
 {
-//#if defined(HLA13)
-//	_nativeFdAmb = new FdAmb_Hla13(this);
-//#elif defined(HLA1516_2010)
-//	_nativeFdAmb = new FdAmb_Hla13(this);
-//#endif
 	// Create FdAmb Event Queue
 	FdAmbEventQueue = gcnew Queue<RaconEventArgs^>();
 }
 
+// OnConnectionLost
+void CallbackManager2::OnConnectionLost(Racon::RtiLayer::HlaFederationManagementEventArgs^ e)	{
+  this->ConnectionLost(this, e);// Raise the event. c++/cli checks it is null or not.
+};
+// OnSynchronizationPointRegistrationConfirmed
+void CallbackManager2::OnSynchronizationPointRegistrationConfirmed(Racon::RtiLayer::HlaFederationManagementEventArgs^ e) {
+	this->ConnectionLost(this, e);// Raise the event. c++/cli checks it is null or not.
+};
+// OnSynchronizationPointAnnounced
+void CallbackManager2::OnSynchronizationPointAnnounced(Racon::RtiLayer::HlaFederationManagementEventArgs^ e) {
+	this->ConnectionLost(this, e);// Raise the event. c++/cli checks it is null or not.
+};
+// OnFederationSynchronized
+void CallbackManager2::OnFederationSynchronized(Racon::RtiLayer::HlaFederationManagementEventArgs^ e) {
+	this->ConnectionLost(this, e);// Raise the event. c++/cli checks it is null or not.
+};
 // OnInitiateFederateSave
-void CallbackManager::OnInitiateFederateSave(Racon::RtiLayer::HlaFederationManagementEventArgs^ e)	{
+void CallbackManager2::OnInitiateFederateSave(Racon::RtiLayer::HlaFederationManagementEventArgs^ e)	{
   this->InitiateFederateSave(this, e);// Raise the event. c++/cli checks it is null or not.
 };
 // OnInitiateFederateRestore
-void CallbackManager::OnInitiateFederateRestore(HlaFederationManagementEventArgs^ e)	{
+void CallbackManager2::OnInitiateFederateRestore(HlaFederationManagementEventArgs^ e)	{
   this->InitiateFederateRestore(this, e);// Raise the event. c++/cli checks it is null or not.
 };
 // OnAcceptanceOfRequestFederationRestore
-void CallbackManager::OnAcceptanceOfRequestFederationRestore(HlaFederationManagementEventArgs^ e)	{
+void CallbackManager2::OnFederationRestorationRequestConfirmed(HlaFederationManagementEventArgs^ e)	{
   this->FederationRestorationRequestConfirmed(this, e);
 };
 // OnFederationSaved
-void CallbackManager::OnFederationSaved(HlaFederationManagementEventArgs^ e)	{
+void CallbackManager2::OnFederationSaved(HlaFederationManagementEventArgs^ e)	{
   this->FederationSaved(this, e);
 };
 // OnFederationRestored
-void CallbackManager::OnFederationRestored(HlaFederationManagementEventArgs^ e)	{
+void CallbackManager2::OnFederationRestored(HlaFederationManagementEventArgs^ e)	{
   this->FederationRestored(this, e);
 };
 // OnFederationRestoreBegun
-void CallbackManager::OnFederationRestoreBegun(HlaFederationManagementEventArgs^ e)	{
+void CallbackManager2::OnFederationRestoreBegun(HlaFederationManagementEventArgs^ e)	{
   this->FederationRestoreBegun(this, e);
 };
 // OnStartRegistrationForObjectClassAdvised
-void CallbackManager::OnStartRegistrationForObjectClassAdvised(HlaDeclarationManagementEventArgs^ e)	{
+void CallbackManager2::OnStartRegistrationForObjectClassAdvised(HlaDeclarationManagementEventArgs^ e)	{
 	this->StartRegistrationForObjectClassAdvised(this, e);
 };
 // OnStopRegistrationForObjectClassAdvised
-void CallbackManager::OnStopRegistrationForObjectClassAdvised(HlaDeclarationManagementEventArgs^ e)	{
+void CallbackManager2::OnStopRegistrationForObjectClassAdvised(HlaDeclarationManagementEventArgs^ e)	{
 	this->StopRegistrationForObjectClassAdvised(this, e);
 };
 // OnTurnInteractionsOffAdvised
-void CallbackManager::OnTurnInteractionsOffAdvised(HlaDeclarationManagementEventArgs^ e)	{
+void CallbackManager2::OnTurnInteractionsOffAdvised(HlaDeclarationManagementEventArgs^ e)	{
 	this->TurnInteractionsOffAdvised(this, e);
 };
 // OnTurnInteractionsOnAdvised
-void CallbackManager::OnTurnInteractionsOnAdvised(HlaDeclarationManagementEventArgs^ e)	{
+void CallbackManager2::OnTurnInteractionsOnAdvised(HlaDeclarationManagementEventArgs^ e)	{
 	this->TurnInteractionsOnAdvised(this, e);
 };
 // Object Discovered
-void CallbackManager::OnObjectDiscovered(HlaObjectEventArgs^ e)	{
+void CallbackManager2::OnObjectDiscovered(HlaObjectEventArgs^ e)	{
   this->ObjectDiscovered(this, e);
 };
 // Object Removed
-void CallbackManager::OnObjectRemoved(HlaObjectEventArgs^ e)	{
+void CallbackManager2::OnObjectRemoved(HlaObjectEventArgs^ e)	{
   this->ObjectRemoved(this, e);
 };
 // Object Attributes Reflected
-void CallbackManager::OnObjectAttributesReflected(HlaObjectEventArgs^ e)	
+void CallbackManager2::OnObjectAttributesReflected(HlaObjectEventArgs^ e)	
 {
   this->ObjectAttributesReflected(this, e);
 };
 // Interaction Received
-void CallbackManager::OnInteractionReceived(HlaInteractionEventArgs^ e)
+void CallbackManager2::OnInteractionReceived(HlaInteractionEventArgs^ e)
 {
   this->InteractionReceived(this, e);
 };
 // Attribute Value Update Requested
-void CallbackManager::OnAttributeValueUpdateRequested(HlaObjectEventArgs^ e)	
+void CallbackManager2::OnAttributeValueUpdateRequested(HlaObjectEventArgs^ e)	
 {
   this->AttributeValueUpdateRequested(this, e);
 }
 // TurnUpdatesOnForObjectInstanceAdvised
-void CallbackManager::OnTurnUpdatesOnForObjectInstanceAdvised(HlaObjectEventArgs^ e)
+void CallbackManager2::OnTurnUpdatesOnForObjectInstanceAdvised(HlaObjectEventArgs^ e)
 {
 	this->TurnUpdatesOnForObjectInstanceAdvised(this, e);
 }
 // TurnUpdatesOffForObjectInstanceAdvised
-void CallbackManager::OnTurnUpdatesOffForObjectInstanceAdvised(HlaObjectEventArgs^ e)
+void CallbackManager2::OnTurnUpdatesOffForObjectInstanceAdvised(HlaObjectEventArgs^ e)
 {
 	this->TurnUpdatesOffForObjectInstanceAdvised(this, e);
 }
 // OnAttributeOwnershipReleaseRequested
-void CallbackManager::OnAttributeOwnershipReleaseRequested(HlaOwnershipManagementEventArgs^ e)	
+void CallbackManager2::OnAttributeOwnershipReleaseRequested(HlaOwnershipManagementEventArgs^ e)	
 {
   this->AttributeOwnershipReleaseRequested(this, e);
 }
 // OnAttributeOwnershipInformed
-void CallbackManager::OnAttributeOwnershipInformed(HlaOwnershipManagementEventArgs^ e)	
+void CallbackManager2::OnAttributeOwnershipInformed(HlaOwnershipManagementEventArgs^ e)	
 {
   this->AttributeOwnershipInformed(this, e);
 }
 // OnAttributeOwnershipAcquisitionNotified
-void CallbackManager::OnAttributeOwnershipAcquisitionNotified(HlaOwnershipManagementEventArgs^ e)	
+void CallbackManager2::OnAttributeOwnershipAcquisitionNotified(HlaOwnershipManagementEventArgs^ e)	
 {
   this->AttributeOwnershipAcquisitionNotified(this, e);
 }
 // OnAttributeOwnershipDivestitureNotified
-void CallbackManager::OnAttributeOwnershipDivestitureNotified(HlaOwnershipManagementEventArgs^ e)	
+void CallbackManager2::OnAttributeOwnershipDivestitureNotified(HlaOwnershipManagementEventArgs^ e)	
 {
   this->AttributeOwnershipDivestitureNotified(this, e);
 }
 // OnAttributeOwnershipUnavailable
-void CallbackManager::OnAttributeOwnershipUnavailable(HlaOwnershipManagementEventArgs^ e)	
+void CallbackManager2::OnAttributeOwnershipUnavailable(HlaOwnershipManagementEventArgs^ e)	
 {
   this->AttributeOwnershipUnavailable(this, e);
 }
 // OnAttributeOwnershipAcquisitionCancellationConfirmed
-void CallbackManager::OnAttributeOwnershipAcquisitionCancellationConfirmed(HlaOwnershipManagementEventArgs^ e)	
+void CallbackManager2::OnAttributeOwnershipAcquisitionCancellationConfirmed(HlaOwnershipManagementEventArgs^ e)	
 {
   this->AttributeOwnershipAcquisitionCancellationConfirmed(this, e);
 }
 // OnAttributeOwnershipAssumptionRequested
-void CallbackManager::OnAttributeOwnershipAssumptionRequested(HlaOwnershipManagementEventArgs^ e)	
+void CallbackManager2::OnAttributeOwnershipAssumptionRequested(HlaOwnershipManagementEventArgs^ e)	
 {
   this->AttributeOwnershipAssumptionRequested(this, e);
 }
 // OnTimeConstrainedEnabled
-void CallbackManager::OnTimeConstrainedEnabled(HlaTimeManagementEventArgs^ e)
+void CallbackManager2::OnTimeConstrainedEnabled(HlaTimeManagementEventArgs^ e)
 {
 	this->TimeConstrainedEnabled(this, e);
 }
 // OnTimeRegulationEnabled
-void CallbackManager::OnTimeRegulationEnabled(HlaTimeManagementEventArgs^ e)
+void CallbackManager2::OnTimeRegulationEnabled(HlaTimeManagementEventArgs^ e)
 {
 	this->TimeRegulationEnabled(this, e);
 }
 // OnTimeAdvanceGrant
-void CallbackManager::OnTimeAdvanceGrant(HlaTimeManagementEventArgs^ e)
+void CallbackManager2::OnTimeAdvanceGrant(HlaTimeManagementEventArgs^ e)
 {
 	this->TimeAdvanceGrant(this, e);
 }
 // OnRequestRetraction
-void CallbackManager::OnRequestRetraction(HlaTimeManagementEventArgs^ e)
+void CallbackManager2::OnRequestRetraction(HlaTimeManagementEventArgs^ e)
 {
 	this->RequestRetraction(this, e);
 }
 
 //// Interaction Received
-//void CallbackManager::OnInteractionReceived(RTI::InteractionClassHandle theInteraction, const RTI::ParameterHandleValuePairSet& theParameters)	
+//void CallbackManager2::OnInteractionReceived(RTI::InteractionClassHandle theInteraction, const RTI::ParameterHandleValuePairSet& theParameters)	
 //{
 //	try{
 //		// Create Event Arguments

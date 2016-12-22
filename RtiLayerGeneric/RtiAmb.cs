@@ -20,6 +20,8 @@ along with this program.If not, see <http://www.gnu.org/licenses/>.
 */
 
 using System;
+using System.ComponentModel; // BindingList
+using System.Collections.Generic; // List
 
 namespace Racon.RtiLayer
 {
@@ -50,6 +52,7 @@ namespace Racon.RtiLayer
 
     #region Events
     // Events related to the federate-initiated services
+    public event EventHandler<RaconEventArgs> NoConnection;
     public event EventHandler<RaconEventArgs> FederationExecutionCreated;
     public event EventHandler<RaconEventArgs> FederationExecutionDestroyed;
     public event EventHandler<RaconEventArgs> FederateConnected;
@@ -63,6 +66,10 @@ namespace Racon.RtiLayer
     #endregion
 
     #region Triggers
+    protected void OnNotConnected(RaconEventArgs _val)
+    {
+      NoConnection(this, _val);
+    }
     protected void OnFederationExecutionCreated(RaconEventArgs _val)
     {
       FederationExecutionCreated(this, _val);
@@ -108,27 +115,56 @@ namespace Racon.RtiLayer
     #region Methods
 
     #region Fedaration Management
-    public abstract void connect(string str);
-    public abstract void disconnect();
-    public abstract void createFederation(string str, string str2);
-    public abstract void joinFederation(string str, string str2);
-    public abstract void resignFederation(int p1);
-    public abstract void destroyFederation(string str);
-    public abstract void requestFederationSave(string str);
-    public abstract void requestFederationSave(string str, double p1);
-    public abstract void federateSaveBegun();
-    public abstract void federateSaveComplete(bool p1);
-    public abstract void requestFederationRestore(string str);
-    public abstract void federateRestoreComplete(bool p1);
+    public abstract void connect(string localSettingsDesignator); // 4.2
+    public abstract void disconnect(); // 4.3
+    public abstract void createFederation(string str, string str2); // 4.5
+    public abstract void destroyFederation(string str); // 4.6
+    public abstract void listFederationExecutions(); // 4.7
+    public abstract uint joinFederation(string fedexName, string federateName);// 4.9
+    public abstract void resignFederation(int p1); // 4.10
+    public abstract void registerFederationSynchronizationPoint(string synchronizationPointLabel, string userSuppliedTag); // 4.11
+    public abstract void registerFederationSynchronizationPoint(string synchronizationPointLabel, string userSuppliedTag, List<uint> setOfJoinedFederateDesignators); // 4.11
+    public abstract void synchronizationPointAchieved(string synchronizationPointLabel, bool synchronizationSuccess = true); // 4.14
+    public abstract void requestFederationSave(string str); // 4.16
+    public abstract void requestFederationSave(string str, double p1); // 4.16
+    public abstract void federateSaveBegun(); // 4.18
+    public abstract void federateSaveComplete(bool p1); // 4.19
+    public abstract void requestFederationRestore(string str); // 4.24
+    public abstract void federateRestoreComplete(bool p1); // 4.28
     #endregion // Fedaration Management
 
     #region Declaration Management
+    public abstract void publishInteractionClass(HlaInteractionClass ic);
+    public abstract void publishObjectClass(HlaObjectClass oc, BindingList<HlaAttribute> list);
+    public abstract void subscribeInteractionClass(HlaInteractionClass ic);
+    public abstract bool subscribeObjectClass(HlaObjectClass oc, BindingList<HlaAttribute> list, Boolean p);
+    public abstract bool unsubscribeInteractionClass(HlaInteractionClass ic);
+    public abstract bool unsubscribeObjectClass(HlaObjectClass oc);
     #endregion // Declaration Management
 
     #region Object Management
+    public abstract bool deleteObjectInstance(HlaObject o);
+    public abstract EventRetractionHandle deleteObjectInstance(HlaObject o, double d);
+    public abstract bool registerObject(HlaObject o);
+    public abstract bool registerObject(HlaObject o, string s);
+    public abstract bool updateAttributeValues(HlaObject o);
+    public abstract EventRetractionHandle updateAttributeValues(HlaObject o, double d);
+    public abstract bool sendInteraction(HlaInteraction i);
+    public abstract EventRetractionHandle sendInteraction(HlaInteraction i, double d);
+    public abstract bool requestAttributeValueUpdate(HlaObjectClass o, List<HlaAttribute> l);
+    public abstract bool requestAttributeValueUpdate(HlaObject o, List<HlaAttribute> l);
     #endregion
 
     #region Ownership Management
+    public abstract bool attributeOwnershipAcquisitionIfAvailable(HlaObject o, RaconAttributeSet s);
+    public abstract bool attributeOwnershipAcquisition(HlaObject o, RaconAttributeSet s);
+    public abstract bool cancelAttributeOwnershipAcquisition(HlaObject o, RaconAttributeSet s);
+    public abstract bool queryAttributeOwnership(HlaObject o, HlaAttribute a);
+    public abstract bool attributeOwnershipReleaseResponse(HlaObject o, RaconAttributeSet s);
+    public abstract bool cancelNegotiatedAttributeOwnershipDivestiture(HlaObject o, RaconAttributeSet s);
+    public abstract bool isAttributeOwnedByFederate(HlaObject o, HlaAttribute a);
+    public abstract bool negotiatedAttributeOwnershipDivestiture(HlaObject o, RaconAttributeSet s);
+    public abstract bool unconditionalAttributeOwnershipDivestiture(HlaObject o, RaconAttributeSet s);
     #endregion
 
     #region Data Distribution Management
@@ -152,6 +188,7 @@ namespace Racon.RtiLayer
     public abstract double queryMinNextEventTime();
     public abstract bool timeAdvanceRequest(double p);
     public abstract bool timeAdvanceRequestAvailable(double p);
+    public abstract bool retract(EventRetractionHandle h) ;
     #endregion// Time Management
 
     #region Support Services
@@ -165,8 +202,12 @@ namespace Racon.RtiLayer
     public abstract bool enableInteractionRelevanceAdvisorySwitch();//10.39
     public abstract bool disableInteractionRelevanceAdvisorySwitch();//10.40
     public abstract void evokeCallback(double approximateMinimumTimeInSeconds);//10.41 
-    public abstract void evokeMultipleCallbacks (double approximateMinimumTimeInSeconds, double approximateMaximumTimeInSeconds);//10.42
+    public abstract void evokeMultipleCallbacks(double approximateMinimumTimeInSeconds, double approximateMaximumTimeInSeconds);//10.42
     public virtual uint getSpaceHandle(string p) { return 0; } // HLA13
+    public abstract void getClassHandleFromRti(HlaInteractionClass ic);
+    public abstract void getClassHandleFromRti(HlaObjectClass oc);
+    public abstract void getParameterHandlesFromRti(HlaInteractionClass ic);
+    public abstract void getAttributeHandlesFromRti(HlaObjectClass oc);
     #endregion// Support Services
 
     #endregion

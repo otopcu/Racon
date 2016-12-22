@@ -135,15 +135,16 @@ namespace Racon.RtiLayer
     {
       try
       {
+        _type data;
         // String
         if (typeof(_type) == typeof(string))
         {
-          return (_type)Convert.ChangeType(Marshal.PtrToStringAnsi(Value), typeof(_type));
+          data = (_type)Convert.ChangeType(Marshal.PtrToStringAnsi(Value), typeof(_type));
         }
         // DateTime
         else if (typeof(_type) == typeof(DateTime))
         {
-          return (_type)Convert.ChangeType(DateTime.Parse(Marshal.PtrToStringAnsi(Value)), typeof(_type));
+          data = (_type)Convert.ChangeType(DateTime.Parse(Marshal.PtrToStringAnsi(Value)), typeof(_type));
         }
         //// int/long
         //else if ((typeof(_type) == typeof(int)) || (typeof(_type) == typeof(long)))
@@ -162,8 +163,9 @@ namespace Racon.RtiLayer
         //return (_type)Convert.ChangeType(Marshal.PtrToStructure(Value, typeof(_type)), typeof(_type));
         {
           Type outputType = typeof(_type).IsEnum ? Enum.GetUnderlyingType(typeof(_type)) : typeof(_type);
-          return (_type)(Marshal.PtrToStructure(Value, outputType));
+          data = (_type)(Marshal.PtrToStructure(Value, outputType));
         }
+        return data;
       }
       catch (ArgumentException)
       {
@@ -178,6 +180,15 @@ namespace Racon.RtiLayer
 
     }
     #endregion
+
+    /// <summary>
+    /// Data Marshaling
+    /// String
+    /// </summary>
+    public void FreeIntPtrMemory()
+    {
+      Marshal.FreeHGlobal(Value);
+    }
 
   }
 }

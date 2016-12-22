@@ -21,9 +21,6 @@
     <ClCompile Include="Stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="FdAmb.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="FdAmb_Hla1516e.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -75,9 +72,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Helpers_Hla1516e.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\CallbackManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Helpers_Hla13.h">

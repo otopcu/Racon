@@ -45,7 +45,7 @@ namespace Racon.Federation
     /// 
     public CFederateStateEventArgs(FederateStates state)
 		{
-			this.FdState = state;
+			FdState = state;
 		}
 	};
 }

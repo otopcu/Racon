@@ -12,9 +12,9 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{BF7E0C2F-FB62-491B-AB11-77B9041F29E4}</ProjectGuid>
-    <RootNamespace>RTILayer</RootNamespace>
+    <RootNamespace>Racon.RtiLayer</RootNamespace>
     <Keyword>ManagedCProj</Keyword>
-    <ProjectName>RtiLayerNative</ProjectName>
+    <ProjectName>Racon.RtiLayer.Native</ProjectName>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -133,7 +133,6 @@
   <ItemGroup>
     <ClCompile Include="AssemblyInfo.cpp" />
     <ClCompile Include="FdAmb_Hla13.cpp" />
-    <ClCompile Include="FdAmb.cpp" />
     <ClCompile Include="FdAmb_Hla1516e.cpp" />
     <ClCompile Include="RtiAmb_Hla13.cpp" />
     <ClCompile Include="RtiAmb_Hla1516e.cpp" />
@@ -145,7 +144,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\FdAmb_Hla13.h" />
-    <ClInclude Include="include\CallbackManager.h" />
     <ClInclude Include="include\FdAmb_Hla1516e.h" />
     <ClInclude Include="include\Helpers_Hla1516e.h" />
     <ClInclude Include="include\resource.h" />
@@ -169,7 +167,7 @@
     <ResourceCompile Include="app.rc" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\RtiLayerGeneric\RtiLayerGeneric.csproj">
+    <ProjectReference Include="..\RtiLayerGeneric\Racon.RtiLayer.csproj">
       <Project>{bf7b1e1d-55eb-4581-8009-5e2757f9c8c6}</Project>
     </ProjectReference>
   </ItemGroup>

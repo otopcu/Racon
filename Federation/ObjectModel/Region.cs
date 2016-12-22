@@ -23,8 +23,9 @@ using System;
 using System.ComponentModel;
 using System.Windows.Forms;//MessageBox
 using System.Diagnostics.Contracts;
-
+// RACoN
 using Racon.RtiLayer;
+using Racon.RtiLayer.Native;
 
 namespace Racon.ObjectModel
 {

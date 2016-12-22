@@ -32,7 +32,9 @@ using System.ComponentModel;//BackgroundWorker
 using System.Diagnostics.Contracts;
 using System.Linq;//.ToList()
 using Racon.ObjectModel;
+// RACoN
 using Racon.RtiLayer;
+using Racon.RtiLayer.Native;
 using Racon.Logger;
 
 namespace Racon.Federation
@@ -70,7 +72,7 @@ namespace Racon.Federation
     /// <summary>
     /// The reference for internal RTI ambassador. This reference can be used to access internal RTI ambassador interface
     /// </summary>
-    protected Racon.RtiLayer.CRtiAmb RtiAmb
+    protected CRtiAmb RtiAmb
     {
       get { return _rtiAmb; }
     }
@@ -120,6 +122,7 @@ namespace Racon.Federation
         }
       }
     }
+    
     /// <summary>
     /// TraceLog dumbs the logger.Log
     /// </summary>
@@ -181,9 +184,14 @@ namespace Racon.Federation
     }
 
     /// <summary>
-    /// The federation execution that this federate will interact (e.g. create, join etc.)/>.
+    /// The federation execution that this federate will interact (e.g. create, join etc.).
     /// </summary>
     public CFederationExecution FederationExecution { get; set; }
+
+    /// <summary>
+    /// Federate handle.
+    /// </summary>
+    public ulong FederateHandle { get; set; }
 
     #endregion // Properties
 
@@ -255,6 +263,7 @@ namespace Racon.Federation
       // Subscribe to the Contract Failed Event for Pre- and post conditions
       Contract.ContractFailed += Contract_ContractFailed;
       // Subscribe to the HLA-specific service events (RACoN Events + RTI Events + Federate Events)
+      _rtiAmb.NoConnection += RtiAmb_NotConnected;
       _rtiAmb.FederateConnected += RtiAmb_FederateConnected;
       _rtiAmb.FederateDisconnected += RtiAmb_FederateDisconnected; ;
       _rtiAmb.FederateJoined += RtiAmb_FederateJoined;
@@ -266,6 +275,12 @@ namespace Racon.Federation
       _rtiAmb.HLAClassSubscribed += RtiAmb_HLAClassSubscribed;
       _rtiAmb.RTIEventOccured += RtiAmb_RTIEventOccured;
       // FM
+      ConnectionLost += FdAmb_ConnectionLost;
+      FederationExecutionsReported += FdAmb_FederationExecutionsReported;
+      SynchronizationPointRegistrationSucceeded += FdAmb_OnSynchronizationPointRegistrationConfirmedHandler;
+      SynchronizationPointRegistrationFailed += FdAmb_OnSynchronizationPointRegistrationFailedHandler;
+      SynchronizationPointAnnounced += FdAmb_SynchronizationPointAnnounced;
+      FederationSynchronized += FdAmb_FederationSynchronized;
       InitiateFederateSave += FdAmb_InitiateFederateSaveHandler;
       InitiateFederateRestore += FdAmb_InitiateFederateRestoreHandler;
       FederationRestorationRequestConfirmed += FdAmb_ConfirmFederationRestorationRequestHandler;
@@ -311,11 +326,55 @@ namespace Racon.Federation
     /// <summary>
     /// Federate ambassador callback
     /// </summary>
+    public virtual void FdAmb_ConnectionLost(object sender, HlaFederationManagementEventArgs data)
+    {
+      logger.Add(data.TraceMessage);
+      // In case of RTI crash - resign and disconnect
+      bool res = ResignFederationExecution();
+      if (res) Disconnect();
+    }
+    /// <summary>
+    /// Federate ambassador callback for Federation Executions Reported
+    /// </summary>
+    public virtual void FdAmb_FederationExecutionsReported(object sender, HlaFederationManagementEventArgs data)
+    {
+      logger.Add(data.TraceMessage);
+    }
+    /// <summary>
+    /// FdAmb_OnSynchronizationPointRegistrationConfirmedHandler
+    /// </summary>
+    public virtual void FdAmb_OnSynchronizationPointRegistrationConfirmedHandler(object sender, HlaFederationManagementEventArgs data)
+    {
+      logger.Add(data.TraceMessage);
+    }
+    /// <summary>
+    /// FdAmb_OnSynchronizationPointRegistrationFailedHandler
+    /// </summary>
+    public virtual void FdAmb_OnSynchronizationPointRegistrationFailedHandler(object sender, HlaFederationManagementEventArgs data)
+    {
+      logger.Add(data.TraceMessage);
+    }
+    /// <summary>
+    /// Federate ambassador callback. FdAmb_SynchronizationPointAnnounced.
+    /// </summary>
+    public virtual void FdAmb_SynchronizationPointAnnounced(object sender, HlaFederationManagementEventArgs data)
+    {
+      logger.Add(data.TraceMessage);
+    }
+    /// <summary>
+    /// Federate ambassador callback. FdAmb_FederationSynchronized
+    /// </summary>
+    public virtual void FdAmb_FederationSynchronized(object sender, HlaFederationManagementEventArgs data)
+    {
+      logger.Add(data.TraceMessage);
+    }
+    /// <summary>
+    /// Federate ambassador callback
+    /// </summary>
     public virtual void FdAmb_InitiateFederateSaveHandler(object sender, HlaFederationManagementEventArgs data)
     {
       logger.Add(data.TraceMessage);
     }
-
     /// <summary>
     /// Federate ambassador callback
     /// </summary>
@@ -562,6 +621,15 @@ namespace Racon.Federation
     /// <summary>
     /// RTI ambassador handler for RtiAmb_FederateConnected
     /// </summary>
+    private void RtiAmb_NotConnected(object sender, RaconEventArgs data)
+    {
+      logger.Add(data.TraceMessage);
+      FederateState = FederateStates.NOTCONNECTED;
+    }
+
+    /// <summary>
+    /// RTI ambassador handler for RtiAmb_FederateConnected
+    /// </summary>
     private void RtiAmb_FederateConnected(object sender, RaconEventArgs data)
     {
       logger.Add(data.TraceMessage);
@@ -618,7 +686,6 @@ namespace Racon.Federation
     /// </summary>
     public virtual void RtiAmb_ObjectRegistered(object sender, RaconEventArgs data)
     {
-
       logger.Add(data.TraceMessage);
     }
 
@@ -627,7 +694,6 @@ namespace Racon.Federation
     /// </summary>
     public virtual void RtiAmb_HLAClassPublished(object sender, RaconEventArgs data)
     {
-
       logger.Add(data.TraceMessage);
     }
 
@@ -636,7 +702,6 @@ namespace Racon.Federation
     /// </summary>
     public virtual void RtiAmb_HLAClassSubscribed(object sender, RaconEventArgs data)
     {
-
       logger.Add(data.TraceMessage);
     }
 
@@ -645,7 +710,6 @@ namespace Racon.Federation
     /// </summary>
     public virtual void RtiAmb_RTIEventOccured(object sender, RaconEventArgs data)
     {
-
       logger.Add(data.TraceMessage);
     }
     #endregion // RTIAmb Handlers
@@ -698,6 +762,24 @@ namespace Racon.Federation
         switch (AnEventInstance.EventType)
         {
           // FM
+          case RaconEventTypes.ConnectionLost:
+            OnConnectionLost((HlaFederationManagementEventArgs)AnEventInstance);
+            break;
+          case RaconEventTypes.FederationExecutionsReported:
+            OnFederationExecutionsReported((HlaFederationManagementEventArgs)AnEventInstance);
+            break;
+          case RaconEventTypes.SynchronizationPointRegistrationSucceeded:
+            OnSynchronizationPointRegistrationConfirmed((HlaFederationManagementEventArgs)AnEventInstance);
+            break;
+          case RaconEventTypes.synchronizationPointRegistrationFailed:
+            OnSynchronizationPointRegistrationFailed((HlaFederationManagementEventArgs)AnEventInstance);
+            break;
+          case RaconEventTypes.SynchronizationPointAnnounced:
+            OnSynchronizationPointAnnounced((HlaFederationManagementEventArgs)AnEventInstance);
+            break;
+          case RaconEventTypes.FederationSynchronized:
+            OnFederationSynchronized((HlaFederationManagementEventArgs)AnEventInstance);
+            break;
           case RaconEventTypes.InitiateFederateSave:
             OnInitiateFederateSave((HlaFederationManagementEventArgs)AnEventInstance);
             break;
@@ -705,7 +787,7 @@ namespace Racon.Federation
             OnInitiateFederateRestore((HlaFederationManagementEventArgs)AnEventInstance);
             break;
           case RaconEventTypes.FederationRestorationRequestConfirmed:
-            OnAcceptanceOfRequestFederationRestore((HlaFederationManagementEventArgs)AnEventInstance);
+            OnFederationRestorationRequestConfirmed((HlaFederationManagementEventArgs)AnEventInstance);
             break;
           case RaconEventTypes.FederationSaved:
             OnFederationSaved((HlaFederationManagementEventArgs)AnEventInstance);
@@ -743,7 +825,8 @@ namespace Racon.Federation
             OnInteractionReceived(interactionArgs);
             foreach (var obj in interactionArgs.Interaction.Parameters)
             {
-              FreeIntPtrMemory(obj.Value);
+              obj.FreeIntPtrMemory();
+              //FreeIntPtrMemory(obj.Value);
             }
             break;
           case RaconEventTypes.AttributeValueUpdateRequested:
@@ -755,7 +838,8 @@ namespace Racon.Federation
             OnObjectAttributesReflected(objectArgs);
             foreach (var obj in objectArgs.ObjectInstance.Attributes)
             {
-              FreeIntPtrMemory(obj.Value);
+              obj.FreeIntPtrMemory();
+              //FreeIntPtrMemory(obj.Value);
             }
             break;
           case RaconEventTypes.TurnUpdatesOnForObjectInstanceAdvised:
@@ -938,6 +1022,15 @@ namespace Racon.Federation
     }
 
     /// <summary>
+    /// (IEEE1516.1-2010 4.7) Requests a list of current federation executions
+    /// </summary>
+    virtual public void ListFederationExecutions()
+    {
+      if (FederateState.HasFlag(FederateStates.CONNECTED))
+        _rtiAmb.listFederationExecutions();
+    }
+
+    /// <summary>
     /// Joins a federation execution 
     /// </summary>
     /// <param name="fedexName">Name of the Federation Execution to be destroyed.</param>
@@ -957,7 +1050,7 @@ namespace Racon.Federation
       #endregion
 
       if (FederateState.HasFlag(FederateStates.NOTJOINED))
-        _rtiAmb.joinFederation(fedexName, federateName);
+        FederateHandle = _rtiAmb.joinFederation(fedexName, federateName);
       return FederateState.HasFlag(FederateStates.JOINED) ? true : false;
     }
 
@@ -998,7 +1091,7 @@ namespace Racon.Federation
     /// <returns>True if method call is succesfull.</returns>
     /// <remarks>This method resigns federation execution.
     /// </remarks>
-    virtual public bool ResignFederationExecution(ResignAction action)
+    virtual public bool ResignFederationExecution(ResignAction action = ResignAction.NO_ACTION)
     {
       #region Contracts
       // Preconditions
@@ -1034,6 +1127,36 @@ namespace Racon.Federation
       return FederationExecutionState.HasFlag(FederationExecutionStates.FEDEX_DOESNOTEXIST) ? true : false;
     }
 
+    /// <summary>
+    /// This method shall be used to initiate the registration of an upcoming federation synchronization point label.
+    /// </summary>
+    /// <param name="label">Synchronization point label</param>
+    /// <param name="tag">User-supplied tag</param>
+    virtual public void RegisterFederationSynchronizationPoint(string label, string tag = "")
+    {
+      _rtiAmb.registerFederationSynchronizationPoint(label, tag);
+    }
+
+    /// <summary>
+    /// This method shall be used to initiate the registration of an upcoming federation synchronization point label.
+    /// </summary>
+    /// <param name="label">Synchronization point label</param>
+    /// <param name="tag">User-supplied tag</param>
+    /// <param name="federates">set of joined federate designators</param>
+    virtual public void RegisterFederationSynchronizationPoint(string label, string tag, List<uint> federates)
+    {
+      _rtiAmb.registerFederationSynchronizationPoint(label, tag, federates);
+    }
+
+    /// <summary>
+    /// This method shall inform the RTI that the joined federate has reached the specified synchronization point.
+    /// </summary>
+    /// <param name="label">Synchronization point label</param>
+    /// <param name="result">Optional synchronization-success indicator</param>
+    virtual public void SynchronizationPointAchieved(string label, bool result = true)
+    {
+      _rtiAmb.synchronizationPointAchieved(label, result);
+    }
 
     /// <summary>
     /// This method requests a federation save as soon as possible supplied with a string associated to a particular save.
@@ -1051,7 +1174,7 @@ namespace Racon.Federation
     /// <param name="label">String label</param>
     /// <param name="time">time</param>
     /// <returns>True if method call is succesfull.</returns>
-    virtual public void RequestFederationSave(string label, Double time)
+    virtual public void RequestFederationSave(string label, double time)
     {
       _rtiAmb.requestFederationSave(label, time);
     }
@@ -1520,12 +1643,12 @@ namespace Racon.Federation
     /// </remarks>
     virtual public bool RequestAttributeValueUpdate(HlaObjectClass theClass)
     {
-      List<HlaAttribute> attributes = new List<HlaAttribute>();
-      foreach (var attribute in theClass.Attributes)
-      {
-        attributes.Add(attribute);
-      }
-      if (_rtiAmb.requestAttributeValueUpdate(theClass, attributes)) return true;
+      //List<HlaAttribute> attributes = new List<HlaAttribute>();
+      //foreach (var attribute in theClass.Attributes)
+      //{
+      //  attributes.Add(attribute);
+      //}
+      if (_rtiAmb.requestAttributeValueUpdate(theClass, theClass.Attributes.ToList())) return true;
       else return false;
     }
     /// <summary>
@@ -1562,7 +1685,14 @@ namespace Racon.Federation
       //HlaObjectClass oc = _som.OCList.SingleOrDefault(p => p.Handle == theObject.ClassHandle); // returns null if not found
       bool res = false;
       //if (oc != null)
-      res = RequestAttributeValueUpdate(theObject, theObject.Type.Attributes.ToList());
+      try
+      {
+        res = RequestAttributeValueUpdate(theObject, theObject.Type.Attributes.ToList()); // if user forgets to set type of the object, then an exception generated
+      }
+      catch (Exception e)
+      {
+        logger.Add("When requesting attribute value, the object type for (" + theObject.Name + ") is not set. " + e.Message, LogLevel.WARN);
+      }
       return res;
     }
     /// <summary>

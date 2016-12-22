@@ -26,13 +26,14 @@ along with this program.If not, see <http://www.gnu.org/licenses/>.
 #include "RTI/time/HLAfloat64Time.h"
 #include "RtiAmb_OpenRti_1516e.h"
 #include "Helpers_Hla1516e.h"
-//#include <assert.h>
 
-using namespace Racon::RtiLayer;
 using namespace rti1516e;
 using namespace System;
 using namespace System::Runtime::InteropServices;// For Marshalling
 using namespace System::Threading; // for sleep
+// Racon
+using namespace Racon::RtiLayer;
+using namespace Racon::RtiLayer::Native;
 
 #pragma region Constructor
 RtiAmb_OpenRti_1516e::RtiAmb_OpenRti_1516e(CallbackManager^ eventManager) : RtiAmb_Hla1516e(eventManager) {
@@ -46,67 +47,10 @@ RtiAmb_OpenRti_1516e::RtiAmb_OpenRti_1516e(CallbackManager^ eventManager) : RtiA
 #pragma endregion			
 
 #pragma region Federation Management
-// Join Federation
-void RtiAmb_OpenRti_1516e::joinFederation(String ^fedexec, String ^fdName) {
-  bool joined = false;
-  int numTries = 0;
-  while ((numTries++ < 20) && !joined) {
-    try {
-      pin_ptr<const wchar_t> fedx = PtrToStringChars(fedexec);
-      pin_ptr<const wchar_t> fd = PtrToStringChars(fdName);
-
-      rti1516e::FederateHandle federateHandle = rti->joinFederationExecution(fd, L"Federate Type (Not Implemented)", fedx);
-      joined = true;
-      String^ handle = gcnew String(federateHandle.toString().c_str());
-      String^ msg = "Federate joined to the federation execution (" + fedexec + "). Federate handle: " + Handle2Long(federateHandle).ToString();
-      this->OnFederateJoined(gcnew RaconEventArgs(msg));
-    }
-#pragma region exceptions
-    catch (CouldNotCreateLogicalTimeFactory& e) {
-      String^ msg = "MSG-(CouldNotCreateLogicalTimeFactory - joinFederation):" + Environment::NewLine + " Reason: " + gcnew String(e.what().c_str()) + Environment::NewLine;
-      this->OnRTIEventOccured(gcnew RaconEventArgs(msg));
-    }
-    catch (FederationExecutionDoesNotExist& e) {
-      MessageBox::Show("MSG-(FederationExecutionDoesNotExist - joinFederation):" + Environment::NewLine + "Federation Execution does not exist. Please, restart the federate. Reason: " + gcnew String(e.what().c_str()) + Environment::NewLine, "RtiAmb_OpenRti_1516e", MessageBoxButtons::OK, MessageBoxIcon::Warning);
-    }
-    catch (ErrorReadingFDD& e) {
-      MessageBox::Show("MSG-(ErrorReadingFED - joinFederation):" + Environment::NewLine + "Invalid FOM Module. Reason: " + gcnew String(e.what().c_str()) + Environment::NewLine, "RtiAmb_OpenRti_1516e", MessageBoxButtons::OK, MessageBoxIcon::Warning);
-    }
-    catch (InconsistentFDD& e) {
-      MessageBox::Show("MSG-(InconsistentFDD - joinFederation):" + Environment::NewLine + "Inconsistent FOM Module. Reason: " + gcnew String(e.what().c_str()) + Environment::NewLine, "RtiAmb_OpenRti_1516e", MessageBoxButtons::OK, MessageBoxIcon::Warning);
-    }
-    catch (CouldNotOpenFDD& e) {
-      MessageBox::Show("MSG-(CouldNotOpenFDD - joinFederation):" + Environment::NewLine + "Federate cannot open the FED file. Either the file does not exist or there exists an error in the file name or path provided. Please, check that FED file exists and its path is correct. Reason: " + gcnew String(e.what().c_str()) + Environment::NewLine, "RtiAmb_OpenRti_1516e", MessageBoxButtons::OK, MessageBoxIcon::Warning);
-    }
-    catch (SaveInProgress& e) {
-      String^ msg = "MSG-(SaveInProgress - joinFederation):" + Environment::NewLine + " Reason: " + gcnew String(e.what().c_str()) + Environment::NewLine;
-      this->OnRTIEventOccured(gcnew RaconEventArgs(msg));
-    }
-    catch (RestoreInProgress& e) {
-      String^ msg = "MSG-(RestoreInProgress - joinFederation):" + Environment::NewLine + " Reason: " + gcnew String(e.what().c_str()) + Environment::NewLine;
-      this->OnRTIEventOccured(gcnew RaconEventArgs(msg));
-    }
-    catch (FederateAlreadyExecutionMember& e) {
-      MessageBox::Show("MSG-(FederateAlreadyExecutionMember - joinFederation):" + Environment::NewLine + "Federate already is an federation execution member." + Environment::NewLine, "RtiAmb_OpenRti_1516e", MessageBoxButtons::OK, MessageBoxIcon::Warning);
-    }
-    catch (NotConnected& e) {
-      String^ msg = "MSG-(NotConnected - joinFederation):" + Environment::NewLine + " Reason: " + gcnew String(e.what().c_str()) + Environment::NewLine;
-      this->OnRTIEventOccured(gcnew RaconEventArgs(msg));
-    }
-    catch (RTIinternalError& e) {
-      MessageBox::Show("MSG-(RTIinternalError - joinFederation):" + Environment::NewLine + gcnew String(e.what().c_str()) + Environment::NewLine, "RtiAmb_OpenRti_1516e", MessageBoxButtons::OK, MessageBoxIcon::Error);
-    }
-    catch (System::Exception^ e) {
-      MessageBox::Show("MSG-(GeneralException - joinFederation):" + Environment::NewLine + e->ToString() + Environment::NewLine, "RtiAmb_OpenRti_1516e", MessageBoxButtons::OK, MessageBoxIcon::Warning);
-    }
-#pragma endregion
-  } // end of while
-};
 #pragma endregion	// Federation Management
 
 #pragma region Declaration Management
 #pragma endregion	// Declaration Management
-
 
 #pragma region Object Management
 

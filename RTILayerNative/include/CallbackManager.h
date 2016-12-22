@@ -31,11 +31,11 @@ using namespace Racon::RtiLayer;
 namespace Racon
 {
 	namespace RtiLayer {
-		public ref class CallbackManager
+		public ref class CallbackManager2
 		{
 			// Constructor
 		public:
-			CallbackManager();
+			CallbackManager2();
 			// Custom Event Handlers - Delegates (function pointers)
 #pragma region Delegates
 		public:
@@ -46,12 +46,16 @@ namespace Racon
 		public:
 			// Events related to the RTI-initiated services
 			// FM Events
-			virtual event EventHandler<HlaFederationManagementEventArgs^>^ InitiateFederateSave;
-			virtual event EventHandler<HlaFederationManagementEventArgs^>^ InitiateFederateRestore;
-			virtual event EventHandler<HlaFederationManagementEventArgs^>^ FederationRestorationRequestConfirmed;
-			virtual event EventHandler<HlaFederationManagementEventArgs^>^ FederationSaved;
-			virtual event EventHandler<HlaFederationManagementEventArgs^>^ FederationRestored;
-			virtual event EventHandler<HlaFederationManagementEventArgs^>^ FederationRestoreBegun;
+			virtual event EventHandler<HlaFederationManagementEventArgs^>^ ConnectionLost; // 4.4
+			virtual event EventHandler<HlaFederationManagementEventArgs^>^ SynchronizationPointRegistrationConfirmed; // 4.12
+			virtual event EventHandler<HlaFederationManagementEventArgs^>^ SynchronizationPointAnnounced; // 4.13
+			virtual event EventHandler<HlaFederationManagementEventArgs^>^ FederationSynchronized; // 4.15
+			virtual event EventHandler<HlaFederationManagementEventArgs^>^ InitiateFederateSave; // 4.17
+			virtual event EventHandler<HlaFederationManagementEventArgs^>^ FederationSaved; // 4.20
+			virtual event EventHandler<HlaFederationManagementEventArgs^>^ FederationRestorationRequestConfirmed; // 4.25
+			virtual event EventHandler<HlaFederationManagementEventArgs^>^ FederationRestoreBegun; // 4.26
+			virtual event EventHandler<HlaFederationManagementEventArgs^>^ InitiateFederateRestore; // 4.27
+			virtual event EventHandler<HlaFederationManagementEventArgs^>^ FederationRestored; // 4.29
 			// DM Events
 			virtual event EventHandler<HlaDeclarationManagementEventArgs^>^ StartRegistrationForObjectClassAdvised;
 			virtual event EventHandler<HlaDeclarationManagementEventArgs^>^ StopRegistrationForObjectClassAdvised;
@@ -87,9 +91,13 @@ namespace Racon
 #pragma region Triggers
 		protected:
 			// FM
+			virtual void OnConnectionLost(HlaFederationManagementEventArgs^);
+			virtual void OnSynchronizationPointRegistrationConfirmed(HlaFederationManagementEventArgs^);
+			virtual void OnSynchronizationPointAnnounced(HlaFederationManagementEventArgs^);
+			virtual void OnFederationSynchronized(HlaFederationManagementEventArgs^);
 			virtual void OnInitiateFederateSave(HlaFederationManagementEventArgs^);
 			virtual void OnInitiateFederateRestore(HlaFederationManagementEventArgs^);
-			virtual void OnAcceptanceOfRequestFederationRestore(HlaFederationManagementEventArgs^);
+			virtual void OnFederationRestorationRequestConfirmed(HlaFederationManagementEventArgs^);
 			virtual void OnFederationSaved(HlaFederationManagementEventArgs^);
 			virtual void OnFederationRestored(HlaFederationManagementEventArgs^);
 			virtual void OnFederationRestoreBegun(HlaFederationManagementEventArgs^);

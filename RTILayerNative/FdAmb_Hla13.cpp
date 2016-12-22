@@ -22,9 +22,10 @@ along with this program.If not, see <http://www.gnu.org/licenses/>.
 #include "StdAfx.h"
 #include "FdAmb_Hla13.h"
 #include "RtiAmb.h"
-#include "CallbackManager.h"
 
+// Racon
 using namespace Racon::RtiLayer;
+using namespace Racon::RtiLayer::Native;
 
 #pragma region Constructors
 FdAmb_Hla13::FdAmb_Hla13(CallbackManager ^_parent){
@@ -33,6 +34,88 @@ FdAmb_Hla13::FdAmb_Hla13(CallbackManager ^_parent){
 #pragma endregion	// Constructors		
 
 #pragma region Federation Management Services
+
+
+void FdAmb_Hla13::synchronizationPointRegistrationSucceeded(const char * label)
+throw (RTI::FederateInternalError) {
+	try {
+		// Create Event Arguments
+		HlaFederationManagementEventArgs ^args = gcnew HlaFederationManagementEventArgs();
+		args->Label = gcnew String(label);
+		args->TraceMessage = "<< Synchronization point registration is succesfull. Label: " + args->Label;
+		args->EventType = RaconEventTypes::SynchronizationPointRegistrationSucceeded;
+		wrapper->FdAmbEventQueue->Enqueue(args);// Add to the Event Queue
+#pragma region exceptions
+	}
+	catch (RTI::FederateInternalError& e) {
+		MessageBox::Show("MSG-(FederateInternalError - synchronizationPointRegistrationSucceeded):" + Environment::NewLine + gcnew String(e._reason) + Environment::NewLine, "FdAmb_Hla13", MessageBoxButtons::OK, MessageBoxIcon::Error);
+	}
+	catch (System::Exception^ e) {
+		MessageBox::Show("MSG-(GeneralException - synchronizationPointRegistrationSucceeded):" + Environment::NewLine + e->ToString() + Environment::NewLine, "FdAmb_Hla13", MessageBoxButtons::OK, MessageBoxIcon::Warning);
+	}
+#pragma endregion
+};
+
+void FdAmb_Hla13::synchronizationPointRegistrationFailed(const char *  label)
+	throw (RTI::FederateInternalError) {
+	try {
+		// Create Event Arguments
+		HlaFederationManagementEventArgs ^args = gcnew HlaFederationManagementEventArgs();
+		args->Label = gcnew String(label);
+		args->TraceMessage = "<< Synchronization point registration is failed. Label: " + args->Label;
+		args->EventType = RaconEventTypes::synchronizationPointRegistrationFailed;
+		wrapper->FdAmbEventQueue->Enqueue(args); // Add to the Event Queue
+
+#pragma region exceptions
+	}
+	catch (RTI::FederateInternalError& e) {
+		MessageBox::Show("MSG-(FederateInternalError - synchronizationPointRegistrationFailed):" + Environment::NewLine + gcnew String(e._reason) + Environment::NewLine, "FdAmb_Hla13", MessageBoxButtons::OK, MessageBoxIcon::Error);
+	}
+	catch (System::Exception^ e) {
+		MessageBox::Show("MSG-(GeneralException - synchronizationPointRegistrationFailed):" + Environment::NewLine + e->ToString() + Environment::NewLine, "FdAmb_Hla13", MessageBoxButtons::OK, MessageBoxIcon::Warning);
+	}
+#pragma endregion
+};
+
+void FdAmb_Hla13::announceSynchronizationPoint(const char * label, const char * theUserSuppliedTag)
+throw (RTI::FederateInternalError) {
+	try {
+		HlaFederationManagementEventArgs ^args = gcnew HlaFederationManagementEventArgs();
+		args->Label = gcnew String(label);
+		args->Tag = gcnew String(theUserSuppliedTag);
+		args->TraceMessage = "<< Synchronization point announced. Label: " + args->Label + ". Tag: " + args->Tag;
+		args->EventType = RaconEventTypes::SynchronizationPointAnnounced;
+		wrapper->FdAmbEventQueue->Enqueue(args);// Add to the Event Queue
+#pragma region exceptions
+	}
+	catch (RTI::FederateInternalError& e) {
+		MessageBox::Show("MSG-(FederateInternalError - announceSynchronizationPoint):" + Environment::NewLine + gcnew String(e._reason) + Environment::NewLine, "FdAmb_Hla13", MessageBoxButtons::OK, MessageBoxIcon::Error);
+	}
+	catch (System::Exception^ e) {
+		MessageBox::Show("MSG-(GeneralException - announceSynchronizationPoint):" + Environment::NewLine + e->ToString() + Environment::NewLine, "FdAmb_Hla13", MessageBoxButtons::OK, MessageBoxIcon::Warning);
+	}
+#pragma endregion
+};
+
+void FdAmb_Hla13::federationSynchronized(const char * label)
+throw (RTI::FederateInternalError) {
+	try {
+		HlaFederationManagementEventArgs ^args = gcnew HlaFederationManagementEventArgs();
+		args->Label = gcnew String(label);
+		args->TraceMessage = "<< Federation is synchronized. Label: " + args->Label;
+		args->EventType = RaconEventTypes::FederationSynchronized;
+		// Add to the Event Queue
+		wrapper->FdAmbEventQueue->Enqueue(args);
+#pragma region exceptions
+	}
+	catch (RTI::FederateInternalError& e) {
+		MessageBox::Show("MSG-(FederateInternalError - federationSynchronized):" + Environment::NewLine + gcnew String(e._reason) + Environment::NewLine, "FdAmb_Hla13", MessageBoxButtons::OK, MessageBoxIcon::Error);
+	}
+	catch (System::Exception^ e) {
+		MessageBox::Show("MSG-(GeneralException - federationSynchronized):" + Environment::NewLine + e->ToString() + Environment::NewLine, "FdAmb_Hla13", MessageBoxButtons::OK, MessageBoxIcon::Warning);
+	}
+#pragma endregion
+};
 
 void FdAmb_Hla13::initiateFederateSave (const char *label)
 	throw (RTI::UnableToPerformSave, RTI::FederateInternalError) {
@@ -52,6 +135,7 @@ void FdAmb_Hla13::initiateFederateSave (const char *label)
 			MessageBox::Show("MSG-(initiateFederateSave):" + Environment::NewLine +  Environment::NewLine, "FdAmb_HLA13", MessageBoxButtons::OK, MessageBoxIcon::Warning);
 		}
 }
+
 void FdAmb_Hla13::federationSaved ()
 	throw (RTI::FederateInternalError) {
 		try{

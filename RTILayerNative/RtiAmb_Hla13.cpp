@@ -27,6 +27,9 @@ using namespace System;
 using namespace System::Runtime::InteropServices;// For Marshalling
 using namespace System::Windows::Forms;
 using namespace System::Threading; // for sleep
+// Racon
+using namespace Racon::RtiLayer;
+using namespace Racon::RtiLayer::Native;
 
 // Constructor
 #pragma region Constructor
@@ -79,8 +82,21 @@ void RtiAmb_Hla13::createFederation(String ^fedexec, String ^fdd) {
   }
 };
 
+// 4.7 - listFederationExecutions //not supported in HLA 1.3 specification
+void RtiAmb_Hla13::listFederationExecutions() {
+	try {
+		String^ msg = "listFederationExecutions() call is not supported in HLA 1.3 specification.";
+		this->OnRTIEventOccured(gcnew RaconEventArgs(msg));
+	}
+#pragma region exceptions
+	catch (System::Exception^ e) {
+		MessageBox::Show("MSG-(GeneralException - listFederationExecutions):" + Environment::NewLine + e->ToString() + Environment::NewLine, "RtiAmb_Hla1516e", MessageBoxButtons::OK, MessageBoxIcon::Warning);
+	}
+#pragma endregion
+};
+
 // Join Federation
-void RtiAmb_Hla13::joinFederation(String ^fedexec, String ^fdName) {
+unsigned int RtiAmb_Hla13::joinFederation(String ^fedexec, String ^fdName) {
   bool joined = false;
   int numTries = 0;
   while ((numTries++ < 20) && !joined) {
@@ -89,6 +105,7 @@ void RtiAmb_Hla13::joinFederation(String ^fedexec, String ^fdName) {
       joined = true;
       String^ msg = "Federate joined to the federation execution. Federate handle: " + federateHandle;
       this->OnFederateJoined(gcnew RaconEventArgs(msg));
+			return federateHandle;
     }
     catch (RTI::FederateAlreadyExecutionMember&) {
       MessageBox::Show("MSG-(FederateAlreadyExecutionMember - joinFederation):" + Environment::NewLine + "Federate already is an federation execution member." + Environment::NewLine, "RTIAmbassador-HLA13", MessageBoxButtons::OK, MessageBoxIcon::Warning);
@@ -163,6 +180,115 @@ void RtiAmb_Hla13::destroyFederation(String ^fedexec) {
   catch (Exception^ e) {
     MessageBox::Show("MSG-(GeneralException - destroyFederation):" + Environment::NewLine + e->ToString() + Environment::NewLine, "RTIAmbassador-HLA13", MessageBoxButtons::OK, MessageBoxIcon::Warning);
   }
+};
+
+// 4.11 - registerFederationSynchronizationPoint
+void RtiAmb_Hla13::registerFederationSynchronizationPoint(String^ synchronizationPointLabel, String^ userSuppliedTag) {
+	try {
+		rti->registerFederationSynchronizationPoint((char*)Marshal::StringToHGlobalAnsi(synchronizationPointLabel).ToPointer(), (char*)Marshal::StringToHGlobalAnsi(userSuppliedTag).ToPointer());
+		String^ msg = "Federate requested a register of a federation synchronization point. Label: " + synchronizationPointLabel + ". Tag: " + userSuppliedTag;
+		this->OnRTIEventOccured(gcnew RaconEventArgs(msg));
+	}
+#pragma region exceptions
+	catch (RTI::FederateNotExecutionMember& e) {
+		String^ msg = "MSG-(FederateNotExecutionMember - registerFederationSynchronizationPoint):" + Environment::NewLine + " Reason: " + gcnew String(e._reason) + Environment::NewLine;
+		this->OnRTIEventOccured(gcnew RaconEventArgs(msg));
+	}
+	catch (RTI::ConcurrentAccessAttempted& e) {
+		String^ msg = "MSG-(ConcurrentAccessAttempted - registerFederationSynchronizationPoint):" + Environment::NewLine + " Reason: " + gcnew String(e._reason) + Environment::NewLine;
+		this->OnRTIEventOccured(gcnew RaconEventArgs(msg));
+	}
+	catch (RTI::SaveInProgress& e) {
+		String^ msg = "MSG-(SaveInProgress - registerFederationSynchronizationPoint):" + Environment::NewLine + " Reason: " + gcnew String(e._reason) + Environment::NewLine;
+		this->OnRTIEventOccured(gcnew RaconEventArgs(msg));
+	}
+	catch (RTI::RestoreInProgress& e) {
+		String^ msg = "MSG-(RestoreInProgress - registerFederationSynchronizationPoint):" + Environment::NewLine + " Reason: " + gcnew String(e._reason) + Environment::NewLine;
+		this->OnRTIEventOccured(gcnew RaconEventArgs(msg));
+	}
+	catch (RTI::RTIinternalError& e) {
+		MessageBox::Show("MSG-(RTIinternalError - registerFederationSynchronizationPoint):" + Environment::NewLine + gcnew String(e._reason) + Environment::NewLine, "RtiAmb_Hla13", MessageBoxButtons::OK, MessageBoxIcon::Error);
+	}
+	catch (System::Exception^ e) {
+		MessageBox::Show("MSG-(GeneralException - registerFederationSynchronizationPoint):" + Environment::NewLine + e->ToString() + Environment::NewLine, "RtiAmb_Hla13", MessageBoxButtons::OK, MessageBoxIcon::Warning);
+	}
+#pragma endregion
+};
+
+// 4.11 - registerFederationSynchronizationPoint with a set of federates
+void RtiAmb_Hla13::registerFederationSynchronizationPoint(String^ synchronizationPointLabel, String^ userSuppliedTag, List<unsigned int>^ setOfJoinedFederateDesignators) {
+	try {
+		RTI::FederateHandleSet* federates = RTI::FederateHandleSetFactory::create(setOfJoinedFederateDesignators->Count);
+
+		for (int i = 0; i < setOfJoinedFederateDesignators->Count; i++) {
+			federates->add(setOfJoinedFederateDesignators[i]);
+		}
+
+		rti->registerFederationSynchronizationPoint((char*)Marshal::StringToHGlobalAnsi(synchronizationPointLabel).ToPointer(), (char*)Marshal::StringToHGlobalAnsi(userSuppliedTag).ToPointer(), *federates);
+		String^ msg = "Federate requested a register of a federation synchronization point. Label: " + synchronizationPointLabel + ". Tag: " + userSuppliedTag;
+		this->OnRTIEventOccured(gcnew RaconEventArgs(msg));
+	}
+#pragma region exceptions
+	catch (RTI::FederateNotExecutionMember& e) {
+		String^ msg = "MSG-(FederateNotExecutionMember - registerFederationSynchronizationPoint):" + Environment::NewLine + " Reason: " + gcnew String(e._reason) + Environment::NewLine;
+		this->OnRTIEventOccured(gcnew RaconEventArgs(msg));
+	}
+	catch (RTI::ConcurrentAccessAttempted& e) {
+		String^ msg = "MSG-(ConcurrentAccessAttempted - registerFederationSynchronizationPoint):" + Environment::NewLine + " Reason: " + gcnew String(e._reason) + Environment::NewLine;
+		this->OnRTIEventOccured(gcnew RaconEventArgs(msg));
+	}
+	catch (RTI::SaveInProgress& e) {
+		String^ msg = "MSG-(SaveInProgress - registerFederationSynchronizationPoint):" + Environment::NewLine + " Reason: " + gcnew String(e._reason) + Environment::NewLine;
+		this->OnRTIEventOccured(gcnew RaconEventArgs(msg));
+	}
+	catch (RTI::RestoreInProgress& e) {
+		String^ msg = "MSG-(RestoreInProgress - registerFederationSynchronizationPoint):" + Environment::NewLine + " Reason: " + gcnew String(e._reason) + Environment::NewLine;
+		this->OnRTIEventOccured(gcnew RaconEventArgs(msg));
+	}
+	catch (RTI::RTIinternalError& e) {
+		MessageBox::Show("MSG-(RTIinternalError - registerFederationSynchronizationPoint):" + Environment::NewLine + gcnew String(e._reason) + Environment::NewLine, "RtiAmb_Hla13", MessageBoxButtons::OK, MessageBoxIcon::Error);
+	}
+	catch (System::Exception^ e) {
+		MessageBox::Show("MSG-(GeneralException - registerFederationSynchronizationPoint):" + Environment::NewLine + e->ToString() + Environment::NewLine, "RtiAmb_Hla13", MessageBoxButtons::OK, MessageBoxIcon::Warning);
+	}
+#pragma endregion
+};
+
+// 4.14 - synchronizationPointAchieved
+void RtiAmb_Hla13::synchronizationPointAchieved(String^ synchronizationPointLabel, bool synchronizationSuccess) {
+	try {
+		rti->synchronizationPointAchieved((char*)Marshal::StringToHGlobalAnsi(synchronizationPointLabel).ToPointer());
+		String^ msg = "Federation synchronization point is achieved. Label: " + synchronizationPointLabel ;
+		this->OnRTIEventOccured(gcnew RaconEventArgs(msg));
+	}
+#pragma region exceptions
+	catch (RTI::SynchronizationPointLabelWasNotAnnounced& e) {
+		String^ msg = "MSG-(SynchronizationPointLabelWasNotAnnounced - synchronizationPointAchieved):" + Environment::NewLine + " Reason: " + gcnew String(e._reason) + Environment::NewLine;
+		this->OnRTIEventOccured(gcnew RaconEventArgs(msg));
+	}
+	catch (RTI::FederateNotExecutionMember& e) {
+		String^ msg = "MSG-(FederateNotExecutionMember - synchronizationPointAchieved):" + Environment::NewLine + " Reason: " + gcnew String(e._reason) + Environment::NewLine;
+		this->OnRTIEventOccured(gcnew RaconEventArgs(msg));
+	}
+	catch (RTI::ConcurrentAccessAttempted& e) {
+		String^ msg = "MSG-(ConcurrentAccessAttempted - synchronizationPointAchieved):" + Environment::NewLine + " Reason: " + gcnew String(e._reason) + Environment::NewLine;
+		this->OnRTIEventOccured(gcnew RaconEventArgs(msg));
+	}
+	catch (RTI::SaveInProgress& e) {
+		String^ msg = "MSG-(SaveInProgress - synchronizationPointAchieved):" + Environment::NewLine + " Reason: " + gcnew String(e._reason) + Environment::NewLine;
+		this->OnRTIEventOccured(gcnew RaconEventArgs(msg));
+	}
+	catch (RTI::RestoreInProgress& e) {
+		String^ msg = "MSG-(RestoreInProgress - synchronizationPointAchieved):" + Environment::NewLine + " Reason: " + gcnew String(e._reason) + Environment::NewLine;
+		this->OnRTIEventOccured(gcnew RaconEventArgs(msg));
+	}
+	catch (RTI::RTIinternalError& e) {
+		MessageBox::Show("MSG-(RTIinternalError - synchronizationPointAchieved):" + Environment::NewLine + gcnew String(e._reason) + Environment::NewLine, "RtiAmb_Hla13", MessageBoxButtons::OK, MessageBoxIcon::Error);
+	}
+	catch (System::Exception^ e) {
+		MessageBox::Show("MSG-(GeneralException - synchronizationPointAchieved):" + Environment::NewLine + e->ToString() + Environment::NewLine, "RtiAmb_Hla13", MessageBoxButtons::OK, MessageBoxIcon::Warning);
+	}
+#pragma endregion
 };
 
 // Request Federation Save - save as soon as possible

@@ -26,61 +26,63 @@ along with this program.If not, see <http://www.gnu.org/licenses/>.
 namespace Racon
 {
 	namespace RtiLayer {
-		public ref class RtiAmb_Dmso_Hla13 : public RtiAmb_Hla13 {
+		namespace Native {
+			public ref class RtiAmb_Dmso_Hla13 : public RtiAmb_Hla13 {
 
 #pragma region Fields
-		private:
+			private:
 #pragma endregion			
 
 #pragma region Ctor/Dtor
-		public:
-			RtiAmb_Dmso_Hla13(CallbackManager^ eventManager) : RtiAmb_Hla13(eventManager) {
+			public:
+				RtiAmb_Dmso_Hla13(CallbackManager^ eventManager) : RtiAmb_Hla13(eventManager) {
 					RtiVersion = "DMSO RTI 1.3NG v6";
-			};
+				};
 
-			~RtiAmb_Dmso_Hla13()
-			{
-				rti->~RTIambassador();
-				_nativeFdAmb->~FdAmb_Hla13();
-			};
+				~RtiAmb_Dmso_Hla13()
+				{
+					rti->~RTIambassador();
+					_nativeFdAmb->~FdAmb_Hla13();
+				};
 #pragma endregion						
 
 #pragma region Methods
 #pragma region Fedaration Management
-		public:
+			public:
 #pragma endregion			
 
 #pragma region Declaration Management
-		public:
+			public:
 #pragma endregion			
 
 #pragma region Object Management
-		public:
+			public:
 #pragma endregion	// Object Management
 
 #pragma region Ownership Management
-		public:
+			public:
 #pragma endregion // Ownership Management
 
 #pragma region Data Distribution Management
-		public:
+			public:
 #pragma endregion	// Data Distribution Management
 
 #pragma region Time Management
-		public:
+			public:
 #pragma endregion
 
 #pragma region Support Services
-		public:
+			public:
 #pragma endregion
 
 #pragma region Helpers
-		protected:
+			protected:
 #pragma endregion
 
 #pragma endregion
 
-		};
+			};
+		}
 	}
 }
 

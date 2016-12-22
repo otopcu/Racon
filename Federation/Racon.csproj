@@ -196,13 +196,13 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\RtiLayerGeneric\RtiLayerGeneric.csproj">
+    <ProjectReference Include="..\RtiLayerGeneric\Racon.RtiLayer.csproj">
       <Project>{bf7b1e1d-55eb-4581-8009-5e2757f9c8c6}</Project>
-      <Name>RtiLayerGeneric</Name>
+      <Name>Racon.RtiLayer</Name>
     </ProjectReference>
     <ProjectReference Include="..\RTILayerNative\RTILayer.vcxproj">
       <Project>{bf7e0c2f-fb62-491b-ab11-77b9041f29e4}</Project>
-      <Name>RtiLayerNative</Name>
+      <Name>Racon.RtiLayer.Native</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

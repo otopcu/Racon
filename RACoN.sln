@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FederationLayer", "Federation\FederationLayer.csproj", "{C9B50F36-C483-4EA2-8A36-D2B0787AFF21}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Racon", "Federation\Racon.csproj", "{C9B50F36-C483-4EA2-8A36-D2B0787AFF21}"
 	ProjectSection(ProjectDependencies) = postProject
 		{BF7E0C2F-FB62-491B-AB11-77B9041F29E4} = {BF7E0C2F-FB62-491B-AB11-77B9041F29E4}
 	EndProjectSection
@@ -15,9 +15,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "License", "License", "{D364
 		LICENSE.txt = LICENSE.txt
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RtiLayerGeneric", "RtiLayerGeneric\RtiLayerGeneric.csproj", "{BF7B1E1D-55EB-4581-8009-5E2757F9C8C6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Racon.RtiLayer", "RtiLayerGeneric\Racon.RtiLayer.csproj", "{BF7B1E1D-55EB-4581-8009-5E2757F9C8C6}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RtiLayerNative", "RTILayerNative\RTILayer.vcxproj", "{BF7E0C2F-FB62-491B-AB11-77B9041F29E4}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Racon.RtiLayer.Native", "RTILayerNative\RTILayer.vcxproj", "{BF7E0C2F-FB62-491B-AB11-77B9041F29E4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

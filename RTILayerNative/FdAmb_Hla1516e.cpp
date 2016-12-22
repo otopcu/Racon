@@ -20,11 +20,14 @@ along with this program.If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "StdAfx.h"
-#include "CallbackManager.h"
+#include <iostream> // for using std
 #include "Helpers_Hla1516e.h"
 #include "FdAmb_Hla1516e.h"
 
 using namespace rti1516e;
+// Racon
+using namespace Racon::RtiLayer;
+using namespace Racon::RtiLayer::Native;
 
 #pragma region Constructors
 FdAmb_Hla1516e::FdAmb_Hla1516e(CallbackManager ^_parent, OmHla1516e* _om)
@@ -35,6 +38,145 @@ FdAmb_Hla1516e::FdAmb_Hla1516e(CallbackManager ^_parent, OmHla1516e* _om)
 #pragma endregion	// Constructors		
 
 #pragma region Federation Management Services
+// 4.4 - ConnectionLost
+void FdAmb_Hla1516e::connectionLost(std::wstring const & faultDescription)
+	throw (rti1516e::FederateInternalError) {
+	try {
+		// Create Event Arguments
+		HlaFederationManagementEventArgs ^args = gcnew HlaFederationManagementEventArgs();
+		args->Reason = gcnew String(faultDescription.c_str());
+		args->TraceMessage = "Connection lost (Fault description: " + args->Reason + ").";
+		args->EventType = RaconEventTypes::ConnectionLost;
+		// Add to the Event Queue
+		wrapper->FdAmbEventQueue->Enqueue(args);
+#pragma region exceptions
+	}
+		catch (FederateInternalError& e) {
+			MessageBox::Show("MSG-(FederateInternalError - connectionLost):" + Environment::NewLine + gcnew String(e.what().c_str()) + Environment::NewLine, "FdAmb_Hla1516e", MessageBoxButtons::OK, MessageBoxIcon::Error);
+		}
+		catch (System::Exception^ e) {
+			MessageBox::Show("MSG-(GeneralException - connectionLost):" + Environment::NewLine + e->ToString() + Environment::NewLine, "FdAmb_Hla1516e", MessageBoxButtons::OK, MessageBoxIcon::Warning);
+		}
+#pragma endregion
+};
+
+// 4.8 - reportFederationExecutions
+void FdAmb_Hla1516e::reportFederationExecutions(rti1516e::FederationExecutionInformationVector const &theFederationExecutionInformationList)
+	throw (rti1516e::FederateInternalError) {
+	try {
+		// Create Event Arguments
+		HlaFederationManagementEventArgs ^args = gcnew HlaFederationManagementEventArgs();
+		// Iterate the vector - using range c++11 
+		String^ fedex = "";
+		for (auto const& value : theFederationExecutionInformationList) 
+			fedex += "Federation Execution Name: " + gcnew String((value.federationExecutionName).c_str()) + ", logical Time Implementation Name: " + gcnew String((value.logicalTimeImplementationName).c_str()) + Environment::NewLine;
+
+		args->TraceMessage = "Federation executions that are reported:\n" + fedex;
+		args->EventType = RaconEventTypes::FederationExecutionsReported;
+		// Add to the Event Queue
+		wrapper->FdAmbEventQueue->Enqueue(args);
+#pragma region exceptions
+	}
+	catch (FederateInternalError& e) {
+		MessageBox::Show("MSG-(FederateInternalError - reportFederationExecutions):" + Environment::NewLine + gcnew String(e.what().c_str()) + Environment::NewLine, "FdAmb_Hla1516e", MessageBoxButtons::OK, MessageBoxIcon::Error);
+	}
+	catch (System::Exception^ e) {
+		MessageBox::Show("MSG-(GeneralException - reportFederationExecutions):" + Environment::NewLine + e->ToString() + Environment::NewLine, "FdAmb_Hla1516e", MessageBoxButtons::OK, MessageBoxIcon::Warning);
+	}
+#pragma endregion
+};
+
+// 4.12 - synchronizationPointRegistrationSucceeded
+void FdAmb_Hla1516e::synchronizationPointRegistrationSucceeded(std::wstring const & label)
+	throw (rti1516e::FederateInternalError) {
+	try {
+		// Create Event Arguments
+		HlaFederationManagementEventArgs ^args = gcnew HlaFederationManagementEventArgs();
+		args->Label = gcnew String(label.c_str());
+		args->TraceMessage = "<< Synchronization point registration is succesfull. Label: " + args->Label;
+		args->EventType = RaconEventTypes::SynchronizationPointRegistrationSucceeded;
+		// Add to the Event Queue
+		wrapper->FdAmbEventQueue->Enqueue(args);
+#pragma region exceptions
+	}
+	catch (FederateInternalError& e) {
+		MessageBox::Show("MSG-(FederateInternalError - synchronizationPointRegistrationSucceeded):" + Environment::NewLine + gcnew String(e.what().c_str()) + Environment::NewLine, "FdAmb_Hla1516e", MessageBoxButtons::OK, MessageBoxIcon::Error);
+	}
+	catch (System::Exception^ e) {
+		MessageBox::Show("MSG-(GeneralException - synchronizationPointRegistrationSucceeded):" + Environment::NewLine + e->ToString() + Environment::NewLine, "FdAmb_Hla1516e", MessageBoxButtons::OK, MessageBoxIcon::Warning);
+	}
+#pragma endregion
+};
+
+// 4.12 - synchronizationPointRegistrationFailed
+void FdAmb_Hla1516e::synchronizationPointRegistrationFailed(std::wstring const & label,
+	rti1516e::SynchronizationPointFailureReason reason)
+throw (rti1516e::FederateInternalError) {
+	try {
+		// Create Event Arguments
+		HlaFederationManagementEventArgs ^args = gcnew HlaFederationManagementEventArgs();
+		args->Label = gcnew String(label.c_str());
+		args->Reason = getTextForSynchronizationPointFailureReason(reason);
+		args->TraceMessage = "<< Synchronization point registration is failed. Label: " + args->Label + "" + args->Reason;
+		args->EventType = RaconEventTypes::synchronizationPointRegistrationFailed;
+		// Add to the Event Queue
+		wrapper->FdAmbEventQueue->Enqueue(args);
+#pragma region exceptions
+	}
+	catch (FederateInternalError& e) {
+		MessageBox::Show("MSG-(FederateInternalError - synchronizationPointRegistrationFailed):" + Environment::NewLine + gcnew String(e.what().c_str()) + Environment::NewLine, "FdAmb_Hla1516e", MessageBoxButtons::OK, MessageBoxIcon::Error);
+	}
+	catch (System::Exception^ e) {
+		MessageBox::Show("MSG-(GeneralException - synchronizationPointRegistrationFailed):" + Environment::NewLine + e->ToString() + Environment::NewLine, "FdAmb_Hla1516e", MessageBoxButtons::OK, MessageBoxIcon::Warning);
+	}
+#pragma endregion
+};
+
+// 4.13 - announceSynchronizationPoint
+void FdAmb_Hla1516e::announceSynchronizationPoint(std::wstring  const & label, rti1516e::VariableLengthData const & theUserSuppliedTag)
+	throw (rti1516e::FederateInternalError) {
+	try {
+		HlaFederationManagementEventArgs ^args = gcnew HlaFederationManagementEventArgs();
+		args->Label = gcnew String(label.c_str());
+		args->Tag = gcnew String((char*)(theUserSuppliedTag.data()));
+		args->TraceMessage = "<< Synchronization point announced. Label: " + args->Label + ". Tag: " + args->Tag;
+		args->EventType = RaconEventTypes::SynchronizationPointAnnounced;
+		// Add to the Event Queue
+		wrapper->FdAmbEventQueue->Enqueue(args);
+#pragma region exceptions
+	}
+	catch (FederateInternalError& e) {
+		MessageBox::Show("MSG-(FederateInternalError - announceSynchronizationPoint):" + Environment::NewLine + gcnew String(e.what().c_str()) + Environment::NewLine, "FdAmb_Hla1516e", MessageBoxButtons::OK, MessageBoxIcon::Error);
+	}
+	catch (System::Exception^ e) {
+		MessageBox::Show("MSG-(GeneralException - announceSynchronizationPoint):" + Environment::NewLine + e->ToString() + Environment::NewLine, "FdAmb_Hla1516e", MessageBoxButtons::OK, MessageBoxIcon::Warning);
+	}
+#pragma endregion
+};
+
+// 4.15 - federationSynchronized
+void FdAmb_Hla1516e::federationSynchronized(std::wstring const & label, rti1516e::FederateHandleSet const& failedToSyncSet)
+	throw (rti1516e::FederateInternalError) {
+	try {
+		HlaFederationManagementEventArgs ^args = gcnew HlaFederationManagementEventArgs();
+		args->Label = gcnew String(label.c_str());
+		String^ federates = "";
+		for (auto const& value : failedToSyncSet)
+			federates = federates + gcnew String((value).toString().c_str()) + ", ";
+		args->TraceMessage = "<< Federation is synchronized. Label: " + args->Label + ". Federates, which are unsuccessful at synchronization: " + federates;
+		args->EventType = RaconEventTypes::FederationSynchronized;
+		// Add to the Event Queue
+		wrapper->FdAmbEventQueue->Enqueue(args);
+#pragma region exceptions
+	}
+	catch (FederateInternalError& e) {
+		MessageBox::Show("MSG-(FederateInternalError - announceSynchronizationPoint):" + Environment::NewLine + gcnew String(e.what().c_str()) + Environment::NewLine, "FdAmb_Hla1516e", MessageBoxButtons::OK, MessageBoxIcon::Error);
+	}
+	catch (System::Exception^ e) {
+		MessageBox::Show("MSG-(GeneralException - announceSynchronizationPoint):" + Environment::NewLine + e->ToString() + Environment::NewLine, "FdAmb_Hla1516e", MessageBoxButtons::OK, MessageBoxIcon::Warning);
+	}
+#pragma endregion
+};
 
 void FdAmb_Hla1516e::initiateFederateSave(std::wstring const & label)
 throw (rti1516e::FederateInternalError) {
@@ -47,12 +189,14 @@ throw (rti1516e::FederateInternalError) {
 		// Add to the Event Queue
 		wrapper->FdAmbEventQueue->Enqueue(args);
 	}
+#pragma region exceptions
 	catch (FederateInternalError& e) {
 		MessageBox::Show("MSG-(FederateInternalError - initiateFederateSave):" + Environment::NewLine + gcnew String(e.what().c_str()) + Environment::NewLine, "FdAmb_Hla1516e", MessageBoxButtons::OK, MessageBoxIcon::Error);
 	}
 	catch (System::Exception^ e) {
-		MessageBox::Show("MSG-(initiateFederateSave):" + Environment::NewLine + e->ToString() + Environment::NewLine, "FdAmb_Hla1516e", MessageBoxButtons::OK, MessageBoxIcon::Warning);
+		MessageBox::Show("MSG-(GeneralException - initiateFederateSave):" + Environment::NewLine + e->ToString() + Environment::NewLine, "FdAmb_Hla1516e", MessageBoxButtons::OK, MessageBoxIcon::Warning);
 	}
+#pragma endregion
 }
 
 void FdAmb_Hla1516e::initiateFederateSave(std::wstring const & label, rti1516e::LogicalTime const & theTime)
@@ -532,7 +676,6 @@ throw (rti1516e::FederateInternalError) {
 			char *buffer = (char*)malloc((*iterator).second.size());
 			// Copy data to buffer
 			memcpy(buffer, (void *)((*iterator).second.data()), (*iterator).second.size());
-
 			//// Debug
 			////args->TraceMessage += " Value Size: " + (*iterator).second.size();
 			//if (toULong(gcnew String((*iterator).first.toString().c_str())) == 0)
@@ -555,12 +698,14 @@ throw (rti1516e::FederateInternalError) {
 		// Add to the Event Queue
 		wrapper->FdAmbEventQueue->Enqueue(args);
 	}
+#pragma region exceptions
 	catch (FederateInternalError& e) {
 		MessageBox::Show("MSG-(FederateInternalError - receiveInteraction):" + Environment::NewLine + gcnew String(e.what().c_str()) + Environment::NewLine, "FdAmb_Hla1516e", MessageBoxButtons::OK, MessageBoxIcon::Error);
 	}
 	catch (System::Exception^ e) {
 		MessageBox::Show("MSG-(receiveInteraction):" + Environment::NewLine + e->ToString() + Environment::NewLine, "FdAmb_Hla1516e", MessageBoxButtons::OK, MessageBoxIcon::Warning);
 	}
+#pragma endregion
 };
 
 // 6.13 - receiveInteraction w/ time
