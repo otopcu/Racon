@@ -35,7 +35,7 @@ namespace Racon
 {
 	namespace RtiLayer {
 		namespace Native {
-			public ref class CRtiAmb : Racon::RtiLayer::RtiAmb
+			public ref class CRtiAmb : RtiAmb
 			{
 #pragma region Fields
 			private:
