@@ -16,13 +16,16 @@
       The RTI abstraction component for MS.NET (RACoN) deals with the High Level Architecture (HLA) runtime infrastructure (RTI) communication in order to access the federation-wide data (actually, the objects and interactions exchanged in federation). RTI is middleware broker software that manages the federation execution and object exchange through a federation execution. The RACoN provides the .NET wrapper classes for the RTI and RTI-specific data structures. As it offers more maintainable, robust, and portable methods, developing an abstraction layer (wrapper) over RTI is a popular approach in many HLA-based projects.
     </summary>
     <releaseNotes>
-      •	Services for federation execution listing is implemented.
-      •	Federation synchronization services are implemented for both HLA1.3 and HLA1516e.
-      •	ConnectionLost() service is implemented.
-      •	A new logger is implemented.
+      •	HLA1516e Ownership management services are implemented.
+      •	DDM services are re-implemented for HLA Evolved.
+      •	GetDimensionHandle() and GetDimensionName() services are implemented.
+      •	GetFederateHandle() and GetFederateName() services are implemented.
+      •	Multiple FOM modules are supported.
+      •	Some overloads for Create and Join federation execution services are added.
+      •	System.Windows.Forms reference is removed.
     </releaseNotes>
     <copyright>
-      Copyright © 2009-2016 Okan Topçu
+      Copyright © 2009-2017 Okan Topçu
     </copyright>
     <tags>
       Distributed Simulation; HLA
