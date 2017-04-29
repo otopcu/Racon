@@ -3,7 +3,7 @@ https://sites.google.com/site/okantopcu/racon
 =============================================
 
 
-Copyright @ Okan Topçu, 2009-2016
+Copyright @ Okan Topçu, 2009-2017
 otot.support@outlook.com
 
 The RTI abstraction component for MS.NET (RACoN) deals with the HLA runtime infrastructure (RTI) level communication 
