@@ -8,7 +8,7 @@
 RACoN - RTI abstraction component for MS.NET (RACoN)
 https://sites.google.com/site/okantopcu/racon
 
-Copyright © Okan Topçu, 2009-2016
+Copyright © Okan Topçu, 2009-2017
 otot.support@outlook.com
 
 This program is free software : you can redistribute it and / or modify
@@ -25,11 +25,12 @@ You should have received a copy of the GNU Lesser General Public License
 along with this program.If not, see <http://www.gnu.org/licenses/>.
 */
 
+using Racon.RtiLayer;
 using System;
 using System.Collections.ObjectModel; // ObservableCollection
 using System.ComponentModel;
 using System.Text;
-using System.Threading.Tasks;
+//using System.Threading.Tasks;
 
 namespace Racon.Logger
 {

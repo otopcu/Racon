@@ -7,7 +7,7 @@
 Racon - RTI abstraction component for MS.NET (Racon)
 https://sites.google.com/site/okantopcu/racon
 
-Copyright © Okan Topçu, 2009-2016
+Copyright © Okan Topçu, 2009-2017
 otot.support@outlook.com
 
 This program is free software : you can redistribute it and / or modify

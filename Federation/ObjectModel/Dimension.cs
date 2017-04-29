@@ -2,7 +2,7 @@
 RACoN - RTI abstraction component for MS.NET (RACoN)
 https://sites.google.com/site/okantopcu/racon
 
-Copyright © Okan Topçu, 2009-2016
+Copyright © Okan Topçu, 2009-2017
 otot.support@outlook.com
 
 This program is free software : you can redistribute it and / or modify
@@ -32,7 +32,7 @@ namespace Racon.ObjectModel
   public class CDimension
   {
     #region Fields
-    private CRtiAmb _rtiAmb;
+    private RtiAmb _rtiAmb;
     #endregion
 
     #region Properties
@@ -64,7 +64,7 @@ namespace Racon.ObjectModel
     /// <summary>
     /// RtiAmb reference. If it is null, then Handle is -1.
     /// </summary>
-    public CRtiAmb RtiAmb
+    public RtiAmb RtiAmb
     {
       get { return _rtiAmb; }
       set 

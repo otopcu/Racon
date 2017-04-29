@@ -2,7 +2,7 @@
 Racon - RTI abstraction component for MS.NET (Racon)
 https://sites.google.com/site/okantopcu/racon
 
-Copyright © Okan Topçu, 2009-2016
+Copyright © Okan Topçu, 2009-2017
 otot.support@outlook.com
 
 This program is free software : you can redistribute it and / or modify
@@ -41,7 +41,15 @@ namespace Racon.RtiLayer
     /// <summary>
     ///  Retraction Handle
     /// </summary>
-    public EventRetractionHandle RetractionHandle { get; set; }
+    public MessageRetraction RetractionHandle { get; set; }
+    /// <summary>
+    ///  Supplemental reflect info.
+    /// </summary>
+    public SupplementalReflectInfo SupplementalReflectInfo { get; set; }
+    /// <summary>
+    ///  Supplemental remove info.
+    /// </summary>
+    public SupplementalRemoveInfo SupplementalRemoveInfo { get; set; }
     #endregion
 
     #region Constructors
@@ -51,7 +59,9 @@ namespace Racon.RtiLayer
     public HlaObjectEventArgs()
     {
       ObjectInstance = new HlaObject();
-      RetractionHandle = new EventRetractionHandle();
+      RetractionHandle = new MessageRetraction();
+      SupplementalReflectInfo = new SupplementalReflectInfo();
+      SupplementalRemoveInfo = new SupplementalRemoveInfo();
     }
     #endregion
 

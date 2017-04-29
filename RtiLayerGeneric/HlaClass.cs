@@ -2,7 +2,7 @@
 Racon - RTI abstraction component for MS.NET (Racon)
 https://sites.google.com/site/okantopcu/racon
 
-Copyright © Okan Topçu, 2009-2016
+Copyright © Okan Topçu, 2009-2017
 otot.support@outlook.com
 
 This program is free software : you can redistribute it and / or modify
@@ -26,6 +26,9 @@ using System.Text;
 
 namespace Racon.RtiLayer
 {
+  /// <summary>
+  /// Abstract class for HLA class
+  /// </summary>
   public abstract class HlaClass
   {
     #region Properties
@@ -58,6 +61,11 @@ namespace Racon.RtiLayer
       Tag = "";
       ClassPS = PSKind.Neither;
     }
+    /// <summary>
+    /// Constructor
+    /// </summary>
+    /// <param name="name"></param>
+    /// <param name="ps"></param>
     protected HlaClass(string name, PSKind ps) : this()
     {
       Name = name;

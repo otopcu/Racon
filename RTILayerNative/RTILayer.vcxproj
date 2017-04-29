@@ -15,7 +15,7 @@
     <RootNamespace>Racon.RtiLayer</RootNamespace>
     <Keyword>ManagedCProj</Keyword>
     <ProjectName>Racon.RtiLayer.Native</ProjectName>
-    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.10586.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
@@ -125,10 +125,6 @@
       <CopyLocalSatelliteAssemblies>true</CopyLocalSatelliteAssemblies>
       <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
     </Reference>
-    <Reference Include="System.Windows.Forms">
-      <CopyLocalSatelliteAssemblies>true</CopyLocalSatelliteAssemblies>
-      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AssemblyInfo.cpp" />
@@ -136,7 +132,6 @@
     <ClCompile Include="FdAmb_Hla1516e.cpp" />
     <ClCompile Include="RtiAmb_Hla13.cpp" />
     <ClCompile Include="RtiAmb_Hla1516e.cpp" />
-    <ClCompile Include="RtiAmb_OpenRti_1516e.cpp" />
     <ClCompile Include="Stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
@@ -147,7 +142,6 @@
     <ClInclude Include="include\FdAmb_Hla1516e.h" />
     <ClInclude Include="include\Helpers_Hla1516e.h" />
     <ClInclude Include="include\resource.h" />
-    <ClInclude Include="include\RtiAmb.h" />
     <ClInclude Include="include\RtiAmb_Dmso_Hla13.h" />
     <ClInclude Include="include\RtiAmb_Hla13.h" />
     <ClInclude Include="include\RtiAmb_Hla1516e.h" />

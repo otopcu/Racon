@@ -2,7 +2,7 @@
 Racon - RTI abstraction component for MS.NET (Racon)
 https://sites.google.com/site/okantopcu/racon
 
-Copyright © Okan Topçu, 2009-2016
+Copyright © Okan Topçu, 2009-2017
 otot.support@outlook.com
 
 This program is free software : you can redistribute it and / or modify
@@ -24,6 +24,8 @@ along with this program.If not, see <http://www.gnu.org/licenses/>.
 /// </summary>
 
 #pragma once
+#include <map>
+#include <string>
 #include<RTI.hh>
 
 using namespace System;
@@ -31,7 +33,18 @@ using namespace System;
 namespace Racon {
 	namespace RtiLayer {
 		namespace Native {
-			typedef unsigned long  ULong; // c++ unsigned long = C# uint, UInt32
+      // Native RTI object model tracker (NomTracker)
+      public class NomHla13
+      {
+      public:
+        // Maps RaconObjectModel (handle) -> NativeObjectModel (handle)
+        std::map<char*, RTI::Region*> Regions;
+      public:
+        NomHla13(void) {
+        };
+      };
+      
+      typedef unsigned long  ULong; // c++ unsigned long = C# uint, UInt32
 			typedef ULong Handle;
 			//typedef Handle ParameterHandle;
 			typedef Handle ObjectHandle;

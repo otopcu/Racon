@@ -7,7 +7,7 @@
 RACoN - RTI abstraction component for MS.NET (RACoN)
 https://sites.google.com/site/okantopcu/racon
 
-Copyright © Okan Topçu, 2009-2016
+Copyright © Okan Topçu, 2009-2017
 otot.support@outlook.com
 
 This program is free software : you can redistribute it and / or modify
@@ -27,17 +27,16 @@ along with this program.If not, see <http://www.gnu.org/licenses/>.
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Windows.Forms;//MessageBox
 using System.ComponentModel;//BackgroundWorker
 using System.Diagnostics.Contracts;
 using System.Linq;//.ToList()
-using Racon.ObjectModel;
 // RACoN
+using Racon.ObjectModel;
 using Racon.RtiLayer;
 using Racon.RtiLayer.Native;
 using Racon.Logger;
 
-namespace Racon.Federation
+namespace Racon
 {
   /// <summary>
   /// Presents an extension point for application-specific federates. The generic federate defines the abstraction and is implemented as a wrapper façade class. 
@@ -53,10 +52,10 @@ namespace Racon.Federation
   /// </list>
   /// <para>The federate-initiated and RACON event handlers are executed as soon as they are raised, but, the RTI-initiated events (callbacks from the RTI to the federate ambassador) are queued as events for processing at the end of each simulation cycle. They are executed when the federate run method is called. The federate Run() method must be called in the main (simulation loop) of the application.</para>
   /// </remarks>
-  public abstract class CGenericFederate : CallbackManager
+  public abstract class CGenericFederate : CallbackManager, IDisposable
   {
     #region Fields
-    private CRtiAmb _rtiAmb; // Generic RTI Ambassador
+    private RtiAmb _rtiAmb; // Generic RTI Ambassador
     private RTILibraryType _RtiLibrary; // Current RTI Library reference
     private CObjectModel _som;
     private FederateStates _FederateState;
@@ -64,21 +63,19 @@ namespace Racon.Federation
     // Loggers
     private string _statusMessage;
     private LogManager logger;
-    //private StringBuilder _TraceLog;
-    //private LogLevel _LogLevel;
     #endregion // Fields
 
     #region Properties
     /// <summary>
     /// The reference for internal RTI ambassador. This reference can be used to access internal RTI ambassador interface
     /// </summary>
-    protected CRtiAmb RtiAmb
+    protected RtiAmb RtiAmb
     {
       get { return _rtiAmb; }
     }
 
     /// <summary>
-    /// Current federate state. When it is set, it raises <see cref="Racon.Federation.CGenericFederate.FederateStateChanged"/> Event.
+    /// Current federate state. When it is set, it raises <see cref="Racon.CGenericFederate.FederateStateChanged"/> Event.
     /// </summary>
     public FederateStates FederateState
     {
@@ -93,7 +90,7 @@ namespace Racon.Federation
     }
 
     /// <summary>
-    /// Current federation execution state. When it is set, it raises <see cref="Racon.Federation.CGenericFederate.FederationStateChanged"/> Event.
+    /// Current federation execution state. When it is set, it raises <see cref="Racon.CGenericFederate.FederationStateChanged"/> Event.
     /// </summary>
     public FederationExecutionStates FederationExecutionState
     {
@@ -107,7 +104,7 @@ namespace Racon.Federation
     }
 
     /// <summary>
-    /// The log message RACoN. When it is set, it raises <see cref="Racon.Federation.CGenericFederate.StatusMessageChanged"/> Event.
+    /// The log message RACoN. When it is set, it raises <see cref="Racon.CGenericFederate.StatusMessageChanged"/> Event.
     /// </summary>
     public string StatusMessage
     {
@@ -122,7 +119,7 @@ namespace Racon.Federation
         }
       }
     }
-    
+
     /// <summary>
     /// TraceLog dumbs the logger.Log
     /// </summary>
@@ -135,7 +132,7 @@ namespace Racon.Federation
     }
 
     /// <summary>
-    /// Current Log Level. When it is set, it reports version, RTI native library, and current log level via <see cref="Racon.Federation.CGenericFederate.StatusMessage"/>. 
+    /// Current Log Level. When it is set, it reports version, RTI native library, and current log level via <see cref="Racon.CGenericFederate.StatusMessage"/>. 
     /// </summary>
     public LogLevel LogLevel
     {
@@ -152,7 +149,7 @@ namespace Racon.Federation
     }
 
     /// <summary>
-    /// Current type of native RTI Library. It is set via constructor only, <see cref="Racon.Federation.CGenericFederate.RtiAmb"/> switches accordingly.
+    /// Current type of native RTI Library. It is set via constructor only, <see cref="Racon.CGenericFederate.RtiAmb"/> switches accordingly.
     /// </summary>
     public RTILibraryType RTILibrary
     {
@@ -191,7 +188,17 @@ namespace Racon.Federation
     /// <summary>
     /// Federate handle.
     /// </summary>
-    public ulong FederateHandle { get; set; }
+    public uint FederateHandle { get; set; }
+
+    /// <summary>
+    /// The federate logical time. A point in HLA time axis.
+    /// </summary>
+    public double Time { get; set; }
+
+    /// <summary>
+    /// The federate lookahead. Time interval
+    /// </summary>
+    public double Lookahead { get; set; }
 
     #endregion // Properties
 
@@ -260,6 +267,9 @@ namespace Racon.Federation
       // Set states
       _FederationExecutionState = FederationExecutionStates.FEDEX_DOESNOTEXIST;
       _FederateState = FederateStates.NOTCONNECTED;
+      // initalize time
+      Time = 0.0;
+      Lookahead = 0.0;
       // Subscribe to the Contract Failed Event for Pre- and post conditions
       Contract.ContractFailed += Contract_ContractFailed;
       // Subscribe to the HLA-specific service events (RACoN Events + RTI Events + Federate Events)
@@ -319,68 +329,97 @@ namespace Racon.Federation
     }
     #endregion // Constructors
 
+    #region Finalizer
+    /// <summary>
+    /// CGenericFederate destructor disposes 
+    /// </summary>
+    public void Dispose()
+    {
+      Dispose(true);
+      GC.SuppressFinalize(this);
+    }
+    /// <summary>
+    /// Dispose(bool disposing) 
+    /// </summary>
+    protected virtual void Dispose(bool disposing)
+    {
+      if (disposing)
+      {
+        IDisposable dis = RtiAmb as IDisposable;
+        if (dis != null) { dis.Dispose(); }
+      }
+    }
+    #endregion 
+
     #region Event Handlers
 
-    #region RTI-initiated Callback Event Handlers
+    #region FdAmb Callback Event Handlers
     #region FM handlers
     /// <summary>
     /// Federate ambassador callback
     /// </summary>
     public virtual void FdAmb_ConnectionLost(object sender, HlaFederationManagementEventArgs data)
     {
-      logger.Add(data.TraceMessage);
+      logger.Add(data.TraceMessage, data.Level);
       // In case of RTI crash - resign and disconnect
       bool res = ResignFederationExecution();
       if (res) Disconnect();
     }
     /// <summary>
-    /// Federate ambassador callback for Federation Executions Reported
+    /// IEEE1516-2010 4.8: Federate ambassador callback for Federation Executions Reported
     /// </summary>
     public virtual void FdAmb_FederationExecutionsReported(object sender, HlaFederationManagementEventArgs data)
     {
-      logger.Add(data.TraceMessage);
+      logger.Add(data.TraceMessage, data.Level);
     }
     /// <summary>
     /// FdAmb_OnSynchronizationPointRegistrationConfirmedHandler
     /// </summary>
     public virtual void FdAmb_OnSynchronizationPointRegistrationConfirmedHandler(object sender, HlaFederationManagementEventArgs data)
     {
-      logger.Add(data.TraceMessage);
+      logger.Add(data.TraceMessage, data.Level);
     }
     /// <summary>
     /// FdAmb_OnSynchronizationPointRegistrationFailedHandler
     /// </summary>
     public virtual void FdAmb_OnSynchronizationPointRegistrationFailedHandler(object sender, HlaFederationManagementEventArgs data)
     {
-      logger.Add(data.TraceMessage);
+      logger.Add(data.TraceMessage, data.Level);
     }
     /// <summary>
     /// Federate ambassador callback. FdAmb_SynchronizationPointAnnounced.
     /// </summary>
     public virtual void FdAmb_SynchronizationPointAnnounced(object sender, HlaFederationManagementEventArgs data)
     {
-      logger.Add(data.TraceMessage);
+      logger.Add(data.TraceMessage, data.Level);
     }
     /// <summary>
     /// Federate ambassador callback. FdAmb_FederationSynchronized
     /// </summary>
     public virtual void FdAmb_FederationSynchronized(object sender, HlaFederationManagementEventArgs data)
     {
-      logger.Add(data.TraceMessage);
+      logger.Add(data.TraceMessage, data.Level);
     }
     /// <summary>
     /// Federate ambassador callback
     /// </summary>
     public virtual void FdAmb_InitiateFederateSaveHandler(object sender, HlaFederationManagementEventArgs data)
     {
-      logger.Add(data.TraceMessage);
+      logger.Add(data.TraceMessage, data.Level);
+    }
+    /// <summary>
+    /// IEEE1516-2010 4.22: FdAmb_FederationSaveStatusResponse
+    /// </summary>
+    public virtual void FdAmb_FederationSaveStatusResponse(object sender, HlaFederationManagementEventArgs data)
+    {
+      logger.Add(data.TraceMessage, data.Level);
     }
     /// <summary>
     /// Federate ambassador callback
     /// </summary>
     public virtual void FdAmb_InitiateFederateRestoreHandler(object sender, HlaFederationManagementEventArgs data)
     {
-      logger.Add(data.TraceMessage);
+      logger.Add(data.TraceMessage, data.Level);
     }
 
     /// <summary>
@@ -388,28 +427,35 @@ namespace Racon.Federation
     /// </summary>
     public virtual void FdAmb_ConfirmFederationRestorationRequestHandler(object sender, HlaFederationManagementEventArgs data)
     {
-      logger.Add(data.TraceMessage);
+      logger.Add(data.TraceMessage, data.Level);
     }
     /// <summary>
     /// Federate ambassador callback
     /// </summary>
     public virtual void FdAmb_FederationSaved(object sender, HlaFederationManagementEventArgs data)
     {
-      logger.Add(data.TraceMessage);
+      logger.Add(data.TraceMessage, data.Level);
     }
     /// <summary>
     /// Federate ambassador callback
     /// </summary>
     public virtual void FdAmb_FederationRestored(object sender, HlaFederationManagementEventArgs data)
     {
-      logger.Add(data.TraceMessage);
+      logger.Add(data.TraceMessage, data.Level);
     }
     /// <summary>
     /// Federate ambassador callback
     /// </summary>
     public virtual void FdAmb_FederationRestoreBegun(object sender, HlaFederationManagementEventArgs data)
     {
-      logger.Add(data.TraceMessage);
+      logger.Add(data.TraceMessage, data.Level);
+    }
+    /// <summary>
+    /// IEEE1516-2010 4.32: FdAmb_FederationRestoreStatusResponse
+    /// </summary>
+    public virtual void FdAmb_FederationRestoreStatusResponse(object sender, HlaFederationManagementEventArgs data)
+    {
+      logger.Add(data.TraceMessage, data.Level);
     }
     #endregion // FM Handlers
     #region DM handlers
@@ -418,7 +464,7 @@ namespace Racon.Federation
     /// </summary>
     public virtual void FdAmb_StartRegistrationForObjectClassAdvisedHandler(object sender, HlaDeclarationManagementEventArgs data)
     {
-      logger.Add(data.TraceMessage);
+      logger.Add(data.TraceMessage, data.Level);
     }
 
     /// <summary>
@@ -426,7 +472,7 @@ namespace Racon.Federation
     /// </summary>
     public virtual void FdAmb_StopRegistrationForObjectClassAdvisedHandler(object sender, HlaDeclarationManagementEventArgs data)
     {
-      logger.Add(data.TraceMessage);
+      logger.Add(data.TraceMessage, data.Level);
     }
 
     /// <summary>
@@ -434,7 +480,7 @@ namespace Racon.Federation
     /// </summary>
     public virtual void FdAmb_TurnInteractionsOffAdvisedHandler(object sender, HlaDeclarationManagementEventArgs data)
     {
-      logger.Add(data.TraceMessage);
+      logger.Add(data.TraceMessage, data.Level);
     }
 
     /// <summary>
@@ -443,7 +489,7 @@ namespace Racon.Federation
     public virtual void FdAmb_TurnInteractionsOnAdvisedHandler(object sender, HlaDeclarationManagementEventArgs data)
     {
 
-      logger.Add(data.TraceMessage);
+      logger.Add(data.TraceMessage, data.Level);
     }
     #endregion // DM Handlers
     #region OM handlers
@@ -460,7 +506,7 @@ namespace Racon.Federation
       //Thread thread = new Thread(new ParameterizedThreadStart(FdAmb_ObjectDiscovered));
       //thread.Start(data);
 
-      logger.Add(data.TraceMessage);
+      logger.Add(data.TraceMessage, data.Level);
     }
 
     /// <summary>
@@ -469,7 +515,7 @@ namespace Racon.Federation
     public virtual void FdAmb_ObjectRemovedHandler(object sender, HlaObjectEventArgs data)
     {
 
-      logger.Add(data.TraceMessage);
+      logger.Add(data.TraceMessage, data.Level);
     }
 
     /// <summary>
@@ -478,7 +524,7 @@ namespace Racon.Federation
     public virtual void FdAmb_AttributeValueUpdateRequestedHandler(object sender, HlaObjectEventArgs data)
     {
 
-      logger.Add(data.TraceMessage);
+      logger.Add(data.TraceMessage, data.Level);
     }
 
     /// <summary>
@@ -487,7 +533,7 @@ namespace Racon.Federation
     public virtual void FdAmb_InteractionReceivedHandler(object sender, HlaInteractionEventArgs data)
     {
 
-      logger.Add(data.TraceMessage);
+      logger.Add(data.TraceMessage, data.Level);
     }
 
     /// <summary>
@@ -496,7 +542,7 @@ namespace Racon.Federation
     public virtual void FdAmb_ObjectAttributesReflectedHandler(object sender, HlaObjectEventArgs data)
     {
 
-      logger.Add(data.TraceMessage);
+      logger.Add(data.TraceMessage, data.Level);
     }
 
     /// <summary>
@@ -505,7 +551,7 @@ namespace Racon.Federation
     public virtual void FdAmb_TurnUpdatesOnForObjectInstanceAdvisedHandler(object sender, HlaObjectEventArgs data)
     {
 
-      logger.Add(data.TraceMessage);
+      logger.Add(data.TraceMessage, data.Level);
     }
     /// <summary>
     /// Federate ambassador callback - TurnUpdatesOffForObjectInstance
@@ -513,17 +559,26 @@ namespace Racon.Federation
     public virtual void FdAmb_TurnUpdatesOffForObjectInstanceAdvisedHandler(object sender, HlaObjectEventArgs data)
     {
 
-      logger.Add(data.TraceMessage);
+      logger.Add(data.TraceMessage, data.Level);
     }
     #endregion // OM Handlers
     #region OwM handlers
+
     /// <summary>
-    /// Federate ambassador callback
+    /// IEEE1516-2010 7.4
+    /// FdAmb_AttributeOwnershipAssumptionRequested
     /// </summary>
     public virtual void FdAmb_AttributeOwnershipAssumptionRequested(object sender, HlaOwnershipManagementEventArgs data)
     {
+      logger.Add(data.TraceMessage, data.Level);
+    }
 
-      logger.Add(data.TraceMessage);
+    /// <summary>
+    /// IEEE1516-2010 7.5
+    /// </summary>
+    public virtual void FdAmb_RequestDivestitureConfirmation(object sender, HlaOwnershipManagementEventArgs data)
+    {
+      logger.Add(data.TraceMessage, data.Level);
     }
 
     /// <summary>
@@ -531,8 +586,7 @@ namespace Racon.Federation
     /// </summary>
     public virtual void FdAmb_AttributeOwnershipAcquisitionCancellationConfirmed(object sender, HlaOwnershipManagementEventArgs data)
     {
-
-      logger.Add(data.TraceMessage);
+      logger.Add(data.TraceMessage, data.Level);
     }
 
     /// <summary>
@@ -540,8 +594,7 @@ namespace Racon.Federation
     /// </summary>
     public virtual void FdAmb_AttributeOwnershipUnavailable(object sender, HlaOwnershipManagementEventArgs data)
     {
-
-      logger.Add(data.TraceMessage);
+      logger.Add(data.TraceMessage, data.Level);
     }
 
     /// <summary>
@@ -549,8 +602,7 @@ namespace Racon.Federation
     /// </summary>
     public virtual void FdAmb_AttributeOwnershipDivestitureNotified(object sender, HlaOwnershipManagementEventArgs data)
     {
-
-      logger.Add(data.TraceMessage);
+      logger.Add(data.TraceMessage, data.Level);
     }
 
     /// <summary>
@@ -558,8 +610,7 @@ namespace Racon.Federation
     /// </summary>
     public virtual void FdAmb_AttributeOwnershipAcquisitionNotified(object sender, HlaOwnershipManagementEventArgs data)
     {
-
-      logger.Add(data.TraceMessage);
+      logger.Add(data.TraceMessage, data.Level);
     }
 
     /// <summary>
@@ -567,17 +618,15 @@ namespace Racon.Federation
     /// </summary>
     public virtual void FdAmb_AttributeOwnershipInformed(object sender, HlaOwnershipManagementEventArgs data)
     {
-
-      logger.Add(data.TraceMessage);
+      logger.Add(data.TraceMessage, data.Level);
     }
 
     /// <summary>
-    /// Federate ambassador callback // HLA13 only
+    /// Federate ambassador callback - HLA13 only
     /// </summary>
     public virtual void FdAmb_AttributeOwnershipReleaseRequestedHandler(object sender, HlaOwnershipManagementEventArgs data)
     {
-
-      logger.Add(data.TraceMessage);
+      logger.Add(data.TraceMessage, data.Level);
     }
     #endregion // OwM Handlers
     #region TM handlers
@@ -586,32 +635,28 @@ namespace Racon.Federation
     /// </summary>
     public virtual void FdAmb_TimeConstrainedEnabled(object sender, HlaTimeManagementEventArgs data)
     {
-
-      logger.Add(data.TraceMessage);
+      logger.Add(data.TraceMessage, data.Level);
     }
     /// <summary>
     /// Federate ambassador callback
     /// </summary>
     public virtual void FdAmb_TimeRegulationEnabled(object sender, HlaTimeManagementEventArgs data)
     {
-
-      logger.Add(data.TraceMessage);
+      logger.Add(data.TraceMessage, data.Level);
     }
     /// <summary>
     /// Federate ambassador callback
     /// </summary>
     public virtual void FdAmb_TimeAdvanceGrant(object sender, HlaTimeManagementEventArgs data)
     {
-
-      logger.Add(data.TraceMessage);
+      logger.Add(data.TraceMessage, data.Level);
     }
     /// <summary>
     /// Federate ambassador callback
     /// </summary>
     public virtual void FdAmb_RequestRetraction(object sender, HlaTimeManagementEventArgs data)
     {
-
-      logger.Add(data.TraceMessage);
+      logger.Add(data.TraceMessage, data.Level);
     }
     #endregion // TM Handlers
     #endregion // RTI-initiated Callback Event Handlers
@@ -623,7 +668,7 @@ namespace Racon.Federation
     /// </summary>
     private void RtiAmb_NotConnected(object sender, RaconEventArgs data)
     {
-      logger.Add(data.TraceMessage);
+      logger.Add(data.TraceMessage, data.Level);
       FederateState = FederateStates.NOTCONNECTED;
     }
 
@@ -632,7 +677,7 @@ namespace Racon.Federation
     /// </summary>
     private void RtiAmb_FederateConnected(object sender, RaconEventArgs data)
     {
-      logger.Add(data.TraceMessage);
+      logger.Add(data.TraceMessage, data.Level);
       FederateState = FederateStates.CONNECTED | FederateStates.NOTJOINED;
     }
 
@@ -641,7 +686,7 @@ namespace Racon.Federation
     /// </summary>
     private void RtiAmb_FederateDisconnected(object sender, RaconEventArgs data)
     {
-      logger.Add(data.TraceMessage);
+      logger.Add(data.TraceMessage, data.Level);
       FederateState = FederateStates.NOTCONNECTED;
     }
 
@@ -650,7 +695,7 @@ namespace Racon.Federation
     /// </summary>
     public virtual void RtiAmb_FederateJoined(object sender, RaconEventArgs data)
     {
-      logger.Add(data.TraceMessage);
+      logger.Add(data.TraceMessage, data.Level);
       FederateState = FederateStates.CONNECTED | FederateStates.JOINED | FederateStates.FREERUN;
     }
 
@@ -659,7 +704,7 @@ namespace Racon.Federation
     /// </summary>
     public virtual void RtiAmb_FederateResigned(object sender, RaconEventArgs data)
     {
-      logger.Add(data.TraceMessage);
+      logger.Add(data.TraceMessage, data.Level);
       FederateState = FederateStates.CONNECTED | FederateStates.NOTJOINED;
     }
 
@@ -668,7 +713,7 @@ namespace Racon.Federation
     /// </summary>
     public virtual void RtiAmb_FederationExecutionCreated(object sender, RaconEventArgs data)
     {
-      logger.Add(data.TraceMessage);
+      logger.Add(data.TraceMessage, data.Level);
       FederationExecutionState = FederationExecutionStates.FEDEX_EXISTS;
     }
 
@@ -677,7 +722,7 @@ namespace Racon.Federation
     /// </summary>
     public virtual void RtiAmb_FederationExecutionDestroyed(object sender, RaconEventArgs data)
     {
-      logger.Add(data.TraceMessage);
+      logger.Add(data.TraceMessage, data.Level);
       FederationExecutionState = FederationExecutionStates.FEDEX_DOESNOTEXIST;
     }
 
@@ -686,7 +731,7 @@ namespace Racon.Federation
     /// </summary>
     public virtual void RtiAmb_ObjectRegistered(object sender, RaconEventArgs data)
     {
-      logger.Add(data.TraceMessage);
+      logger.Add(data.TraceMessage, data.Level);
     }
 
     /// <summary>
@@ -694,7 +739,7 @@ namespace Racon.Federation
     /// </summary>
     public virtual void RtiAmb_HLAClassPublished(object sender, RaconEventArgs data)
     {
-      logger.Add(data.TraceMessage);
+      logger.Add(data.TraceMessage, data.Level);
     }
 
     /// <summary>
@@ -702,7 +747,7 @@ namespace Racon.Federation
     /// </summary>
     public virtual void RtiAmb_HLAClassSubscribed(object sender, RaconEventArgs data)
     {
-      logger.Add(data.TraceMessage);
+      logger.Add(data.TraceMessage, data.Level);
     }
 
     /// <summary>
@@ -710,7 +755,7 @@ namespace Racon.Federation
     /// </summary>
     public virtual void RtiAmb_RTIEventOccured(object sender, RaconEventArgs data)
     {
-      logger.Add(data.TraceMessage);
+      logger.Add(data.TraceMessage, data.Level);
     }
     #endregion // RTIAmb Handlers
 
@@ -745,6 +790,9 @@ namespace Racon.Federation
     #endregion // Event Handlers
 
     #region Methods
+
+    #region High-Level Services
+
     /// <summary>
     /// Method to tick and process the callbacks.
     /// </summary>
@@ -798,6 +846,13 @@ namespace Racon.Federation
           case RaconEventTypes.FederationRestoreBegun:
             OnFederationRestoreBegun((HlaFederationManagementEventArgs)AnEventInstance);
             break;
+          case RaconEventTypes.FederationSaveStatusResponse:
+            OnFederationSaveStatusResponse((HlaFederationManagementEventArgs)AnEventInstance);
+            break;
+          case RaconEventTypes.FederationRestoreStatusResponse:
+            OnFederationRestoreStatusResponse((HlaFederationManagementEventArgs)AnEventInstance);
+            break;
+
           // DM
           case RaconEventTypes.StartRegistrationForObjectClassAdvised:
             OnStartRegistrationForObjectClassAdvised((HlaDeclarationManagementEventArgs)AnEventInstance);
@@ -811,6 +866,7 @@ namespace Racon.Federation
           case RaconEventTypes.TurnInteractionsOnAdvised:
             OnTurnInteractionsOnAdvised((HlaDeclarationManagementEventArgs)AnEventInstance);
             break;
+
           // OM
           case RaconEventTypes.ObjectDiscovered:
             OnObjectDiscovered((HlaObjectEventArgs)AnEventInstance);
@@ -850,6 +906,9 @@ namespace Racon.Federation
             break;
 
           // OwM
+          case RaconEventTypes.RequestDivestitureConfirmation:
+            OnRequestDivestitureConfirmation((HlaOwnershipManagementEventArgs)AnEventInstance);
+            break;
           case RaconEventTypes.AttributeOwnershipAssumptionRequested:
             OnAttributeOwnershipAssumptionRequested((HlaOwnershipManagementEventArgs)AnEventInstance);
             break;
@@ -871,6 +930,7 @@ namespace Racon.Federation
           case RaconEventTypes.AttributeOwnershipInformed:
             OnAttributeOwnershipInformed((HlaOwnershipManagementEventArgs)AnEventInstance);
             break;
+
           // TM
           case RaconEventTypes.TimeConstrainedEnabled:
             OnTimeConstrainedEnabled((HlaTimeManagementEventArgs)AnEventInstance);
@@ -883,6 +943,9 @@ namespace Racon.Federation
             break;
           case RaconEventTypes.RequestRetraction:
             OnRequestRetraction((HlaTimeManagementEventArgs)AnEventInstance);
+            break;
+          default: // just log
+            logger.Add(AnEventInstance.TraceMessage, AnEventInstance.Level);
             break;
         }
       }
@@ -913,12 +976,13 @@ namespace Racon.Federation
       return true;
     }
 
-    #region RtiAmb Function Wrappers
-
-    #region Federation Management
-
     /// <summary>
-    /// Initializes federation execution
+    /// Initializes federation execution:
+    /// (1) Connects.
+    /// (2) Creates federation execution.
+    /// (3) Joins federation execution.
+    /// (4) Creates regions.
+    /// (5) Declares capability.
     /// </summary>
     /// <param name="fedexec">Federation Execution</param>
     /// <returns>returns True/False.</returns>
@@ -932,126 +996,35 @@ namespace Racon.Federation
       // Preconditions
       Contract.Requires(fedexec != null, "CFederationExecution instance passed to FinalizeFederation() method is null.");
       Contract.Requires(fedexec.Name != null, "Federation Execution Name passed to InitializeFederation() method is null.");
-      Contract.Requires(fedexec.FDD != null, "FDD passed to InitializeFederation() method is null.");
+      Contract.Requires(fedexec.FomModules.Count != 0, "FDD passed to InitializeFederation() method is null.");
       Contract.Requires(FederationExecution.FederateName != null, "Federate Name passed to InitializeFederation() method is null.");
       // Postconditions
       Contract.Ensures(FederationExecutionState == FederationExecutionStates.FEDEX_EXISTS, " at InitializeFederation().");
       Contract.Ensures(FederateState.HasFlag(FederateStates.JOINED), " at InitializeFederation().");
       #endregion
 
-      bool res = Connect(fedexec.ConnectionSettings);
+      bool res = Connect(CallbackModel.EVOKED, fedexec.ConnectionSettings);
 
       if (res)
-        res = CreateFederationExecution(fedexec.Name, fedexec.FDD);
+        if (fedexec.FomModules.Count == 1)
+          res = CreateFederationExecution(fedexec.Name, fedexec.FomModules[0]);
+        else
+          res = CreateFederationExecution(fedexec.Name, fedexec.FomModules);
+
       //Contract.Assert(FederationExecutionState == FederationExecutionStates.FEDEX_EXISTS, "After createFederation() call, federation state is not set to CREATED in InitializeFederation() method.");// Runs only in debug mode
       if (res)
-        res = JoinFederationExecution(fedexec.Name, fedexec.FederateName);
-
+        res = JoinFederationExecution(fedexec.FederateName, fedexec.FederateType, fedexec.Name, fedexec.FomModules);
       if (res)
       {
+        // Get Dimension Handles
+        GetAllDimensionHandles();
         // Data Distribution Management
         createRegions();
-        // Declare publish and subscribe interests.
-        declareCapability();
+        // Declare publish and subscribe capabilities and interests.
+        DeclareCapability();
       }
 
       return res;
-    }
-
-    /// <summary>
-    /// Connects to RTI
-    /// </summary>
-    /// <param name="localSettingsDesignator">Connection paramaters in form of "protocol"://"ip":"port". For example: rti://127.0.0.1:12345 </param>
-    /// <returns>returns True/False.</returns>    
-    /// <remarks>This method is for IEEE1516-2010 compatiblity. Sets the federate status as CONNECTED.
-    /// </remarks>
-    virtual public bool Connect(string localSettingsDesignator = "")
-    {
-      #region Contracts
-      // Preconditions
-      Contract.Requires(FederateState == FederateStates.NOTCONNECTED, " at Connect().");
-      // Postconditions
-      Contract.Ensures(FederateState.HasFlag(FederateStates.CONNECTED), "After Connect() call, federate state is not set correctly at Connect().");
-      #endregion
-
-      if (FederateState.HasFlag(FederateStates.NOTCONNECTED))
-        _rtiAmb.connect(localSettingsDesignator);
-      return FederateState.HasFlag(FederateStates.CONNECTED) ? true : false;
-    }
-
-    /// <summary>
-    /// Disconnects from RTI
-    /// </summary>
-    /// <remarks>This method is for IEEE1516-2010 compatiblity. Sets the federate status as NOTCONNECTED.
-    /// </remarks>
-    virtual public bool Disconnect()
-    {
-      #region Contracts
-      // Preconditions
-      Contract.Requires(FederateState.HasFlag(FederateStates.CONNECTED | FederateStates.NOTJOINED), " at Disconnect().");
-      // Postconditions
-      Contract.Ensures(FederateState.HasFlag(FederateStates.NOTCONNECTED), "After Disconnect() call, federate state is not set correctly at Disconnect().");
-      #endregion
-
-      if (FederateState.HasFlag(FederateStates.CONNECTED))
-        _rtiAmb.disconnect();
-      return FederateState.HasFlag(FederateStates.NOTCONNECTED) ? true : false;
-    }
-
-    /// <summary>
-    /// Creates a federation execution 
-    /// </summary>
-    /// <param name="fedexName">Name of the Federation Execution to be destroyed.</param>
-    /// <param name="fdd">Path of the FDD file.</param>
-    /// <returns>True if method call is succesfull.</returns>
-    /// <remarks>This method creates federation execution.
-    /// </remarks>
-    virtual public bool CreateFederationExecution(string fedexName, string fdd)
-    {
-      #region Contracts
-      // Preconditions
-      Contract.Requires(FederateState.HasFlag(FederateStates.CONNECTED), " at CreateFederationExecution().");
-      Contract.Requires(FederationExecutionState.HasFlag(FederationExecutionStates.FEDEX_DOESNOTEXIST), " at CreateFederationExecution().");
-      // Postconditions
-      Contract.Ensures(FederationExecutionState.HasFlag(FederationExecutionStates.FEDEX_EXISTS), " at CreateFederationExecution().");
-      #endregion
-
-      if (FederationExecutionState.HasFlag(FederationExecutionStates.FEDEX_DOESNOTEXIST))
-        _rtiAmb.createFederation(fedexName, fdd);
-      return FederationExecutionState.HasFlag(FederationExecutionStates.FEDEX_EXISTS) ? true : false;
-    }
-
-    /// <summary>
-    /// (IEEE1516.1-2010 4.7) Requests a list of current federation executions
-    /// </summary>
-    virtual public void ListFederationExecutions()
-    {
-      if (FederateState.HasFlag(FederateStates.CONNECTED))
-        _rtiAmb.listFederationExecutions();
-    }
-
-    /// <summary>
-    /// Joins a federation execution 
-    /// </summary>
-    /// <param name="fedexName">Name of the Federation Execution to be destroyed.</param>
-    /// <param name="federateName">Name of the joined federate.</param>
-    /// <returns>True if method call is succesfull.</returns>
-    /// <remarks>Federate joins a federation execution.
-    /// </remarks>
-    virtual public bool JoinFederationExecution(string fedexName, string federateName)
-    {
-      #region Contracts
-      // Preconditions
-      Contract.Requires(FederateState.HasFlag(FederateStates.CONNECTED), " at JoinFederationExecution().");
-      Contract.Requires(FederationExecutionState.HasFlag(FederationExecutionStates.FEDEX_EXISTS), " at JoinFederationExecution().");
-      Contract.Requires(FederateState.HasFlag(FederateStates.NOTJOINED), " at JoinFederationExecution().");
-      // Postconditions
-      Contract.Ensures(FederateState.HasFlag(FederateStates.JOINED), " at JoinFederationExecution().");
-      #endregion
-
-      if (FederateState.HasFlag(FederateStates.NOTJOINED))
-        FederateHandle = _rtiAmb.joinFederation(fedexName, federateName);
-      return FederateState.HasFlag(FederateStates.JOINED) ? true : false;
     }
 
     /// <summary>
@@ -1083,6 +1056,199 @@ namespace Racon.Federation
       // !!! Needs admin rights
       //EventLog::WriteEntry("ExPFd","Exception Type: "+e->GetType()->FullName+"\r\nError Message: "+e->Message+"\r\nStack: "+e->StackTrace+""+Environment.NewLine,EventLogEntryType::Warning);
     }
+
+    #endregion // High-Level Services
+
+    #region RtiAmb Function Wrappers
+
+    #region Federation Management
+
+    /// <summary>
+    /// IEEE1516.1-2010 4.2: Connects to RTI
+    /// </summary>
+    /// <param name="callbackModel"> Callback model </param>
+    /// <param name="localSettingsDesignator">Connection paramaters in form of "protocol"://"ip":"port". For example: rti://127.0.0.1:12345 </param>
+    /// <returns>returns True/False.</returns>    
+    /// <remarks>This method is for IEEE1516-2010 compatiblity. Sets the federate status as CONNECTED.
+    /// </remarks>
+    virtual public bool Connect(CallbackModel callbackModel = CallbackModel.EVOKED, string localSettingsDesignator = "")
+    {
+      #region Contracts
+      // Preconditions
+      Contract.Requires(FederateState == FederateStates.NOTCONNECTED, " at Connect().");
+      // Postconditions
+      Contract.Ensures(FederateState.HasFlag(FederateStates.CONNECTED), "After Connect() call, federate state is not set correctly at Connect().");
+      #endregion
+
+      if (FederateState.HasFlag(FederateStates.NOTCONNECTED))
+        _rtiAmb.connect(callbackModel, localSettingsDesignator);
+      return FederateState.HasFlag(FederateStates.CONNECTED) ? true : false;
+    }
+
+    /// <summary>
+    /// IEEE1516.1-2010 4.3: Disconnects from RTI
+    /// </summary>
+    /// <remarks>This method is for IEEE1516-2010 compatiblity. Sets the federate status as NOTCONNECTED.
+    /// </remarks>
+    virtual public bool Disconnect()
+    {
+      #region Contracts
+      // Preconditions
+      Contract.Requires(FederateState.HasFlag(FederateStates.CONNECTED | FederateStates.NOTJOINED), " at Disconnect().");
+      // Postconditions
+      Contract.Ensures(FederateState.HasFlag(FederateStates.NOTCONNECTED), "After Disconnect() call, federate state is not set correctly at Disconnect().");
+      #endregion
+
+      if (FederateState.HasFlag(FederateStates.CONNECTED))
+        _rtiAmb.disconnect();
+      return FederateState.HasFlag(FederateStates.NOTCONNECTED) ? true : false;
+    }
+
+    /// <summary>
+    /// IEEE1516.1-2010 4.5: Creates a federation execution 
+    /// </summary>
+    /// <param name="fedexName">Name of the Federation Execution.</param>
+    /// <param name="fomModule">Path of the FDD file.</param>
+    /// <param name="logicalTimeImplementationName">Optional logical time implementation. If not provided, the RTI provided HLAfloat64Time representation of logical time shall be used.</param>
+    /// <returns>True if method call is succesfull.</returns>
+    /// <remarks>This method creates federation execution.
+    /// </remarks>
+    virtual public bool CreateFederationExecution(string fedexName, string fomModule, string logicalTimeImplementationName = "")
+    {
+      #region Contracts
+      // Preconditions
+      Contract.Requires(FederateState.HasFlag(FederateStates.CONNECTED), " at CreateFederationExecution().");
+      Contract.Requires(FederationExecutionState.HasFlag(FederationExecutionStates.FEDEX_DOESNOTEXIST), " at CreateFederationExecution().");
+      // Postconditions
+      Contract.Ensures(FederationExecutionState.HasFlag(FederationExecutionStates.FEDEX_EXISTS), " at CreateFederationExecution().");
+      #endregion
+
+      if (FederationExecutionState.HasFlag(FederationExecutionStates.FEDEX_DOESNOTEXIST))
+        _rtiAmb.createFederation(fedexName, fomModule, logicalTimeImplementationName);
+      return FederationExecutionState.HasFlag(FederationExecutionStates.FEDEX_EXISTS) ? true : false;
+    }
+
+    /// <summary>
+    /// IEEE1516.1-2010 4.5: Creates a federation execution with multiple FOM modules
+    /// </summary>
+    /// <param name="fedexName">Name of the Federation Execution.</param>
+    /// <param name="fomModules">FOM modules</param>
+    /// <param name="logicalTimeImplementationName">Optional logical time implementation. If not provided, the RTI provided HLAfloat64Time representation of logical time shall be used.</param>
+    /// <returns></returns>
+    virtual public bool CreateFederationExecution(string fedexName, List<string> fomModules, string logicalTimeImplementationName = "")
+    {
+      #region Contracts
+      // Preconditions
+      Contract.Requires(FederateState.HasFlag(FederateStates.CONNECTED), " at CreateFederationExecution().");
+      Contract.Requires(FederationExecutionState.HasFlag(FederationExecutionStates.FEDEX_DOESNOTEXIST), " at CreateFederationExecution().");
+      // Postconditions
+      Contract.Ensures(FederationExecutionState.HasFlag(FederationExecutionStates.FEDEX_EXISTS), " at CreateFederationExecution().");
+      #endregion
+
+      if (FederationExecutionState.HasFlag(FederationExecutionStates.FEDEX_DOESNOTEXIST))
+        _rtiAmb.createFederation(fedexName, fomModules, logicalTimeImplementationName);
+      return FederationExecutionState.HasFlag(FederationExecutionStates.FEDEX_EXISTS) ? true : false;
+    }
+
+    /// <summary>
+    /// IEEE1516.1-2010 4.5: Creates a federation execution with multiple FOM modules and a MIM module
+    /// </summary>
+    /// <param name="fedexName">Name of the Federation Execution.</param>
+    /// <param name="fomModules">FOM modules</param>
+    /// <param name="mimModule">Optional MIM designator. The RTI shall load the supplied MIM if specified; otherwise, it shall automatically load the standard MIM. the supplied MIM module designator shall not be “HLAstandardMIM.”</param>
+    /// <param name="logicalTimeImplementationName">Optional logical time implementation. If not provided, the RTI provided HLAfloat64Time representation of logical time shall be used.</param>
+    /// <returns></returns>
+    virtual public bool CreateFederationExecutionWithMIM(string fedexName, List<string> fomModules, string mimModule = "", string logicalTimeImplementationName = "")
+    {
+      #region Contracts
+      // Preconditions
+      Contract.Requires(FederateState.HasFlag(FederateStates.CONNECTED), " at CreateFederationExecution().");
+      Contract.Requires(FederationExecutionState.HasFlag(FederationExecutionStates.FEDEX_DOESNOTEXIST), " at CreateFederationExecution().");
+      // Postconditions
+      Contract.Ensures(FederationExecutionState.HasFlag(FederationExecutionStates.FEDEX_EXISTS), " at CreateFederationExecution().");
+      #endregion
+
+      if (FederationExecutionState.HasFlag(FederationExecutionStates.FEDEX_DOESNOTEXIST))
+        _rtiAmb.createFederation(fedexName, fomModules, mimModule, logicalTimeImplementationName);
+      return FederationExecutionState.HasFlag(FederationExecutionStates.FEDEX_EXISTS) ? true : false;
+    }
+
+    /// <summary>
+    /// IEEE1516.1-2010 4.7: Requests a list of current federation executions
+    /// </summary>
+    virtual public void ListFederationExecutions()
+    {
+      if (FederateState.HasFlag(FederateStates.CONNECTED))
+        _rtiAmb.listFederationExecutions();
+    }
+
+    /// <summary>
+    /// IEEE1516.1-2010 4.9: Joins a federation execution 
+    /// </summary>
+    /// <param name="federateType">Type of the joined federate. The federate type is used to distinguish federate categories in federation save-and-restore operation. </param>
+    /// <param name="federationExecutionName">Name of the Federation Execution to be joined.</param>
+    /// <param name="fomModules">The FOM module designators are optional and are used to provide additional FDD. The contents cannot conflict with the current FDD specified in federa-tion execution creation.</param>
+    /// <returns>True if method call is succesfull.</returns>
+    /// <remarks>Federate joins a federation execution.
+    /// </remarks>
+    virtual public bool JoinFederationExecution(string federateType, string federationExecutionName, List<string> fomModules = null)
+    {
+      #region Contracts
+      // Preconditions
+      Contract.Requires(FederateState.HasFlag(FederateStates.CONNECTED), " at JoinFederationExecution().");
+      Contract.Requires(FederationExecutionState.HasFlag(FederationExecutionStates.FEDEX_EXISTS), " at JoinFederationExecution().");
+      Contract.Requires(FederateState.HasFlag(FederateStates.NOTJOINED), " at JoinFederationExecution().");
+      // Postconditions
+      Contract.Ensures(FederateState.HasFlag(FederateStates.JOINED), " at JoinFederationExecution().");
+      #endregion
+
+      FederateHandle = _rtiAmb.joinFederationExecution(federateType, federationExecutionName, fomModules);
+      return FederateState.HasFlag(FederateStates.JOINED) ? true : false;
+    }
+
+    /// <summary>
+    /// IEEE1516.1-2010 4.9: join federation execution with a federate name
+    /// </summary>
+    /// <param name="federateName">Name must be unique in the federation execution.</param>
+    /// <param name="federateType">Type of the joined federate. The federate type is used to distinguish federate categories in federation save-and-restore operation. </param>
+    /// <param name="federationExecutionName">Name of the Federation Execution to be joined.</param>
+    /// <param name="fomModules">The FOM module designators are optional and are used to provide additional FDD. The contents cannot conflict with the current FDD specified in federa-tion execution creation.</param>
+    /// <returns></returns>
+    virtual public bool JoinFederationExecution(string federateName, string federateType, string federationExecutionName, List<string> fomModules = null)
+    {
+      #region Contracts
+      // Preconditions
+      Contract.Requires(FederateState.HasFlag(FederateStates.CONNECTED), " at JoinFederationExecution().");
+      Contract.Requires(FederationExecutionState.HasFlag(FederationExecutionStates.FEDEX_EXISTS), " at JoinFederationExecution().");
+      Contract.Requires(FederateState.HasFlag(FederateStates.NOTJOINED), " at JoinFederationExecution().");
+      // Postconditions
+      Contract.Ensures(FederateState.HasFlag(FederateStates.JOINED), " at JoinFederationExecution().");
+      #endregion
+
+      FederateHandle = _rtiAmb.joinFederationExecution(federateName, federateType, federationExecutionName, fomModules);
+      return FederateState.HasFlag(FederateStates.JOINED) ? true : false;
+    }
+    /// <summary>
+    /// HLA13 - join federation
+    /// </summary>
+    /// <param name="federateName">Name must be unique in the federation execution.</param>
+    /// <param name="federationExecutionName">Name of the Federation Execution to be joined.</param>
+    /// <returns></returns>
+    virtual public bool JoinFederationExecution(string federateName, string federationExecutionName)
+    {
+      #region Contracts
+      // Preconditions
+      Contract.Requires(FederateState.HasFlag(FederateStates.CONNECTED), " at JoinFederationExecution().");
+      Contract.Requires(FederationExecutionState.HasFlag(FederationExecutionStates.FEDEX_EXISTS), " at JoinFederationExecution().");
+      Contract.Requires(FederateState.HasFlag(FederateStates.NOTJOINED), " at JoinFederationExecution().");
+      // Postconditions
+      Contract.Ensures(FederateState.HasFlag(FederateStates.JOINED), " at JoinFederationExecution().");
+      #endregion
+
+      FederateHandle = _rtiAmb.joinFederationExecution(federateName, federationExecutionName);
+      return FederateState.HasFlag(FederateStates.JOINED) ? true : false;
+    }
+
 
     /// <summary>
     /// Resigns federation execution with user selected Resign Action 
@@ -1200,6 +1366,22 @@ namespace Racon.Federation
     }
 
     /// <summary>
+    /// IEEE1516.1-2010 4.21: abortFederationSave
+    /// </summary>
+    public virtual void AbortFederationSave()
+    {
+      _rtiAmb.abortFederationSave();
+    }
+
+    /// <summary>
+    /// IEEE1516.1-2010 4.22: queryFederationSaveStatus
+    /// </summary>
+    public virtual void QueryFederationSaveStatus()
+    {
+      _rtiAmb.queryFederationSaveStatus();
+    }
+
+    /// <summary>
     /// This method requests a federation restore associated with a previously saved name federation state.
     /// </summary>
     /// <returns>True if method call is succesfull.</returns>
@@ -1219,6 +1401,21 @@ namespace Racon.Federation
       _rtiAmb.federateRestoreComplete(isCompleted);
     }
 
+    /// <summary>
+    /// IEEE1516.1-2010 4.30: abortFederationRestore
+    /// </summary>
+    public virtual void AbortFederationRestore()
+    {
+      _rtiAmb.abortFederationRestore();
+    }
+    /// <summary>
+    /// IEEE1516.1-2010 4.31: queryFederationRestoreStatus
+    /// </summary>
+    public virtual void QueryFederationRestoreStatus()
+    {
+      _rtiAmb.queryFederationRestoreStatus();
+    }
+
     #endregion // Federation Management
 
     #region Declaration Management
@@ -1226,13 +1423,13 @@ namespace Racon.Federation
     /// Declares capability of a federate in terms of Publish/Subscribe:
     /// (1) Enables object class relevance advisory switch.
     /// (2) Gets object class and attribute handles.
-    /// (3) Publishs/subscribes all the object classes in SOM according to their PS status.
+    /// (3) Publishes/subscribes all the object classes in SOM according to their PS status.
     /// (4) Enables interaction relevance advisory switch.
     /// (5) Gets interaction class and parameter handles.
-    /// (6) Publishs/subscribes all the interaction classes in SOM according to their PS status.
+    /// (6) Publishes/subscribes all the interaction classes in SOM according to their PS status.
     /// </summary>
     /// <returns>True if method call is succesfull.</returns>
-    virtual internal bool declareCapability()
+    virtual public bool DeclareCapability()
     {
       try
       {
@@ -1309,7 +1506,7 @@ namespace Racon.Federation
     /// <param name="oc">Object class</param>
     /// <param name="attributes">Attributes</param>
     /// <returns>True if method call is succesfull.</returns>
-    virtual public bool PublishObjectClass(HlaObjectClass oc, BindingList<HlaAttribute> attributes)
+    virtual public bool PublishObjectClass(HlaObjectClass oc, List<HlaAttribute> attributes)
     {
       _rtiAmb.publishObjectClass(oc, attributes);
       return true;
@@ -1332,7 +1529,7 @@ namespace Racon.Federation
     /// <param name="attributes">Attributes</param>
     /// <param name="active">default is true</param>
     /// <returns>True if method call is succesfull.</returns>
-    virtual public bool SubscribeObjectClass(HlaObjectClass oc, BindingList<HlaAttribute> attributes, bool active = true)
+    virtual public bool SubscribeObjectClass(HlaObjectClass oc, List<HlaAttribute> attributes, bool active = true)
     {
       return _rtiAmb.subscribeObjectClass(oc, attributes, active);
     }
@@ -1360,16 +1557,7 @@ namespace Racon.Federation
     #region Data Distribution Management
 
     /// <summary>
-    /// AssociateRegionForUpdates
-    /// </summary>
-    /// <returns>True if method call is succesfull.</returns>
-    virtual public bool AssociateRegionForUpdates(CHlaRegion region, HlaObject hlaObject, List<HlaAttribute> attributes)
-    {
-      return _rtiAmb.associateRegionForUpdates(region, hlaObject, attributes);
-    }
-
-    /// <summary>
-    /// createRegions
+    /// Racon: createRegions for HLA13
     /// </summary>
     /// <returns>True if method call is succesfull.</returns>
     virtual internal bool createRegions()
@@ -1396,27 +1584,58 @@ namespace Racon.Federation
       }
       catch (Exception e)
       {
-        MessageBox.Show("MSG-(RACoN.Federation.GenericFederate.createRegions):" + Environment.NewLine + e.ToString(), "RACoN", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+        string msg = "EXC-(RACoN.Federation.GenericFederate.createRegions):" + e.ToString();
+        logger.Add(msg, LogLevel.WARN);
         return false;
       }
     }
 
     /// <summary>
-    /// DeleteRegion
+    /// IEEE1516.1-2010 9.2: createRegion
     /// </summary>
-    virtual public bool DeleteRegion(CHlaRegion region)
+    /// <param name="region"></param>
+    /// <param name="dimensions"></param>
+    /// <returns></returns>
+    public virtual uint CreateRegion(HlaRegion region, List<HlaDimension> dimensions)
     {
-      if (_rtiAmb.deleteRegion(region)) return true;
-      else return false;
+      return _rtiAmb.createRegion(region, dimensions);
     }
 
+    /// <summary>
+    /// IEEE1516.1-2010 9.3: commitRegionModifications
+    /// </summary>
+    /// <param name="regions"></param>
+    public virtual void CommitRegionModifications(List<HlaRegion> regions)
+    {
+      _rtiAmb.commitRegionModifications(regions);
+    }
+
+    /// <summary>
+    /// IEEE1516.1-2010 9.4: deleteRegion
+    /// </summary>
+    /// <param name="region"></param>
+    public virtual void DeleteRegion(HlaRegion region)
+    {
+      _rtiAmb.deleteRegion(region);
+    }
+
+    /// <summary>
+    /// IEEE1516.1-2010 9.5: registerObjectInstanceWithRegions
+    /// </summary>
+    /// <param name="objectTobeRegistered"></param>
+    /// <param name="pairs">AttributeHandleSetRegionHandleSetPairVector</param>
+    public virtual bool RegisterHlaObject(HlaObject objectTobeRegistered, AttributeHandleSetRegionHandleSetPairVector pairs)
+    {
+      _rtiAmb.registerObjectInstanceWithRegions(objectTobeRegistered, pairs);
+      return true;
+    }
     /// <summary>
     /// Registers object with a specific region with all its publishable (P) attributes. Here, we assume that all attributes are related with a single region.
     /// </summary>
     /// <param name="theObject">Object to be registered. If object name is set then this method registers the object with its name. Object name must be unique.</param>
     /// <param name="region">The region. Here, we assume that all attributes are related with this region.</param>
     /// <returns>Returns true/false.</returns>
-    virtual public bool RegisterHlaObject(HlaObject theObject, CHlaRegion region)
+    virtual public bool RegisterHlaObject(HlaObject theObject, HlaRegion region)
     {
       #region Contracts
       // Preconditions
@@ -1454,7 +1673,7 @@ namespace Racon.Federation
     /// <param name="attributes">Selected object attributes that will be related with the region.</param>
     /// <param name="region">The region. Here, we assume that all attributes are related with this region.</param>
     /// <returns>Returns true/false.</returns>
-    virtual public bool RegisterHlaObject(HlaObject theObject, List<HlaAttribute> attributes, CHlaRegion region)
+    virtual public bool RegisterHlaObject(HlaObject theObject, List<HlaAttribute> attributes, HlaRegion region)
     {
       #region Contracts
       // Preconditions
@@ -1481,7 +1700,7 @@ namespace Racon.Federation
 
       // Select only P or PS attributes
       List<HlaAttribute> pAttributes = new List<HlaAttribute>();
-      List<CHlaRegion> regions = new List<CHlaRegion>();
+      List<HlaRegion> regions = new List<HlaRegion>();
       foreach (var attr in attributes)
       {
         if ((attr.AttributePS == PSKind.Publish) || (attr.AttributePS == PSKind.PublishSubscribe))
@@ -1490,7 +1709,8 @@ namespace Racon.Federation
           regions.Add(region);
         }
       }
-      return _rtiAmb.registerObjectInstanceWithRegion(theObject, pAttributes, regions);
+      _rtiAmb.registerObjectInstanceWithRegions(theObject, pAttributes, regions);
+      return true;
     }
 
     /// <summary>
@@ -1540,7 +1760,7 @@ namespace Racon.Federation
 
       // Select only P or PS attributes
       List<HlaAttribute> attributes = new List<HlaAttribute>();
-      List<CHlaRegion> regions = new List<CHlaRegion>();
+      List<HlaRegion> regions = new List<HlaRegion>();
       foreach (var pair in attributeRegionPairs.GetPairs())
       {
         // Check that provided attribute is P or PS
@@ -1552,66 +1772,171 @@ namespace Racon.Federation
           regions.Add(pair.Value);
         }
       }
-      return _rtiAmb.registerObjectInstanceWithRegion(theObject, attributes, regions);
-    }
-
-    /// <summary>
-    /// Request Class Attribute Value Update w/ Region
-    /// </summary>
-    /// <returns>True if method call is succesfull.</returns>
-    virtual public bool RequestClassAttributeValueUpdateWithRegion(HlaObjectClass theClass, List<HlaAttribute> attributes, CHlaRegion region)
-    {
-      if (_rtiAmb.requestClassAttributeValueUpdateWithRegion(theClass, attributes, region)) return true;
-      else return false;
-    }
-
-    /// <summary>
-    /// // Subscribe Interaction With Region
-    /// </summary>
-    /// <returns>True if method call is succesfull.</returns>
-    virtual public bool SubscribeInteractionClass(HlaInteractionClass ic, CHlaRegion region)
-    {
-      _rtiAmb.subscribeInteractionClass(ic, region);
+      _rtiAmb.registerObjectInstanceWithRegions(theObject, attributes, regions);
       return true;
+    }
+
+    /// <summary>
+    /// IEEE1516.1-2010 9.6: associateRegionsForUpdates
+    /// </summary>
+    /// <param name="obj"></param>
+    /// <param name="pairs"></param>
+    public virtual bool associateRegionsForUpdates(HlaObject obj, AttributeHandleSetRegionHandleSetPairVector pairs)
+    {
+      return _rtiAmb.associateRegionsForUpdates(obj, pairs);
+    }
+
+    /// <summary>
+    /// HLA13: AssociateRegionForUpdates
+    /// </summary>
+    /// <returns>True if method call is succesfull.</returns>
+    virtual public bool AssociateRegionForUpdates(HlaRegion region, HlaObject hlaObject, List<HlaAttribute> attributes)
+    {
+      return _rtiAmb.associateRegionForUpdates(region, hlaObject, attributes);
+    }
+
+    /// <summary>
+    /// IEEE1516.1-2010 9.7: unassociateRegionsForUpdates
+    /// </summary>
+    /// <param name="obj"></param>
+    /// <param name="pairs"></param>
+    public virtual bool UnassociateRegionsForUpdates(HlaObject obj, AttributeHandleSetRegionHandleSetPairVector pairs)
+    {
+      return _rtiAmb.unassociateRegionsForUpdates(obj, pairs);
+    }
+
+    /// <summary>
+    /// HLA13: unassociateRegionForUpdates
+    /// </summary>
+    /// <returns>True if method call is succesfull.</returns>
+    virtual public bool UnassociateRegionForUpdates(HlaRegion region, HlaObject hlaObject)
+    {
+      return _rtiAmb.unassociateRegionForUpdates(region, hlaObject);
+    }
+
+    /// <summary>
+    /// IEEE1516.1-2010 9.8: subscribeObjectClassAttributesWithRegions
+    /// </summary>
+    /// <param name="oc"></param>
+    /// <param name="pairs"></param>
+    /// <param name="passiveSubscriptionIndicator"></param>
+    public virtual bool subscribeObjectClassAttributesWithRegions(HlaObjectClass oc, AttributeHandleSetRegionHandleSetPairVector pairs, bool passiveSubscriptionIndicator = true)
+    {
+      return _rtiAmb.subscribeObjectClassAttributesWithRegions(oc, pairs, passiveSubscriptionIndicator);
     }
 
     /// <summary>
     /// // Subscribe Object Class With Region
     /// </summary>
     /// <returns>True if method call is succesfull.</returns>
-    virtual public bool subscribeObjectClassAttributesWithRegion(HlaObjectClass oc, List<HlaAttribute> attributes, CHlaRegion region, bool active = true)
+    virtual public bool subscribeObjectClassAttributesWithRegion(HlaObjectClass oc, List<HlaAttribute> attributes, HlaRegion region, bool active = true)
     {
-      return _rtiAmb.subscribeObjectClassAttributesWithRegion(oc, attributes, region, active);
+      return _rtiAmb.subscribeObjectClassAttributesWithRegions(oc, attributes, region, active);
     }
 
     /// <summary>
-    /// unassociateRegionForUpdates
+    /// IEEE1516.1-2010 9.9: unsubscribeObjectClassWithRegions
     /// </summary>
-    /// <returns>True if method call is succesfull.</returns>
-    virtual public bool UnassociateRegionForUpdates(CHlaRegion region, HlaObject hlaObject)
+    /// <param name="oc"></param>
+    /// <param name="pairs"></param>
+    /// <returns></returns>
+    public virtual bool UnsubscribeObjectClassWithRegions(HlaObjectClass oc, AttributeHandleSetRegionHandleSetPairVector pairs)
     {
-      if (_rtiAmb.unassociateRegionForUpdates(region, hlaObject)) return true;
-      else return false;
+      return _rtiAmb.unsubscribeObjectClassWithRegions(oc, pairs);
     }
 
     /// <summary>
-    /// Unsubscribe Interaction Class With Region
+    /// HLA13: Unsubscribe Object Class With Region
     /// </summary>
     /// <returns>True if method call is succesfull.</returns>
-    virtual public bool UnsubscribeInteractionClass(HlaInteractionClass ic, CHlaRegion region)
+    virtual public bool UnsubscribeObjectClassWithRegions(HlaObjectClass oc, HlaRegion region)
     {
-      _rtiAmb.unsubscribeInteractionClass(ic, region);
-      return true;
+      return _rtiAmb.unsubscribeObjectClassWithRegions(oc, region);
     }
 
     /// <summary>
-    /// Unsubscribe Object Class With Region
+    /// IEEE1516.1-2010 9.10: subscribeInteractionClassWithRegions
+    /// </summary>
+    /// <param name="ic"></param>
+    /// <param name="regions"></param>
+    /// <param name="indicator"></param>
+    /// <returns></returns>
+    public virtual bool SubscribeInteractionClassWithRegions(HlaInteractionClass ic, List<HlaRegion> regions, bool indicator = true)
+    {
+      return _rtiAmb.subscribeInteractionClassWithRegions(ic, regions, indicator);
+    }
+
+    /// <summary>
+    /// HLA13: Subscribe Interaction With Region
     /// </summary>
     /// <returns>True if method call is succesfull.</returns>
-    virtual public bool UnsubscribeObjectClass(HlaObjectClass oc, CHlaRegion region)
+    virtual public bool SubscribeInteractionClass(HlaInteractionClass ic, HlaRegion region)
     {
-      _rtiAmb.unsubscribeObjectClassWithRegion(oc, region);
-      return true;
+      return _rtiAmb.subscribeInteractionClassWithRegion(ic, region);
+    }
+
+    /// <summary>
+    /// IEEE1516.1-2010 9.11: unSubscribeInteractionClassWithRegions
+    /// </summary>
+    /// <param name="ic"></param>
+    /// <param name="regions"></param>
+    /// <returns></returns>
+    public virtual bool UnSubscribeInteractionClassWithRegions(HlaInteractionClass ic, List<HlaRegion> regions)
+    {
+      return _rtiAmb.unSubscribeInteractionClassWithRegions(ic, regions);
+    }
+
+    /// <summary>
+    /// HLA13: Unsubscribe Interaction Class With Region
+    /// </summary>
+    /// <returns>True if method call is succesfull.</returns>
+    virtual public bool UnsubscribeInteractionClass(HlaInteractionClass ic, HlaRegion region)
+    {
+      return _rtiAmb.unSubscribeInteractionClassWithRegion(ic, region);
+    }
+
+    /// <summary>
+    /// IEEE1516.1-2010 9.12: sendInteractionWithRegions
+    /// </summary>
+    /// <param name="ic"></param>
+    /// <param name="regions"></param>
+    /// <returns></returns>
+    public virtual bool SendInteractionWithRegions(HlaInteractionClass ic, List<HlaRegion> regions)
+    {
+      return _rtiAmb.sendInteractionWithRegions(ic, regions, ic.Tag);
+    }
+
+    /// <summary>
+    /// IEEE1516.1-2010 9.12: sendInteractionWithRegions with timestamp
+    /// </summary>
+    /// <param name="ic"></param>
+    /// <param name="regions"></param>
+    /// <param name="timestamp"></param>
+    /// <returns></returns>
+    public virtual MessageRetraction SendInteractionWithRegions(HlaInteractionClass ic, List<HlaRegion> regions, double timestamp)
+    {
+      return _rtiAmb.sendInteractionWithRegions(ic, regions, ic.Tag, timestamp);
+    }
+
+    /// <summary>
+    /// IEEE1516.1-2010 9.13: requestClassAttributeValueUpdateWithRegions
+    /// </summary>
+    /// <param name="oc"></param>
+    /// <param name="pairs"></param>
+    /// <param name="tag"></param>
+    /// <returns></returns>
+    public virtual bool RequestAttributeValueUpdateWithRegions(HlaObjectClass oc, AttributeHandleSetRegionHandleSetPairVector pairs, string tag)
+    {
+      return _rtiAmb.requestClassAttributeValueUpdateWithRegions(oc, pairs, tag);
+    }
+
+    /// <summary>
+    /// HLA13: Request Class Attribute Value Update w/ Region
+    /// </summary>
+    /// <returns>True if method call is succesfull.</returns>
+    virtual public bool RequestClassAttributeValueUpdateWithRegion(HlaObjectClass theClass, List<HlaAttribute> attributes, HlaRegion region)
+    {
+      return _rtiAmb.requestClassAttributeValueUpdateWithRegion(theClass, attributes, region);
     }
 
     #endregion
@@ -1629,7 +1954,7 @@ namespace Racon.Federation
     /// <summary>
     /// Schedule to delete Object Instance at a specified time
     /// </summary>
-    virtual public EventRetractionHandle DeleteObjectInstance(HlaObject obj, double time)
+    virtual public MessageRetraction DeleteObjectInstance(HlaObject obj, double time)
     {
       return _rtiAmb.deleteObjectInstance(obj, time);
     }
@@ -1721,14 +2046,14 @@ namespace Racon.Federation
     /// Sends an interaction. If a region is specified then send the interaction in that region.
     /// </summary>
     /// <returns>True if method call is succesfull.</returns>
-    virtual public bool SendInteraction(HlaInteraction theInteraction, CHlaRegion region = null)
+    virtual public bool SendInteraction(HlaInteraction theInteraction, HlaRegion region = null)
     {
       bool res = false;
 
       if (region == null)
         res = _rtiAmb.sendInteraction(theInteraction);
       else
-        res = _rtiAmb.sendInteraction(theInteraction, region);
+        res = _rtiAmb.sendInteractionWithRegion(theInteraction, region);
 
       return res;
     }
@@ -1739,13 +2064,13 @@ namespace Racon.Federation
     /// <param name="theInteraction">HLA interaction to be sent.</param>
     /// <param name="timestamp">timestamp.</param>
     /// <returns> returns Event Retraction Handle.</returns>
-    virtual public EventRetractionHandle SendInteraction(HlaInteraction theInteraction, double timestamp)
+    virtual public MessageRetraction SendInteraction(HlaInteraction theInteraction, double timestamp)
     {
       return _rtiAmb.sendInteraction(theInteraction, timestamp);
     }
 
     /// <summary>
-    /// Register (create) HLA Object.
+    /// Registers (create) an HLA object instance. The object handle is assigned by the RTI at the end of a succesfull method call.
     /// </summary>
     /// <param name="theObject">HLA Object to be registered.</param>
     /// <returns>True if method call is succesfull.</returns>
@@ -1820,7 +2145,7 @@ namespace Racon.Federation
     /// <summary>
     ///UpdateAttributeValues with timestamp
     /// </summary>
-    virtual public EventRetractionHandle UpdateAttributeValues(HlaObject theObject, Double timestamp)
+    virtual public MessageRetraction UpdateAttributeValues(HlaObject theObject, Double timestamp)
     {
       #region Contracts
       // Preconditions
@@ -1850,10 +2175,177 @@ namespace Racon.Federation
     #region Ownership Management
 
     /// <summary>
+    /// IEEE1516.1-2010 7.2 and HLA13
+    /// </summary>
+    /// <remarks>
+    /// Releases ownership of a specified set of instance attributes for a specified object instance. The attributes immediately become unowned and are available for acquisition by any federate.
+    /// </remarks>
+    /// <param name="theObject"></param>
+    /// <param name="attributeSet"></param>
+    /// <returns></returns>
+    virtual public bool UnconditionalAttributeOwnershipDivestiture(HlaObject theObject, List<HlaAttribute> attributeSet)
+    {
+      #region Contracts
+      // Preconditions
+      //a) The federate is connected to the RTI.
+      //b) The federation execution exists.
+      Contract.Requires(FederationExecutionState == FederationExecutionStates.FEDEX_EXISTS, " at AttributeOwnershipAcquisitionIfAvailable().");
+      //c) The federate is joined to that federation execution.
+      Contract.Requires(FederateState.HasFlag(FederateStates.JOINED), " at AttributeOwnershipAcquisitionIfAvailable().");
+      //d) An object instance with the specified designator exists.
+      //g) The joined federate knows about the object instance with the specified designator.
+      //h) Federate save not in progress.
+      //i) Federate restore not in progress.
+
+      // Postconditions
+      #endregion
+
+      return _rtiAmb.unconditionalAttributeOwnershipDivestiture(theObject, attributeSet);
+    }
+
+    /// <summary>
+    /// IEEE1516.1-2010 7.3 and HLA13 
+    /// </summary>
+    /// <remarks>
+    /// Initiates an attempt to release ownership of a specified set of instance-attributes for a specified object instance. 
+    /// In the absence of an acquiring federate, the instance-attributes will continue to be owned by the divesting federate.
+    /// </remarks>
+    /// <param name="theObject"></param>
+    /// <param name="attributeSet"></param>
+    /// <param name="tag"></param>
+    /// <returns></returns>
+    virtual public bool NegotiatedAttributeOwnershipDivestiture(HlaObject theObject, List<HlaAttribute> attributeSet, string tag)
+    {
+      #region Contracts
+      // Preconditions
+      //a) The federate is connected to the RTI.
+      //b) The federation execution exists.
+      Contract.Requires(FederationExecutionState == FederationExecutionStates.FEDEX_EXISTS, " at AttributeOwnershipAcquisitionIfAvailable().");
+      //c) The federate is joined to that federation execution.
+      Contract.Requires(FederateState.HasFlag(FederateStates.JOINED), " at AttributeOwnershipAcquisitionIfAvailable().");
+      //d) An object instance with the specified designator exists.
+      //g) The joined federate knows about the object instance with the specified designator.
+      //h) Federate save not in progress.
+      //i) Federate restore not in progress.
+
+      // Postconditions
+      #endregion
+
+      return _rtiAmb.negotiatedAttributeOwnershipDivestiture(theObject, attributeSet, tag);
+    }
+
+    /// <summary>
+    /// Racon
+    /// </summary>
+    /// <remarks>
+    /// Initiates an attempt to release ownership of all instance-attributes for a specified object instance. 
+    /// In the absence of an acquiring federate, the instance-attributes will continue to be owned by the divesting federate.
+    /// </remarks>
+    /// <param name="theObject"></param>
+    /// <param name="tag"></param>
+    /// <returns></returns>
+    virtual public bool NegotiatedAttributeOwnershipDivestiture(HlaObject theObject, string tag)
+    {
+      #region Contracts
+      // Preconditions
+      //a) The federate is connected to the RTI.
+      //b) The federation execution exists.
+      Contract.Requires(FederationExecutionState == FederationExecutionStates.FEDEX_EXISTS, " at AttributeOwnershipAcquisitionIfAvailable().");
+      //c) The federate is joined to that federation execution.
+      Contract.Requires(FederateState.HasFlag(FederateStates.JOINED), " at AttributeOwnershipAcquisitionIfAvailable().");
+      //d) An object instance with the specified designator exists.
+      //g) The joined federate knows about the object instance with the specified designator.
+      //h) Federate save not in progress.
+      //i) Federate restore not in progress.
+
+      // Postconditions
+      #endregion
+
+      return NegotiatedAttributeOwnershipDivestiture(theObject, theObject.Type.Attributes, tag);
+    }
+
+    /// <summary>
+    /// IEEE1516-2010 7.6
+    /// </summary>
+    /// <param name="theObject"></param>
+    /// <param name="attributeSet"></param>
+    /// <param name="tag"></param>
+    /// <returns></returns>
+    public virtual bool ConfirmDivestiture(HlaObject theObject, List<HlaAttribute> attributeSet, string tag)
+    {
+      return _rtiAmb.confirmDivestiture(theObject, attributeSet, tag);
+    }
+
+    /// <summary>
+    /// IEEE1516.1-2010 7.8 and HLA13 
+    /// </summary>
+    /// <remarks>
+    /// Initiates an attempt to acquire a specified set of attributes of an object instance. 
+    /// </remarks>
+    /// <param name="theObject"></param>
+    /// <param name="attributeSet"></param>
+    /// <param name="tag"></param>
+    /// <returns></returns>
+    virtual public bool AttributeOwnershipAcquisition(HlaObject theObject, List<HlaAttribute> attributeSet ,string tag)
+    {
+      #region Contracts
+      // Preconditions
+      //a) The federate is connected to the RTI.
+      //b) The federation execution exists.
+      Contract.Requires(FederationExecutionState == FederationExecutionStates.FEDEX_EXISTS, " at AttributeOwnershipAcquisitionIfAvailable().");
+      //c) The federate is joined to that federation execution.
+      Contract.Requires(FederateState.HasFlag(FederateStates.JOINED), " at AttributeOwnershipAcquisitionIfAvailable().");
+      //d) An object instance with the specified designator exists.
+      //g) The joined federate knows about the object instance with the specified designator.
+      //h) Federate save not in progress.
+      //i) Federate restore not in progress.
+
+      // Postconditions
+      #endregion
+
+      return _rtiAmb.attributeOwnershipAcquisition(theObject, attributeSet, tag);
+    }
+
+    /// <summary>
+    /// Racon
+    /// </summary>
+    /// <remarks>
+    /// Initiates an attempt to acquire all attributes of an object instance. 
+    /// </remarks>
+    /// <param name="theObject"></param>
+    /// <param name="tag"></param>
+    /// <returns></returns>
+    virtual public bool AttributeOwnershipAcquisition(HlaObject theObject, string tag)
+    {
+      #region Contracts
+      // Preconditions
+      //a) The federate is connected to the RTI.
+      //b) The federation execution exists.
+      Contract.Requires(FederationExecutionState == FederationExecutionStates.FEDEX_EXISTS, " at AttributeOwnershipAcquisitionIfAvailable().");
+      //c) The federate is joined to that federation execution.
+      Contract.Requires(FederateState.HasFlag(FederateStates.JOINED), " at AttributeOwnershipAcquisitionIfAvailable().");
+      //d) An object instance with the specified designator exists.
+      //g) The joined federate knows about the object instance with the specified designator.
+      //h) Federate save not in progress.
+      //i) Federate restore not in progress.
+
+      // Postconditions
+      #endregion
+
+      return AttributeOwnershipAcquisition(theObject, theObject.Type.Attributes, tag);
+    }
+
+    /// <summary>
+    /// IEEE1516.1-2010 7.9 and HLA13 
+    /// </summary>
+    /// <remarks>
     /// Initiates an attempt to acquire a set of instanceattributes of an object instance. 
     /// Only instance-attributes that exist in the federation but are currently unowned will be acquired.
-    /// </summary>
-    virtual public bool AttributeOwnershipAcquisitionIfAvailable(HlaObject theObject, RaconAttributeSet set)
+    /// </remarks>
+    /// <param name="theObject"></param>
+    /// <param name="attributeSet"></param>
+    /// <returns></returns>
+    public virtual bool AttributeOwnershipAcquisitionIfAvailable(HlaObject theObject, List<HlaAttribute> attributeSet)
     {
       #region Contracts
       // Preconditions
@@ -1870,25 +2362,50 @@ namespace Racon.Federation
       // Postconditions
       #endregion
 
-      if (_rtiAmb.attributeOwnershipAcquisitionIfAvailable(theObject, set))
-      {
-        return true;
-      }
-      else return false;
+      return _rtiAmb.attributeOwnershipAcquisitionIfAvailable(theObject, attributeSet);
     }
 
     /// <summary>
-    /// Initiates an attempt to acquire a specified set of attributes of an object instance. 
+    /// IEEE1516-2010 7.12
     /// </summary>
-    virtual public bool AttributeOwnershipAcquisition(HlaObject theObject, RaconAttributeSet set)
+    /// <param name="theObject">Object instance designator</param>
+    /// <param name="attributeSet">Set of attribute designators for which the joined federate is unwilling to divest ownership</param>
+    /// <returns></returns>
+    public virtual bool AttributeOwnershipReleaseDenied(HlaObject theObject, List<HlaAttribute> attributeSet)
+    {
+      return _rtiAmb.attributeOwnershipReleaseDenied(theObject, attributeSet);
+    }
+
+    /// <summary>
+    /// IEEE1516-2010 7.13
+    /// </summary>
+    /// <param name="theObject">Object instance designator</param>
+    /// <param name="attributeSet">Set of attribute designators for which the joined federate is willing to divest ownership.</param>
+    /// <param name="attributesDivested">Set of attribute designators for which ownership has actually been divested. This is filled by the RTI.</param>
+    /// <returns></returns>
+    public virtual bool AttributeOwnershipDivestitureIfWanted(HlaObject theObject, List<HlaAttribute> attributeSet, out List<HlaAttribute> attributesDivested)
+    {
+      return _rtiAmb.attributeOwnershipDivestitureIfWanted(theObject, attributeSet, out attributesDivested);
+    }
+
+    /// <summary>
+    /// IEEE1516.1-2010 7.14 and HLA13
+    /// </summary>
+    /// <remarks>
+    /// Cancels a previously requested negotiated ownership divestiture for a specified set of instance-attributes of a specified object instance.
+    /// </remarks>
+    /// <param name="theObject"></param>
+    /// <param name="attributes"></param>
+    /// <returns></returns>
+    virtual public bool CancelNegotiatedAttributeOwnershipDivestiture(HlaObject theObject, List<HlaAttribute> attributes)
     {
       #region Contracts
       // Preconditions
       //a) The federate is connected to the RTI.
       //b) The federation execution exists.
-      Contract.Requires(FederationExecutionState == FederationExecutionStates.FEDEX_EXISTS, " at AttributeOwnershipAcquisitionIfAvailable().");
+      Contract.Requires(FederationExecutionState == FederationExecutionStates.FEDEX_EXISTS, " at attributeOwnershipReleaseResponse().");
       //c) The federate is joined to that federation execution.
-      Contract.Requires(FederateState.HasFlag(FederateStates.JOINED), " at AttributeOwnershipAcquisitionIfAvailable().");
+      Contract.Requires(FederateState.HasFlag(FederateStates.JOINED), " at attributeOwnershipReleaseResponse().");
       //d) An object instance with the specified designator exists.
       //g) The joined federate knows about the object instance with the specified designator.
       //h) Federate save not in progress.
@@ -1897,42 +2414,19 @@ namespace Racon.Federation
       // Postconditions
       #endregion
 
-      return _rtiAmb.attributeOwnershipAcquisition(theObject, set);
+      return _rtiAmb.cancelNegotiatedAttributeOwnershipDivestiture(theObject, attributes);
     }
+
     /// <summary>
-    /// Initiates an attempt to acquire all attributes of an object instance. 
+    /// IEEE1516.1-2010 7.15 and HLA13
     /// </summary>
-    virtual public bool AttributeOwnershipAcquisition(HlaObject theObject)
-    {
-      #region Contracts
-      // Preconditions
-      //a) The federate is connected to the RTI.
-      //b) The federation execution exists.
-      Contract.Requires(FederationExecutionState == FederationExecutionStates.FEDEX_EXISTS, " at AttributeOwnershipAcquisitionIfAvailable().");
-      //c) The federate is joined to that federation execution.
-      Contract.Requires(FederateState.HasFlag(FederateStates.JOINED), " at AttributeOwnershipAcquisitionIfAvailable().");
-      //d) An object instance with the specified designator exists.
-      //g) The joined federate knows about the object instance with the specified designator.
-      //h) Federate save not in progress.
-      //i) Federate restore not in progress.
-
-      // Postconditions
-      #endregion
-
-      // Create a set
-      RaconAttributeSet set = new RaconAttributeSet();
-      // Add all class attributes
-      //HlaObjectClass oc = _som.OCList.SingleOrDefault(p => p.Handle == theObject.ClassHandle); // returns null if not found
-      //if (oc != null)
-      foreach (HlaAttribute attr in theObject.Type.Attributes)
-        set.AddAttribute(attr);
-      return AttributeOwnershipAcquisition(theObject, set);
-    }
-
-    /// <summary>
+    /// <remarks>
     /// Requests the cancellation of a previously requested ownership acquisition for a specified set of instance-attributes of a specified object instance.
-    /// </summary>
-    virtual public bool CancelAttributeOwnershipAcquisition(HlaObject theObject, RaconAttributeSet set)
+    /// </remarks>
+    /// <param name="theObject"></param>
+    /// <param name="attributes"></param>
+    /// <returns></returns>
+    virtual public bool CancelAttributeOwnershipAcquisition(HlaObject theObject, List<HlaAttribute> attributes)
     {
       #region Contracts
       // Preconditions
@@ -1949,16 +2443,18 @@ namespace Racon.Federation
       // Postconditions
       #endregion
 
-      if (_rtiAmb.cancelAttributeOwnershipAcquisition(theObject, set))
-      {
-        return true;
-      }
-      else return false;
+      return _rtiAmb.cancelAttributeOwnershipAcquisition(theObject, attributes);
     }
 
     /// <summary>
-    /// Determines which federate (if any) holds the attribute ownership token for a given instance-attribute.
+    /// IEEE1516.1-2010 7.17 and HLA13 
     /// </summary>
+    /// <remarks>
+    /// Determines which federate (if any) holds the attribute ownership token for a given instance-attribute.
+    /// </remarks>
+    /// <param name="theObject"></param>
+    /// <param name="attribute"></param>
+    /// <returns></returns>
     virtual public bool QueryAttributeOwnership(HlaObject theObject, HlaAttribute attribute)
     {
       #region Contracts
@@ -1976,71 +2472,18 @@ namespace Racon.Federation
       // Postconditions
       #endregion
 
-      if (_rtiAmb.queryAttributeOwnership(theObject, attribute))
-      {
-        return true;
-      }
-      else return false;
+      return _rtiAmb.queryAttributeOwnership(theObject, attribute);
     }
 
     /// <summary>
-    /// Releases ownership of a set of instance-attributes for a specified instance, 
-    /// in compliance with a requestAttribute-OwnershipRelease() request. HLA-13 specific?
+    /// IEEE1516.1-2010 7.19 and HLA13 
     /// </summary>
-    virtual public bool AttributeOwnershipReleaseResponse(HlaObject theObject, RaconAttributeSet set)
-    {
-      #region Contracts
-      // Preconditions
-      //a) The federate is connected to the RTI.
-      //b) The federation execution exists.
-      Contract.Requires(FederationExecutionState == FederationExecutionStates.FEDEX_EXISTS, " at attributeOwnershipReleaseResponse().");
-      //c) The federate is joined to that federation execution.
-      Contract.Requires(FederateState.HasFlag(FederateStates.JOINED), " at attributeOwnershipReleaseResponse().");
-      //d) An object instance with the specified designator exists.
-      //g) The joined federate knows about the object instance with the specified designator.
-      //h) Federate save not in progress.
-      //i) Federate restore not in progress.
-
-      // Postconditions
-      #endregion
-
-      if (_rtiAmb.attributeOwnershipReleaseResponse(theObject, set))
-      {
-        return true;
-      }
-      else return false;
-    }
-
-    /// <summary>
-    /// Cancels a previously requested negotiated ownership divestiture for a specified set of instance-attributes of a specified object instance.
-    /// </summary>
-    virtual public bool CancelNegotiatedAttributeOwnershipDivestiture(HlaObject theObject, RaconAttributeSet set)
-    {
-      #region Contracts
-      // Preconditions
-      //a) The federate is connected to the RTI.
-      //b) The federation execution exists.
-      Contract.Requires(FederationExecutionState == FederationExecutionStates.FEDEX_EXISTS, " at attributeOwnershipReleaseResponse().");
-      //c) The federate is joined to that federation execution.
-      Contract.Requires(FederateState.HasFlag(FederateStates.JOINED), " at attributeOwnershipReleaseResponse().");
-      //d) An object instance with the specified designator exists.
-      //g) The joined federate knows about the object instance with the specified designator.
-      //h) Federate save not in progress.
-      //i) Federate restore not in progress.
-
-      // Postconditions
-      #endregion
-
-      if (_rtiAmb.cancelNegotiatedAttributeOwnershipDivestiture(theObject, set))
-      {
-        return true;
-      }
-      else return false;
-    }
-
-    /// <summary>
+    /// <remarks>
     /// Queries the LRC to determine whether a specified instance-attribute of a specified object instance is currently owned by the local federate.
-    /// </summary>
+    /// </remarks>
+    /// <param name="theObject"></param>
+    /// <param name="attribute"></param>
+    /// <returns></returns>
     virtual public bool IsAttributeOwnedByFederate(HlaObject theObject, HlaAttribute attribute)
     {
       #region Contracts
@@ -2058,26 +2501,25 @@ namespace Racon.Federation
       // Postconditions
       #endregion
 
-      if (_rtiAmb.isAttributeOwnedByFederate(theObject, attribute))
-      {
-        return true;
-      }
-      else return false;
+      return _rtiAmb.isAttributeOwnedByFederate(theObject, attribute);
     }
 
     /// <summary>
-    /// Initiates an attempt to release ownership of a specified set of instance-attributes for a specified object instance. 
-    /// In the absence of an acquiring federate, the instance-attributes will continue to be owned by the divesting federate.
+    /// HLA13
     /// </summary>
-    virtual public bool NegotiatedAttributeOwnershipDivestiture(HlaObject theObject, RaconAttributeSet set)
+    /// <remarks>
+    /// Releases ownership of a set of instance-attributes for a specified instance, 
+    /// in compliance with a requestAttribute-OwnershipRelease() request. HLA-13 specific?
+    /// </remarks>
+    virtual public bool AttributeOwnershipReleaseResponse(HlaObject theObject, List<HlaAttribute> attributes)
     {
       #region Contracts
       // Preconditions
       //a) The federate is connected to the RTI.
       //b) The federation execution exists.
-      Contract.Requires(FederationExecutionState == FederationExecutionStates.FEDEX_EXISTS, " at AttributeOwnershipAcquisitionIfAvailable().");
+      Contract.Requires(FederationExecutionState == FederationExecutionStates.FEDEX_EXISTS, " at attributeOwnershipReleaseResponse().");
       //c) The federate is joined to that federation execution.
-      Contract.Requires(FederateState.HasFlag(FederateStates.JOINED), " at AttributeOwnershipAcquisitionIfAvailable().");
+      Contract.Requires(FederateState.HasFlag(FederateStates.JOINED), " at attributeOwnershipReleaseResponse().");
       //d) An object instance with the specified designator exists.
       //g) The joined federate knows about the object instance with the specified designator.
       //h) Federate save not in progress.
@@ -2086,117 +2528,39 @@ namespace Racon.Federation
       // Postconditions
       #endregion
 
-      return (_rtiAmb.negotiatedAttributeOwnershipDivestiture(theObject, set));
-    }
-    /// <summary>
-    /// Initiates an attempt to release ownership of all instance-attributes for a specified object instance. 
-    /// In the absence of an acquiring federate, the instance-attributes will continue to be owned by the divesting federate.
-    /// </summary>
-    virtual public bool NegotiatedAttributeOwnershipDivestiture(HlaObject theObject)
-    {
-      #region Contracts
-      // Preconditions
-      //a) The federate is connected to the RTI.
-      //b) The federation execution exists.
-      Contract.Requires(FederationExecutionState == FederationExecutionStates.FEDEX_EXISTS, " at AttributeOwnershipAcquisitionIfAvailable().");
-      //c) The federate is joined to that federation execution.
-      Contract.Requires(FederateState.HasFlag(FederateStates.JOINED), " at AttributeOwnershipAcquisitionIfAvailable().");
-      //d) An object instance with the specified designator exists.
-      //g) The joined federate knows about the object instance with the specified designator.
-      //h) Federate save not in progress.
-      //i) Federate restore not in progress.
-
-      // Postconditions
-      #endregion
-
-      // Create a set
-      RaconAttributeSet set = new RaconAttributeSet();
-      // Add all class attributes
-      //HlaObjectClass oc = _som.OCList.SingleOrDefault(p => p.Handle == theObject.ClassHandle); // returns null if not found
-      //if (oc != null)
-      foreach (HlaAttribute attr in theObject.Type.Attributes)
-        set.AddAttribute(attr);
-      return NegotiatedAttributeOwnershipDivestiture(theObject, set);
-    }
-
-    /// <summary>
-    /// Releases ownership of a specified set of instanceattributes for a specified object instance. The attributes immediately become unowned and are available for acquisition by any federate.
-    /// </summary>
-    virtual public bool UnconditionalAttributeOwnershipDivestiture(HlaObject theObject, RaconAttributeSet set)
-    {
-      #region Contracts
-      // Preconditions
-      //a) The federate is connected to the RTI.
-      //b) The federation execution exists.
-      Contract.Requires(FederationExecutionState == FederationExecutionStates.FEDEX_EXISTS, " at AttributeOwnershipAcquisitionIfAvailable().");
-      //c) The federate is joined to that federation execution.
-      Contract.Requires(FederateState.HasFlag(FederateStates.JOINED), " at AttributeOwnershipAcquisitionIfAvailable().");
-      //d) An object instance with the specified designator exists.
-      //g) The joined federate knows about the object instance with the specified designator.
-      //h) Federate save not in progress.
-      //i) Federate restore not in progress.
-
-      // Postconditions
-      #endregion
-
-      if (_rtiAmb.unconditionalAttributeOwnershipDivestiture(theObject, set))
-      {
-        return true;
-      }
-      else return false;
+      return _rtiAmb.attributeOwnershipReleaseResponse(theObject, attributes);
     }
 
     #endregion // Ownership Management
 
     #region Time Management
+
     /// <summary>
-    /// Enable Async Delivery - HLA13
+    /// IEEE1516.1-2010: 8.2 Enable Time Regulation
     /// </summary>
-    virtual public bool EnableAsyncDelivery()
+    /// <param name="lookahead">the lookahead to use for the federate</param>
+    /// <returns></returns>
+    virtual public bool EnableTimeRegulation(double lookahead)
     {
-      if (_rtiAmb.enableAsynchronousDelivery()) return true;
+      //precondition: lookahead must be non-negative
+      if (_rtiAmb.enableTimeRegulation(lookahead)) return true;
       else return false;
     }
 
     /// <summary>
-    /// ChangeAttributeOrderType
+    /// HLA13 - Enable Time Regulation. parameters are seconds
     /// </summary>
-    virtual public bool ChangeAttributeOrderType(HlaObject theObject, List<HlaAttribute> attributes, OrderType type)
+    /// <param name="federateTime">the minimum logical time to set the federate’s logical time to when turning regulation on</param>
+    /// <param name="lookahead">the lookahead to use for the federate</param>
+    /// <returns></returns>
+    virtual public bool EnableTimeRegulation(double federateTime, double lookahead)
     {
-      if (_rtiAmb.changeAttributeOrderType(theObject, attributes, (uint)type)) return true;
+      if (_rtiAmb.enableTimeRegulation(federateTime, lookahead)) return true;
       else return false;
     }
 
     /// <summary>
-    /// ChangeInteractionOrderType
-    /// </summary>
-    virtual public bool ChangeInteractionOrderType(HlaInteractionClass ic, OrderType type)
-    {
-      if (_rtiAmb.changeInteractionOrderType(ic, (uint)type)) return true;
-      else return false;
-    }
-
-
-    /// <summary>
-    /// Disable Async Delivery - HLA13
-    /// </summary>
-    virtual public bool DisableAsyncDelivery()
-    {
-      if (_rtiAmb.disableAsynchronousDelivery()) return true;
-      else return false;
-    }
-
-    /// <summary>
-    /// Disable Time Constrained - HLA13
-    /// </summary>
-    virtual public bool DisableTimeConstrained()
-    {
-      if (_rtiAmb.disableTimeConstrained()) return true;
-      else return false;
-    }
-
-    /// <summary>
-    /// Disable Time Regulation - HLA13
+    /// IEEE1516.1-2010: 8.4 Disable Time Regulation
     /// </summary>
     virtual public bool DisableTimeRegulation()
     {
@@ -2205,7 +2569,7 @@ namespace Racon.Federation
     }
 
     /// <summary>
-    /// Enable Time Constrained - HLA13
+    /// IEEE1516.1-2010: 8.5 Enable Time Constrained
     /// </summary>
     virtual public bool EnableTimeConstrained()
     {
@@ -2214,104 +2578,241 @@ namespace Racon.Federation
     }
 
     /// <summary>
-    /// Enable Time Regulation - HLA13. parameters are seconds
+    /// IEEE1516.1-2010: 8.7 Disable Time Constrained
     /// </summary>
-    virtual public bool EnableTimeRegulation(Double federateTime, Double lookahead)
+    /// <returns></returns>
+    virtual public bool DisableTimeConstrained()
     {
-      if (_rtiAmb.enableTimeRegulation(federateTime, lookahead)) return true;
+      if (_rtiAmb.disableTimeConstrained()) return true;
       else return false;
     }
 
     /// <summary>
-    /// FlushQueueRequest
+    /// IEEE1516.1-2010: 8.10 Next Message Request
     /// </summary>
-    virtual public bool FlushQueueRequest(Double time)
+    /// <param name="logicalTime"></param>
+    /// <returns></returns>
+    public virtual bool nextMessageRequest(double logicalTime)
     {
-      if (_rtiAmb.flushQueueRequest(time)) return true;
+      if (_rtiAmb.nextMessageRequest(logicalTime)) return true;
       else return false;
     }
 
     /// <summary>
-    /// NextEventRequest
+    /// HLA13: nextEventRequest
     /// </summary>
-    virtual public bool NextEventRequest(Double time)
+    /// <param name="time"></param>
+    /// <returns></returns>
+    virtual public bool NextEventRequest(double time)
     {
       if (_rtiAmb.nextEventRequest(time)) return true;
       else return false;
     }
 
     /// <summary>
-    /// NextEventRequestAvailable
+    /// IEEE1516.1-2010: 8.11 Next Message Request Available
     /// </summary>
-    virtual public bool NextEventRequestAvailable(Double time)
+    /// <param name="logicalTime"></param>
+    /// <returns></returns>
+    public virtual bool nextMessageRequestAvailable(double logicalTime)
+    {
+      if (_rtiAmb.nextMessageRequestAvailable(logicalTime)) return true;
+      else return false;
+    }
+
+    /// <summary>
+    /// HLA13: nextEventRequestAvailable
+    /// </summary>
+    /// <param name="time"></param>
+    /// <returns></returns>
+    virtual public bool NextEventRequestAvailable(double time)
     {
       if (_rtiAmb.nextEventRequestAvailable(time)) return true;
       else return false;
     }
 
     /// <summary>
-    /// ModifyLookahead
+    /// IEEE1516.1-2010: 8.12 Flush Queue Request
     /// </summary>
-    virtual public bool ModifyLookahead(Double time)
+    /// <param name="time"></param>
+    /// <returns></returns>
+    virtual public bool FlushQueueRequest(double time)
     {
-      if (_rtiAmb.modifyLookahead(time)) return true;
+      if (_rtiAmb.flushQueueRequest(time)) return true;
       else return false;
     }
 
     /// <summary>
-    /// QueryFederateTime
+    /// IEEE1516.1-2010: 8.14 Enable Asynchronous Delivery
     /// </summary>
-    virtual public Double QueryFederateTime()
+    /// <returns></returns>
+    virtual public bool EnableAsynchronousDelivery()
     {
-      return _rtiAmb.queryFederateTime();
+      if (_rtiAmb.enableAsynchronousDelivery()) return true;
+      else return false;
     }
 
     /// <summary>
-    /// QueryLBTS
+    /// IEEE1516.1-2010: 8.15 Disable Asynchronous Delivery
     /// </summary>
-    virtual public Double QueryLBTS()
+    /// <returns></returns>
+    virtual public bool DisableAsynchronousDelivery()
     {
-      return _rtiAmb.queryLBTS();
+      if (_rtiAmb.disableAsynchronousDelivery()) return true;
+      else return false;
     }
 
     /// <summary>
-    /// Query
+    /// IEEE1516.1-2010: 8.23 Change Attribute Order Type
     /// </summary>
-    virtual public Double QueryLookahead()
+    /// <param name="theObject"></param>
+    /// <param name="attributes"></param>
+    /// <param name="type"></param>
+    /// <returns></returns>
+    virtual public bool ChangeAttributeOrderType(HlaObject theObject, List<HlaAttribute> attributes, OrderType type)
+    {
+      if (_rtiAmb.changeAttributeOrderType(theObject, attributes, (uint)type)) return true;
+      else return false;
+    }
+
+    /// <summary>
+    /// IEEE1516.1-2010: 8.24 Change Interaction Order Type
+    /// </summary>
+    /// <param name="ic"></param>
+    /// <param name="type"></param>
+    /// <returns></returns>
+    virtual public bool ChangeInteractionOrderType(HlaInteractionClass ic, OrderType type)
+    {
+      if (_rtiAmb.changeInteractionOrderType(ic, (uint)type)) return true;
+      else return false;
+    }
+
+
+
+    /// <summary>
+    /// IEEE1516.1-2010: 8.19 Modify Lookahead
+    /// </summary>
+    /// <param name="lookahead">requested lookahead (lookahead is a time interval)</param>
+    /// <returns></returns>
+    virtual public bool ModifyLookahead(double lookahead)
+    {
+      if (_rtiAmb.modifyLookahead(lookahead)) return true;
+      else return false;
+    }
+
+    /// <summary>
+    /// IEEE1516.1-2010: 8.20 Query Lookahead
+    /// </summary>
+    /// <returns></returns>
+    virtual public double QueryLookahead()
     {
       return _rtiAmb.queryLookahead();
     }
 
     /// <summary>
-    /// Query
+    /// IEEE1516.1-2010: 8.17 Query Logical Time
     /// </summary>
-    virtual public Double QueryMinNextEventTime()
+    /// <returns>The invoking joined federate’s current logical time.</returns>
+    virtual public double QueryLogicalTime()
+    {
+      return _rtiAmb.queryLogicalTime();
+    }
+
+    /// <summary>
+    /// HLA13 - Query Federate Time
+    /// </summary>
+    virtual public double QueryFederateTime()
+    {
+      return _rtiAmb.queryFederateTime();
+    }
+
+    /// <summary>
+    /// IEEE1516.1 2010 - 8.16 Query Greatest Available Logical Time (GALT)
+    /// </summary>
+    /// <param name="Galt">(Optional) current value of invoking joined federate’s GALT</param>
+    /// <returns>GALT definition indicator returns True if GALT is defined</returns>
+    public virtual bool queryGALT(out double Galt)
+    {
+     return _rtiAmb.queryGALT(out Galt);
+    }
+
+    /// <summary>
+    /// IEEE1516.1-2010: 8.16 Query Greatest Available Logical Time (GALT) - with optional GALT value
+    /// </summary>
+    /// <returns>GALT definition indicator returns True if GALT is defined</returns>
+    public virtual bool queryGALT()
+    {
+      double Galt = 0;
+      bool res = _rtiAmb.queryGALT(out Galt);
+      return res;
+    }
+
+    /// <summary>
+    /// HLA13 - QueryLBTS = QueryGALT
+    /// </summary>
+    virtual public double QueryLBTS()
+    {
+      return _rtiAmb.queryLBTS();
+    }
+
+    /// <summary>
+    /// IEEE1516.1-2010: 8.18 Query List Incoming Time Stamp (LIST)
+    /// </summary>
+    /// <param name="Lits">Optional current value of invoking joined federate’s LITS</param>
+    /// <returns>LITS definition indicator returns True if LIST is defined</returns>
+    public virtual bool QueryLITS(out double Lits)
+    {
+      bool res = _rtiAmb.queryLITS(out Lits);
+      return res;
+    }
+
+    /// <summary>
+    /// IEEE1516.1-2010: 8.18 Query List Incoming Time Stamp (LIST) - with optional LITS value
+    /// </summary>
+    /// <returns>LITS definition indicator returns True if LIST is defined</returns>
+    public virtual bool QueryLITS()
+    {
+      double Lits = 0;
+      bool res = _rtiAmb.queryLITS(out Lits);
+      return res;
+    }
+
+    /// <summary>
+    /// HLA13 - QueryMinNextEventTime = queryLITS
+    /// </summary>
+    virtual public double QueryMinNextEventTime()
     {
       return _rtiAmb.queryMinNextEventTime();
     }
 
     /// <summary>
-    /// Retract
+    /// IEEE1516.1-2010: 8.21 Retracts the message with specified retraction handle.
     /// </summary>
-    virtual public bool Retract(EventRetractionHandle retraction)
+    /// <param name="retraction"></param>
+    /// <returns></returns>
+    virtual public bool Retract(MessageRetraction retraction)
     {
       if (_rtiAmb.retract(retraction)) return true;
       else return false;
     }
 
     /// <summary>
-    /// TimeAdvanceRequest
+    /// IEEE1516.1-2010: 8.8 Time Advance Request
     /// </summary>
-    virtual public bool TimeAdvanceRequest(Double time)
+    /// <param name="time">the logical time</param>
+    /// <returns></returns>
+    virtual public bool TimeAdvanceRequest(double time)
     {
       if (_rtiAmb.timeAdvanceRequest(time)) return true;
       else return false;
     }
 
     /// <summary>
-    /// TimeAdvanceRequest Available
+    /// IEEE1516.1-2010: 8.9 Time Advance Request Available
     /// </summary>
-    virtual public bool TimeAdvanceRequestAvailable(Double time)
+    /// <param name="time">the logical time</param>
+    /// <returns></returns>
+    virtual public bool TimeAdvanceRequestAvailable(double time)
     {
       if (_rtiAmb.timeAdvanceRequestAvailable(time)) return true;
       else return false;
@@ -2321,7 +2822,69 @@ namespace Racon.Federation
 
     #region Supporting Services
     /// <summary>
-    /// Enable Attribute Relevance Advisory Switch enables the generation of the Attribute Relevance Advisory Switch service advisory 
+    /// IEEE1516.1-2010 10.4: getFederateHandle
+    /// </summary>
+    /// <param name="federateName"></param>
+    /// <returns></returns>
+    public virtual uint GetFederateHandle(string federateName)
+    {
+      return _rtiAmb.getFederateHandle(federateName);
+    }
+    /// <summary>
+    /// IEEE1516.1-2010 10.5: getFederateName
+    /// </summary>
+    /// <param name="federateHandle"></param>
+    /// <returns></returns>
+    public virtual string GetFederateName(uint federateHandle)
+    {
+      return _rtiAmb.getFederateName(federateHandle);
+    }
+
+    /// <summary>
+    /// Racon: getAllDimensionHandles
+    /// </summary>
+    /// <returns></returns>
+    public virtual void GetAllDimensionHandles()
+    {
+      foreach (var dimension in _som.Dimensions)
+      {
+        dimension.Handle = GetDimensionHandle(dimension.Name);
+      }
+    }
+
+    /// <summary>
+    /// IEEE1516.1-2010 10.25: getDimensionHandle
+    /// </summary>
+    /// <param name="name">Dimension name</param>
+    /// <returns></returns>
+    public virtual uint GetDimensionHandle(string name)
+    {
+      return _rtiAmb.getDimensionHandle(name);
+    }
+
+    /// <summary>
+    /// IEEE1516.1-2010 10.26: getDimensionName
+    /// </summary>
+    /// <param name="handle">Dimension handle</param>
+    /// <returns></returns>
+    public virtual string GetDimensionName(uint handle)
+    {
+      return _rtiAmb.getDimensionName(handle);
+    }
+
+    /// <summary>
+    /// IEEE1516.1-2010 10.30: setRangeBounds
+    /// </summary>
+    /// <param name="regionHandle"></param>
+    /// <param name="dimensionHandle"></param>
+    /// <param name="lowerBound"></param>
+    /// <param name="upperBound"></param>
+    public virtual void SetRangeBounds(uint regionHandle, uint dimensionHandle, uint lowerBound, uint upperBound)
+    {
+      _rtiAmb.setRangeBounds(regionHandle, dimensionHandle, lowerBound, upperBound);
+    }
+    /// <summary>
+    /// IEEE1516.1-2010 10.35: Enable Attribute Relevance Advisory Switch enables the generation of the Attribute Relevance Advisory Switch service advisory 
     /// </summary>
     virtual public bool EnableAttributeRelevanceAdvisorySwitch()
     {
@@ -2330,7 +2893,7 @@ namespace Racon.Federation
     }
 
     /// <summary>
-    /// EnableAttributeScopeAdvisorySwitch
+    /// IEEE1516.1-2010 10.37: EnableAttributeScopeAdvisorySwitch
     /// </summary>
     virtual public bool EnableAttributeScopeAdvisorySwitch()
     {
@@ -2339,7 +2902,7 @@ namespace Racon.Federation
     }
 
     /// <summary>
-    /// EnableInteractionRelevanceAdvisorySwitch
+    /// IEEE1516.1-2010 10.39: EnableInteractionRelevanceAdvisorySwitch
     /// </summary>
     virtual public bool EnableInteractionRelevanceAdvisorySwitch()
     {
@@ -2349,7 +2912,6 @@ namespace Racon.Federation
 
     /// <summary>
     /// Enable Object Class Relevance Advisory Switch enables the generation of the Start/Stop Registration For Object Class service advisory 
-    /// <paramref name="FdAmb_StartRegistrationForObjectClassAdvisedHandler"></paramref>
     /// </summary>
     virtual public bool EnableObjectClassRelevanceAdvisorySwitch()
     {
@@ -2376,7 +2938,7 @@ namespace Racon.Federation
     }
 
     /// <summary>
-    /// Disable Object Class Relevance Advisory Switch disables the generation of the Start/Stop Registration For Object Class service advisory <paramref name="FdAmb_StartRegistrationForObjectClassAdvisedHandler"/>
+    /// Disable Object Class Relevance Advisory Switch disables the generation of the Start/Stop Registration For Object Class service advisory 
     /// </summary>
     virtual public bool DisableObjectClassRelevanceAdvisorySwitch()
     {

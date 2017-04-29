@@ -7,7 +7,7 @@
 RACoN - RTI abstraction component for MS.NET (RACoN)
 https://sites.google.com/site/okantopcu/racon
 
-Copyright © Okan Topçu, 2009-2016
+Copyright © Okan Topçu, 2009-2017
 otot.support@outlook.com
 
 This program is free software : you can redistribute it and / or modify
@@ -24,6 +24,7 @@ You should have received a copy of the GNU Lesser General Public License
 along with this program.If not, see <http://www.gnu.org/licenses/>.
 */
 
+using Racon.RtiLayer;
 using System;
 using System.Collections.ObjectModel; // ObservableCollection
 using System.ComponentModel;
@@ -32,6 +33,9 @@ using System.Threading.Tasks;
 
 namespace Racon.Logger
 {
+  /// <summary>
+  /// RACoN log manager
+  /// </summary>
   public class LogManager
   {
     #region Fields
@@ -40,7 +44,7 @@ namespace Racon.Logger
 
     #region Properties
     /// <summary>
-    /// Current Log Level. When it is set, it reports version, RTI native library, and current log level via <see cref="Racon.Federation.CGenericFederate.StatusMessage"/>.
+    /// Current Log Level. When it is set, it reports version, RTI native library, and current log level via <see cref="Racon.CGenericFederate.StatusMessage"/>.
     /// </summary>
     public LogLevel LogLevel
     {

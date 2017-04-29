@@ -2,7 +2,7 @@
 Racon - RTI abstraction component for MS.NET (Racon)
 https://sites.google.com/site/okantopcu/racon
 
-Copyright © Okan Topçu, 2009-2016
+Copyright © Okan Topçu, 2009-2017
 otot.support@outlook.com
 
 This program is free software : you can redistribute it and / or modify
@@ -37,7 +37,7 @@ using namespace System::Security::Permissions;
 [assembly:AssemblyConfigurationAttribute("")];
 [assembly:AssemblyCompanyAttribute("Okan Topcu")];
 [assembly:AssemblyProductAttribute("Racon.RtiLayer.Native")];
-[assembly:AssemblyCopyrightAttribute("Copyright (c) 2009-2016 Okan Topcu")];
+[assembly:AssemblyCopyrightAttribute("Copyright (c) 2009-2017 Okan Topcu")];
 [assembly:AssemblyTrademarkAttribute("")];
 [assembly:AssemblyCultureAttribute("")];
 
@@ -52,7 +52,7 @@ using namespace System::Security::Permissions;
 // You can specify all the value or you can default the Revision and Build Numbers
 // by using the '*' as shown below:
 
-[assembly:AssemblyVersionAttribute("0.0.2.2")];
+[assembly:AssemblyVersionAttribute("0.0.2.3")];
 
 [assembly:ComVisible(false)];
 

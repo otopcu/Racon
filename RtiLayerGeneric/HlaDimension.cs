@@ -1,8 +1,8 @@
 ﻿/*
-Racon - RTI abstraction component for MS.NET (Racon)
+RACoN - RTI abstraction component for MS.NET (RACoN)
 https://sites.google.com/site/okantopcu/racon
 
-Copyright © Okan Topçu, 2009-2016
+Copyright © Okan Topçu, 2009-2017
 otot.support@outlook.com
 
 This program is free software : you can redistribute it and / or modify
@@ -19,46 +19,40 @@ You should have received a copy of the GNU Lesser General Public License
 along with this program.If not, see <http://www.gnu.org/licenses/>.
 */
 
-using System;
-using System.ComponentModel;
-
 namespace Racon.RtiLayer
 {
-  public class EventRetractionHandle
+  /// <summary>
+  /// Dimension
+  /// </summary>
+  public class HlaDimension
   {
+    #region Fields
+    #endregion
+
     #region Properties
     /// <summary>
-    ///  Serial number
+    /// Region name.
     /// </summary>
-    public uint SerialNumber { get; set; }
+    public string Name { get; set; }
+
     /// <summary>
-    ///  Sending federate handle
+    /// Handle.
     /// </summary>
-    public uint SendingFederate { get; set; }
+    public uint Handle { get; set; }
     #endregion
 
     #region Constructors
     /// <summary>
-    /// Constructor
+    /// CDimension constructor. Dimension name must be the same with the one specified in FED/FDD.
     /// </summary>
-    public EventRetractionHandle() 
+    public HlaDimension(string name)
     {
-      SerialNumber = 0;
-      SendingFederate = 0;
-    }
-    public EventRetractionHandle(uint serial, uint sender) 
-    {
-      SerialNumber = serial;
-      SendingFederate = sender;
-    }
-    public EventRetractionHandle(string serial)
-    {
-      // !!! OpenRTI returns handle numbers greater than uint.MaxValue for the second joined federate
-      uint no;
-      if (uint.TryParse(serial.Split('(', ')')[1], out no))
-        SerialNumber = no;
-
+      Name = name;
     }
     #endregion
+
+    #region Methods
+    #endregion
+
   }
 }

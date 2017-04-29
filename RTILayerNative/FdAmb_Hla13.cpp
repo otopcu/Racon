@@ -2,7 +2,7 @@
 Racon - RTI abstraction component for MS.NET (Racon)
 https://sites.google.com/site/okantopcu/racon
 
-Copyright © Okan Topçu, 2009-2016
+Copyright © Okan Topçu, 2009-2017
 otot.support@outlook.com
 
 This program is free software : you can redistribute it and / or modify
@@ -48,10 +48,12 @@ throw (RTI::FederateInternalError) {
 #pragma region exceptions
 	}
 	catch (RTI::FederateInternalError& e) {
-		MessageBox::Show("MSG-(FederateInternalError - synchronizationPointRegistrationSucceeded):" + Environment::NewLine + gcnew String(e._reason) + Environment::NewLine, "FdAmb_Hla13", MessageBoxButtons::OK, MessageBoxIcon::Error);
+		String^ msg = "FdAmb_Hla13-(FederateInternalError - synchronizationPointRegistrationSucceeded). Reason: " + gcnew String(e._reason);
+		wrapper->FdAmbEventQueue->Enqueue(gcnew RaconEventArgs(msg, LogLevel::ERROR));
 	}
 	catch (System::Exception^ e) {
-		MessageBox::Show("MSG-(GeneralException - synchronizationPointRegistrationSucceeded):" + Environment::NewLine + e->ToString() + Environment::NewLine, "FdAmb_Hla13", MessageBoxButtons::OK, MessageBoxIcon::Warning);
+		String^ msg = "FdAmb_Hla13-(Exception - discoverObjectInstance). Reason: " + gcnew String(e->ToString());
+		wrapper->FdAmbEventQueue->Enqueue(gcnew RaconEventArgs(msg, LogLevel::ERROR));
 	}
 #pragma endregion
 };
@@ -69,10 +71,12 @@ void FdAmb_Hla13::synchronizationPointRegistrationFailed(const char *  label)
 #pragma region exceptions
 	}
 	catch (RTI::FederateInternalError& e) {
-		MessageBox::Show("MSG-(FederateInternalError - synchronizationPointRegistrationFailed):" + Environment::NewLine + gcnew String(e._reason) + Environment::NewLine, "FdAmb_Hla13", MessageBoxButtons::OK, MessageBoxIcon::Error);
+		String^ msg = "FdAmb_Hla13-(FederateInternalError - synchronizationPointRegistrationSucceeded). Reason: " + gcnew String(e._reason);
+		wrapper->FdAmbEventQueue->Enqueue(gcnew RaconEventArgs(msg, LogLevel::ERROR));
 	}
 	catch (System::Exception^ e) {
-		MessageBox::Show("MSG-(GeneralException - synchronizationPointRegistrationFailed):" + Environment::NewLine + e->ToString() + Environment::NewLine, "FdAmb_Hla13", MessageBoxButtons::OK, MessageBoxIcon::Warning);
+		String^ msg = "FdAmb_Hla13-(Exception - discoverObjectInstance). Reason: " + gcnew String(e->ToString());
+		wrapper->FdAmbEventQueue->Enqueue(gcnew RaconEventArgs(msg, LogLevel::ERROR));
 	}
 #pragma endregion
 };
@@ -89,10 +93,12 @@ throw (RTI::FederateInternalError) {
 #pragma region exceptions
 	}
 	catch (RTI::FederateInternalError& e) {
-		MessageBox::Show("MSG-(FederateInternalError - announceSynchronizationPoint):" + Environment::NewLine + gcnew String(e._reason) + Environment::NewLine, "FdAmb_Hla13", MessageBoxButtons::OK, MessageBoxIcon::Error);
+		String^ msg = "FdAmb_Hla13-(FederateInternalError - synchronizationPointRegistrationSucceeded). Reason: " + gcnew String(e._reason);
+		wrapper->FdAmbEventQueue->Enqueue(gcnew RaconEventArgs(msg, LogLevel::ERROR));
 	}
 	catch (System::Exception^ e) {
-		MessageBox::Show("MSG-(GeneralException - announceSynchronizationPoint):" + Environment::NewLine + e->ToString() + Environment::NewLine, "FdAmb_Hla13", MessageBoxButtons::OK, MessageBoxIcon::Warning);
+		String^ msg = "FdAmb_Hla13-(Exception - discoverObjectInstance). Reason: " + gcnew String(e->ToString());
+		wrapper->FdAmbEventQueue->Enqueue(gcnew RaconEventArgs(msg, LogLevel::ERROR));
 	}
 #pragma endregion
 };
@@ -109,10 +115,12 @@ throw (RTI::FederateInternalError) {
 #pragma region exceptions
 	}
 	catch (RTI::FederateInternalError& e) {
-		MessageBox::Show("MSG-(FederateInternalError - federationSynchronized):" + Environment::NewLine + gcnew String(e._reason) + Environment::NewLine, "FdAmb_Hla13", MessageBoxButtons::OK, MessageBoxIcon::Error);
+		String^ msg = "FdAmb_Hla13-(FederateInternalError - synchronizationPointRegistrationSucceeded). Reason: " + gcnew String(e._reason);
+		wrapper->FdAmbEventQueue->Enqueue(gcnew RaconEventArgs(msg, LogLevel::ERROR));
 	}
 	catch (System::Exception^ e) {
-		MessageBox::Show("MSG-(GeneralException - federationSynchronized):" + Environment::NewLine + e->ToString() + Environment::NewLine, "FdAmb_Hla13", MessageBoxButtons::OK, MessageBoxIcon::Warning);
+		String^ msg = "FdAmb_Hla13-(Exception - discoverObjectInstance). Reason: " + gcnew String(e->ToString());
+		wrapper->FdAmbEventQueue->Enqueue(gcnew RaconEventArgs(msg, LogLevel::ERROR));
 	}
 #pragma endregion
 };
@@ -128,12 +136,18 @@ void FdAmb_Hla13::initiateFederateSave (const char *label)
 			// Add to the Event Queue
 			wrapper->FdAmbEventQueue->Enqueue(args);
 		}
-	catch (RTI::UnableToPerformSave& e){
-		MessageBox::Show("MSG-(UnableToPerformSave - initiateFederateSave):" + Environment::NewLine + " Reason: " + Environment::NewLine + "The federate is unable to perform a save at the current time.", "FdAmb_HLA13", MessageBoxButtons::OK, MessageBoxIcon::Warning);
-	}
-		catch (Exception^ e){
-			MessageBox::Show("MSG-(initiateFederateSave):" + Environment::NewLine +  Environment::NewLine, "FdAmb_HLA13", MessageBoxButtons::OK, MessageBoxIcon::Warning);
+		catch (RTI::UnableToPerformSave& e) {
+			String^ msg = "FdAmb_Hla13-(UnableToPerformSave - initiateFederateSave). Reason: " + gcnew String(e._reason);
+			wrapper->FdAmbEventQueue->Enqueue(gcnew RaconEventArgs(msg, LogLevel::ERROR));
 		}
+		catch (RTI::FederateInternalError& e) {
+			String^ msg = "FdAmb_Hla13-(FederateInternalError - synchronizationPointRegistrationSucceeded). Reason: " + gcnew String(e._reason);
+			wrapper->FdAmbEventQueue->Enqueue(gcnew RaconEventArgs(msg, LogLevel::ERROR));
+		}
+	catch (System::Exception^ e) {
+		String^ msg = "FdAmb_Hla13-(Exception - discoverObjectInstance). Reason: " + gcnew String(e->ToString());
+		wrapper->FdAmbEventQueue->Enqueue(gcnew RaconEventArgs(msg, LogLevel::ERROR));
+	}
 }
 
 void FdAmb_Hla13::federationSaved ()
@@ -147,8 +161,9 @@ void FdAmb_Hla13::federationSaved ()
 			// Add to the Event Queue
 			wrapper->FdAmbEventQueue->Enqueue(args);
 		}
-		catch (Exception^ e){
-			MessageBox::Show("MSG-(federationSaved):" + Environment::NewLine +  Environment::NewLine, "FdAmb_HLA13", MessageBoxButtons::OK, MessageBoxIcon::Warning);
+		catch (System::Exception^ e) {
+			String^ msg = "FdAmb_Hla13-(Exception - discoverObjectInstance). Reason: " + gcnew String(e->ToString());
+			wrapper->FdAmbEventQueue->Enqueue(gcnew RaconEventArgs(msg, LogLevel::ERROR));
 		}
 }
 
@@ -164,8 +179,9 @@ void FdAmb_Hla13::federationNotSaved ()
 			// Add to the Event Queue
 			wrapper->FdAmbEventQueue->Enqueue(args);
 		}
-		catch (Exception^ e){
-			MessageBox::Show("MSG-(federationNotSaved):" + Environment::NewLine +  Environment::NewLine, "FdAmb_HLA13", MessageBoxButtons::OK, MessageBoxIcon::Warning);
+		catch (System::Exception^ e) {
+			String^ msg = "FdAmb_Hla13-(Exception - discoverObjectInstance). Reason: " + gcnew String(e->ToString());
+			wrapper->FdAmbEventQueue->Enqueue(gcnew RaconEventArgs(msg, LogLevel::ERROR));
 		}
 }
 
@@ -181,8 +197,9 @@ void FdAmb_Hla13::requestFederationRestoreSucceeded (const char *label)
 			// Add to the Event Queue
 			wrapper->FdAmbEventQueue->Enqueue(args);
 		}
-		catch (Exception^ e){
-			MessageBox::Show("MSG-(requestFederationRestoreSucceeded):" + Environment::NewLine +  Environment::NewLine, "FdAmb_HLA13", MessageBoxButtons::OK, MessageBoxIcon::Warning);
+		catch (System::Exception^ e) {
+			String^ msg = "FdAmb_Hla13-(Exception - discoverObjectInstance). Reason: " + gcnew String(e->ToString());
+			wrapper->FdAmbEventQueue->Enqueue(gcnew RaconEventArgs(msg, LogLevel::ERROR));
 		}
 }
 
@@ -199,8 +216,9 @@ void FdAmb_Hla13::requestFederationRestoreFailed (const char *label,	const char 
 			// Add to the Event Queue
 			wrapper->FdAmbEventQueue->Enqueue(args);
 		}
-		catch (Exception^ e){
-			MessageBox::Show("MSG-(requestFederationRestoreFailed):" + Environment::NewLine +  Environment::NewLine, "FdAmb_HLA13", MessageBoxButtons::OK, MessageBoxIcon::Warning);
+		catch (System::Exception^ e) {
+			String^ msg = "FdAmb_Hla13-(Exception - discoverObjectInstance). Reason: " + gcnew String(e->ToString());
+			wrapper->FdAmbEventQueue->Enqueue(gcnew RaconEventArgs(msg, LogLevel::ERROR));
 		}
 }
 
@@ -214,8 +232,9 @@ void FdAmb_Hla13::federationRestoreBegun ()
 			// Add to the Event Queue
 			wrapper->FdAmbEventQueue->Enqueue(args);
 		}
-		catch (Exception^ e){
-			MessageBox::Show("MSG-(federationRestoreBegun):" + Environment::NewLine +  Environment::NewLine, "FdAmb_HLA13", MessageBoxButtons::OK, MessageBoxIcon::Warning);
+		catch (System::Exception^ e) {
+			String^ msg = "FdAmb_Hla13-(Exception - discoverObjectInstance). Reason: " + gcnew String(e->ToString());
+			wrapper->FdAmbEventQueue->Enqueue(gcnew RaconEventArgs(msg, LogLevel::ERROR));
 		}
 }
 
@@ -231,15 +250,22 @@ void FdAmb_Hla13::initiateFederateRestore (const char *label, RTI::FederateHandl
 			// Add to the Event Queue
 			wrapper->FdAmbEventQueue->Enqueue(args);
 		}
-	catch (RTI::SpecifiedSaveLabelDoesNotExist& e){
-		MessageBox::Show("MSG-(SpecifiedSaveLabelDoesNotExist - initiateFederateRestore):" + Environment::NewLine + " Reason: " + Environment::NewLine + "The specified save label does not correspond to an existing labeled saved state.", "FdAmb_HLA13", MessageBoxButtons::OK, MessageBoxIcon::Warning);
-	}
-	catch (RTI::CouldNotRestore& e){
-		MessageBox::Show("MSG-(CouldNotRestore - initiateFederateRestore):" + Environment::NewLine + " Reason: " + Environment::NewLine + "TThe federate recognizes the save label but was unable to restore its state for some other reason.", "FdAmb_HLA13", MessageBoxButtons::OK, MessageBoxIcon::Warning);
-	}
-		catch (Exception^ e){
-			MessageBox::Show("MSG-(initiateFederateSave):" + Environment::NewLine +  Environment::NewLine, "FdAmb_HLA13", MessageBoxButtons::OK, MessageBoxIcon::Warning);
+		catch (RTI::SpecifiedSaveLabelDoesNotExist& e) {
+			String^ msg = "FdAmb_Hla13-(SpecifiedSaveLabelDoesNotExist - initiateFederateRestore). Reason: " + gcnew String(e._reason);
+			wrapper->FdAmbEventQueue->Enqueue(gcnew RaconEventArgs(msg, LogLevel::WARN));
 		}
+		catch (RTI::CouldNotRestore& e) {
+			String^ msg = "FdAmb_Hla13-(CouldNotRestore - initiateFederateRestore). Reason: " + gcnew String(e._reason);
+			wrapper->FdAmbEventQueue->Enqueue(gcnew RaconEventArgs(msg, LogLevel::WARN));
+		}
+	catch (RTI::FederateInternalError& e) {
+		String^ msg = "FdAmb_Hla13-(FederateInternalError - initiateFederateRestore). Reason: " + gcnew String(e._reason);
+		wrapper->FdAmbEventQueue->Enqueue(gcnew RaconEventArgs(msg, LogLevel::ERROR));
+	}
+	catch (System::Exception^ e) {
+		String^ msg = "FdAmb_Hla13-(Exception - discoverObjectInstance). Reason: " + gcnew String(e->ToString());
+		wrapper->FdAmbEventQueue->Enqueue(gcnew RaconEventArgs(msg, LogLevel::ERROR));
+	}
 }
 
 void FdAmb_Hla13::federationRestored ()
@@ -253,8 +279,9 @@ void FdAmb_Hla13::federationRestored ()
 			// Add to the Event Queue
 			wrapper->FdAmbEventQueue->Enqueue(args);
 		}
-		catch (Exception^ e){
-			MessageBox::Show("MSG-(federationRestored):" + Environment::NewLine +  Environment::NewLine, "FdAmb_HLA13", MessageBoxButtons::OK, MessageBoxIcon::Warning);
+		catch (System::Exception^ e) {
+			String^ msg = "FdAmb_Hla13-(Exception - discoverObjectInstance). Reason: " + gcnew String(e->ToString());
+			wrapper->FdAmbEventQueue->Enqueue(gcnew RaconEventArgs(msg, LogLevel::ERROR));
 		}
 }
 
@@ -269,8 +296,9 @@ void FdAmb_Hla13::federationNotRestored ()
 			// Add to the Event Queue
 			wrapper->FdAmbEventQueue->Enqueue(args);
 		}
-		catch (Exception^ e){
-			MessageBox::Show("MSG-(federationNotRestored):" + Environment::NewLine +  Environment::NewLine, "FdAmb_HLA13", MessageBoxButtons::OK, MessageBoxIcon::Warning);
+		catch (System::Exception^ e) {
+			String^ msg = "FdAmb_Hla13-(Exception - discoverObjectInstance). Reason: " + gcnew String(e->ToString());
+			wrapper->FdAmbEventQueue->Enqueue(gcnew RaconEventArgs(msg, LogLevel::ERROR));
 		}
 }
 
@@ -290,8 +318,9 @@ void FdAmb_Hla13::startRegistrationForObjectClass (RTI::ObjectClassHandle theCla
 			// Add to the Event Queue
 			wrapper->FdAmbEventQueue->Enqueue(args);
 		}
-		catch (Exception^ e){
-			MessageBox::Show("MSG-(startRegistrationForObjectClass):" + Environment::NewLine +  Environment::NewLine, "FdAmb-HLA13", MessageBoxButtons::OK, MessageBoxIcon::Warning);
+		catch (System::Exception^ e) {
+			String^ msg = "FdAmb_Hla13-(Exception - discoverObjectInstance). Reason: " + gcnew String(e->ToString());
+			wrapper->FdAmbEventQueue->Enqueue(gcnew RaconEventArgs(msg, LogLevel::ERROR));
 		}
 };
 // stopRegistrationForObjectClass
@@ -307,9 +336,10 @@ void FdAmb_Hla13::stopRegistrationForObjectClass (RTI::ObjectClassHandle theClas
 			// Add to the Event Queue
 			wrapper->FdAmbEventQueue->Enqueue(args);
 		}
-		catch (Exception^ e){
-			MessageBox::Show("MSG-(stopRegistrationForObjectClass):" + Environment::NewLine +  Environment::NewLine, "FdAmb-HLA13", MessageBoxButtons::OK, MessageBoxIcon::Warning);
-		}
+	catch (System::Exception^ e) {
+		String^ msg = "FdAmb_Hla13-(Exception - discoverObjectInstance). Reason: " + gcnew String(e->ToString());
+		wrapper->FdAmbEventQueue->Enqueue(gcnew RaconEventArgs(msg, LogLevel::ERROR));
+	}
 };
 // turnInteractionsOn
 void FdAmb_Hla13::turnInteractionsOn (RTI::InteractionClassHandle theHandle)
@@ -323,8 +353,9 @@ void FdAmb_Hla13::turnInteractionsOn (RTI::InteractionClassHandle theHandle)
 			// Add to the Event Queue
 			wrapper->FdAmbEventQueue->Enqueue(args);
 		}
-		catch (Exception^ e){
-			MessageBox::Show("MSG-(turnInteractionsOn):" + Environment::NewLine +  Environment::NewLine, "FdAmb-HLA13", MessageBoxButtons::OK, MessageBoxIcon::Warning);
+		catch (System::Exception^ e) {
+			String^ msg = "FdAmb_Hla13-(Exception - discoverObjectInstance). Reason: " + gcnew String(e->ToString());
+			wrapper->FdAmbEventQueue->Enqueue(gcnew RaconEventArgs(msg, LogLevel::ERROR));
 		}
 };
 // turnInteractionsOff
@@ -339,8 +370,9 @@ void FdAmb_Hla13::turnInteractionsOff (RTI::InteractionClassHandle theHandle)
 			// Add to the Event Queue
 			wrapper->FdAmbEventQueue->Enqueue(args);
 		}
-		catch (Exception^ e){
-			MessageBox::Show("MSG-(turnInteractionsOff):" + Environment::NewLine +  Environment::NewLine, "FdAmb-HLA13", MessageBoxButtons::OK, MessageBoxIcon::Warning);
+		catch (System::Exception^ e) {
+			String^ msg = "FdAmb_Hla13-(Exception - discoverObjectInstance). Reason: " + gcnew String(e->ToString());
+			wrapper->FdAmbEventQueue->Enqueue(gcnew RaconEventArgs(msg, LogLevel::ERROR));
 		}
 };
 #pragma endregion // Declaration Management Services
@@ -362,8 +394,9 @@ void FdAmb_Hla13::discoverObjectInstance(RTI::ObjectHandle theObject, RTI::Objec
 			// Add to the Event Queue
 			wrapper->FdAmbEventQueue->Enqueue(HlaObject);
 		}
-		catch (Exception^ e){
-			MessageBox::Show("MSG-(discoverObjectInstance):" + Environment::NewLine +  Environment::NewLine, "FdAmb-HLA13", MessageBoxButtons::OK, MessageBoxIcon::Warning);
+		catch (System::Exception^ e) {
+			String^ msg = "FdAmb_Hla13-(Exception - discoverObjectInstance). Reason: " + gcnew String(e->ToString());
+			wrapper->FdAmbEventQueue->Enqueue(gcnew RaconEventArgs(msg, LogLevel::ERROR));
 		}
 };
 
@@ -378,10 +411,7 @@ void FdAmb_Hla13::reflectAttributeValues (RTI::ObjectHandle theObject, const RTI
 		// Decode Time
 		RTIfedTime time(theTime);
 		args->Time = time.getTime();
-		// DeCode RetractionHandle
-		//args->RetractionHandle->SetRtiRetractionHandle(&theHandle);
-		args->RetractionHandle->SendingFederate = theHandle.sendingFederate;
-		args->RetractionHandle->SerialNumber = theHandle.theSerialNumber;
+		args->RetractionHandle = gcnew MessageRetraction(theHandle.theSerialNumber, theHandle.sendingFederate);// DeCode RetractionHandle
 		RTI::ULong valueLength;
 		for (unsigned int i = 0; i < theAttributes.size(); i++){
 			// Create a buffer that has the capacity 4096 bytes for each param. Buffer size = 4096 bytes x number of parameters
@@ -402,8 +432,9 @@ void FdAmb_Hla13::reflectAttributeValues (RTI::ObjectHandle theObject, const RTI
 		// Add to the Event Queue
 		wrapper->FdAmbEventQueue->Enqueue(args);
 	}
-	catch (Exception^ e){
-		MessageBox::Show("MSG-(GeneralException - reflectAttributeValues):" + Environment::NewLine + e->ToString() + Environment::NewLine, "FdAmb_HLA13", MessageBoxButtons::OK, MessageBoxIcon::Error);
+	catch (System::Exception^ e) {
+		String^ msg = "FdAmb_Hla13-(Exception - discoverObjectInstance). Reason: " + gcnew String(e->ToString());
+		wrapper->FdAmbEventQueue->Enqueue(gcnew RaconEventArgs(msg, LogLevel::ERROR));
 	}
 };
 void FdAmb_Hla13::reflectAttributeValues (RTI::ObjectHandle theObject, const RTI::AttributeHandleValuePairSet& theAttributes, const char *theTag)
@@ -431,8 +462,9 @@ void FdAmb_Hla13::reflectAttributeValues (RTI::ObjectHandle theObject, const RTI
 			// Add to the Event Queue
 			wrapper->FdAmbEventQueue->Enqueue(args);
 		}
-		catch (Exception^ e){
-			MessageBox::Show("MSG-(GeneralException - reflectAttributeValues):" + Environment::NewLine + e->ToString() + Environment::NewLine, "FdAmb_HLA13", MessageBoxButtons::OK, MessageBoxIcon::Error);
+		catch (System::Exception^ e) {
+			String^ msg = "FdAmb_Hla13-(Exception - discoverObjectInstance). Reason: " + gcnew String(e->ToString());
+			wrapper->FdAmbEventQueue->Enqueue(gcnew RaconEventArgs(msg, LogLevel::ERROR));
 		}
 };
 
@@ -446,9 +478,7 @@ void FdAmb_Hla13::removeObjectInstance (RTI::ObjectHandle theObject, const RTI::
 	// Decode Time
 	RTIfedTime time(theTime);
 	args->Time = time.getTime();
-	// DeCode RetractionHandle
-	args->RetractionHandle->SendingFederate = theHandle.sendingFederate;
-	args->RetractionHandle->SerialNumber = theHandle.theSerialNumber;
+	args->RetractionHandle = gcnew MessageRetraction(theHandle.theSerialNumber, theHandle.sendingFederate);// DeCode RetractionHandle
 
 	args->TraceMessage = "The object (handle: " + theObject + ") is removed." + "Event Timestamp = " + args->Time + ". Event Retraction Handle (Serial No) = " + args->RetractionHandle ->SerialNumber;
 	args->EventType = RaconEventTypes::ObjectRemoved;
@@ -479,9 +509,7 @@ void FdAmb_Hla13::receiveInteraction (RTI::InteractionClassHandle theInteraction
 		// Decode Time
 		RTIfedTime time(theTime);
 		args->Time = time.getTime();
-		// DeCode RetractionHandle
-		args->RetractionHandle->SendingFederate = theHandle.sendingFederate;
-		args->RetractionHandle->SerialNumber = theHandle.theSerialNumber;
+		args->RetractionHandle = gcnew MessageRetraction(theHandle.theSerialNumber, theHandle.sendingFederate);// DeCode RetractionHandle
 
 		RTI::ULong valueLength;
 		for (unsigned int i = 0; i < theParameters.size(); i++){
@@ -501,8 +529,9 @@ void FdAmb_Hla13::receiveInteraction (RTI::InteractionClassHandle theInteraction
 		// Add to the Event Queue
 		wrapper->FdAmbEventQueue->Enqueue(args);
 	}
-	catch (Exception^ e){
-		MessageBox::Show("MSG-(GeneralException - receiveInteraction(time)):" + Environment::NewLine + e->ToString() + Environment::NewLine, "FdAmb_HLA13", MessageBoxButtons::OK, MessageBoxIcon::Error);
+	catch (System::Exception^ e) {
+		String^ msg = "FdAmb_Hla13-(Exception - discoverObjectInstance). Reason: " + gcnew String(e->ToString());
+		wrapper->FdAmbEventQueue->Enqueue(gcnew RaconEventArgs(msg, LogLevel::ERROR));
 	}
 };
 void FdAmb_Hla13::receiveInteraction (RTI::InteractionClassHandle theInteraction, const RTI::ParameterHandleValuePairSet& theParameters, const char *theTag)         
@@ -530,8 +559,9 @@ void FdAmb_Hla13::receiveInteraction (RTI::InteractionClassHandle theInteraction
 			// Add to the Event Queue
 			wrapper->FdAmbEventQueue->Enqueue(args);
 		}
-		catch (Exception^ e){
-			MessageBox::Show("MSG-(GeneralException - receiveInteraction):" + Environment::NewLine + e->ToString() + Environment::NewLine, "FdAmb_HLA13", MessageBoxButtons::OK, MessageBoxIcon::Error);
+		catch (System::Exception^ e) {
+			String^ msg = "FdAmb_Hla13-(Exception - discoverObjectInstance). Reason: " + gcnew String(e->ToString());
+			wrapper->FdAmbEventQueue->Enqueue(gcnew RaconEventArgs(msg, LogLevel::ERROR));
 		}
 };
 
@@ -566,10 +596,11 @@ void FdAmb_Hla13::requestAttributeOwnershipRelease (RTI::ObjectHandle theObject,
 			HlaOwnershipManagementEventArgs ^args = gcnew HlaOwnershipManagementEventArgs();
 			args->ObjectHandle = theObject;
 			args->Tag = gcnew String(theTag);
-			args->AttributeSet = gcnew RaconAttributeSet();
 			String^ attributeString;
 			for (unsigned int i=0; i < candidateAttributes.size(); i++){
-				args->AttributeSet->Attributes->Add(candidateAttributes.getHandle(i));
+        HlaAttribute^ attr = gcnew HlaAttribute();
+        attr->Handle = candidateAttributes.getHandle(i);
+        args->AttributeSet->Add(attr);
 				attributeString += candidateAttributes.getHandle(i);
 				if (i != candidateAttributes.size()-1) attributeString += ", ";
 			}
@@ -578,10 +609,12 @@ void FdAmb_Hla13::requestAttributeOwnershipRelease (RTI::ObjectHandle theObject,
 			// Add to the Event Queue
 			wrapper->FdAmbEventQueue->Enqueue(args);
 		}
-		catch (Exception^ e){
-			MessageBox::Show("MSG-(GeneralException - requestAttributeOwnershipRelease):" + Environment::NewLine + e->ToString() + Environment::NewLine, "FdAmb_HLA13", MessageBoxButtons::OK, MessageBoxIcon::Error);
+		catch (System::Exception^ e) {
+			String^ msg = "FdAmb_Hla13-(Exception - discoverObjectInstance). Reason: " + gcnew String(e->ToString());
+			wrapper->FdAmbEventQueue->Enqueue(gcnew RaconEventArgs(msg, LogLevel::ERROR));
 		}
 };
+
 // attributeOwnershipAcquisitionNotification
 void FdAmb_Hla13::attributeOwnershipAcquisitionNotification(RTI::ObjectHandle theObject, const RTI::AttributeHandleSet& securedAttributes)
 				throw (
@@ -596,10 +629,11 @@ void FdAmb_Hla13::attributeOwnershipAcquisitionNotification(RTI::ObjectHandle th
 			// Create Event Arguments
 			HlaOwnershipManagementEventArgs ^args = gcnew HlaOwnershipManagementEventArgs();
 			args->ObjectHandle = theObject;
-			args->AttributeSet = gcnew RaconAttributeSet();
 			String^ attributeString;
 			for (unsigned int i=0; i < securedAttributes.size(); i++){
-				args->AttributeSet->Attributes->Add(securedAttributes.getHandle(i));
+        HlaAttribute^ attr = gcnew HlaAttribute();
+        attr->Handle = securedAttributes.getHandle(i);
+        args->AttributeSet->Add(attr);
 				attributeString += securedAttributes.getHandle(i);
 				if (i != securedAttributes.size()-1) attributeString += ", ";
 			}
@@ -608,10 +642,12 @@ void FdAmb_Hla13::attributeOwnershipAcquisitionNotification(RTI::ObjectHandle th
 			// Add to the Event Queue
 			wrapper->FdAmbEventQueue->Enqueue(args);
 		}
-		catch (Exception^ e){
-			MessageBox::Show("MSG-(GeneralException - attributeOwnershipAcquisitionNotification):" + Environment::NewLine + e->ToString() + Environment::NewLine, "FdAmb_HLA13", MessageBoxButtons::OK, MessageBoxIcon::Error);
+		catch (System::Exception^ e) {
+			String^ msg = "FdAmb_Hla13-(Exception - discoverObjectInstance). Reason: " + gcnew String(e->ToString());
+			wrapper->FdAmbEventQueue->Enqueue(gcnew RaconEventArgs(msg, LogLevel::ERROR));
 		}
 };
+
 // attributeOwnershipDivestitureNotification
 void FdAmb_Hla13::attributeOwnershipDivestitureNotification (RTI::ObjectHandle  theObject, const RTI::AttributeHandleSet& releasedAttributes)
 				throw (
@@ -625,10 +661,11 @@ void FdAmb_Hla13::attributeOwnershipDivestitureNotification (RTI::ObjectHandle  
 			// Create Event Arguments
 			HlaOwnershipManagementEventArgs ^args = gcnew HlaOwnershipManagementEventArgs();
 			args->ObjectHandle = theObject;
-			args->AttributeSet = gcnew RaconAttributeSet();
 			String^ attributeString;
 			for (unsigned int i=0; i < releasedAttributes.size(); i++){
-				args->AttributeSet->Attributes->Add(releasedAttributes.getHandle(i));
+        HlaAttribute^ attr = gcnew HlaAttribute();
+        attr->Handle = releasedAttributes.getHandle(i);
+        args->AttributeSet->Add(attr);
 				attributeString += releasedAttributes.getHandle(i);
 				if (i != releasedAttributes.size()-1) attributeString += ", ";
 			}
@@ -637,10 +674,12 @@ void FdAmb_Hla13::attributeOwnershipDivestitureNotification (RTI::ObjectHandle  
 			// Add to the Event Queue
 			wrapper->FdAmbEventQueue->Enqueue(args);
 		}
-		catch (Exception^ e){
-			MessageBox::Show("MSG-(GeneralException - attributeOwnershipDivestitureNotification):" + Environment::NewLine + e->ToString() + Environment::NewLine, "FdAmb_HLA13", MessageBoxButtons::OK, MessageBoxIcon::Error);
+		catch (System::Exception^ e) {
+			String^ msg = "FdAmb_Hla13-(Exception - discoverObjectInstance). Reason: " + gcnew String(e->ToString());
+			wrapper->FdAmbEventQueue->Enqueue(gcnew RaconEventArgs(msg, LogLevel::ERROR));
 		}
 };
+
 // attributeOwnershipUnavailable
 void FdAmb_Hla13::attributeOwnershipUnavailable (RTI::ObjectHandle theObject,const RTI::AttributeHandleSet& theAttributes)
 				throw (
@@ -654,10 +693,11 @@ void FdAmb_Hla13::attributeOwnershipUnavailable (RTI::ObjectHandle theObject,con
 			// Create Event Arguments
 			HlaOwnershipManagementEventArgs ^args = gcnew HlaOwnershipManagementEventArgs();
 			args->ObjectHandle = theObject;
-			args->AttributeSet = gcnew RaconAttributeSet();
 			String^ attributeString;
 			for (unsigned int i=0; i < theAttributes.size(); i++){
-				args->AttributeSet->Attributes->Add(theAttributes.getHandle(i));
+        HlaAttribute^ attr = gcnew HlaAttribute();
+        attr->Handle = theAttributes.getHandle(i);
+        args->AttributeSet->Add(attr);
 				attributeString += theAttributes.getHandle(i);
 				if (i != theAttributes.size()-1) attributeString += ", ";
 			}
@@ -666,10 +706,12 @@ void FdAmb_Hla13::attributeOwnershipUnavailable (RTI::ObjectHandle theObject,con
 			// Add to the Event Queue
 			wrapper->FdAmbEventQueue->Enqueue(args);
 		}
-		catch (Exception^ e){
-			MessageBox::Show("MSG-(GeneralException - attributeOwnershipUnavailable):" + Environment::NewLine + e->ToString() + Environment::NewLine, "FdAmb_HLA13", MessageBoxButtons::OK, MessageBoxIcon::Error);
+		catch (System::Exception^ e) {
+			String^ msg = "FdAmb_Hla13-(Exception - discoverObjectInstance). Reason: " + gcnew String(e->ToString());
+			wrapper->FdAmbEventQueue->Enqueue(gcnew RaconEventArgs(msg, LogLevel::ERROR));
 		}
 };
+
 // confirmAttributeOwnershipAcquisitionCancellation
 void FdAmb_Hla13::confirmAttributeOwnershipAcquisitionCancellation(RTI::ObjectHandle theObject, const RTI::AttributeHandleSet& theAttributes)
 				throw (
@@ -683,11 +725,12 @@ void FdAmb_Hla13::confirmAttributeOwnershipAcquisitionCancellation(RTI::ObjectHa
 			// Create Event Arguments
 			HlaOwnershipManagementEventArgs ^args = gcnew HlaOwnershipManagementEventArgs();
 			args->ObjectHandle = theObject;
-			args->AttributeSet = gcnew RaconAttributeSet();
 			String^ attributeString;
 			for (unsigned int i=0; i < theAttributes.size(); i++){
-				args->AttributeSet->Attributes->Add(theAttributes.getHandle(i));
-				attributeString += theAttributes.getHandle(i);
+        HlaAttribute^ attr = gcnew HlaAttribute();
+        attr->Handle = theAttributes.getHandle(i);
+        args->AttributeSet->Add(attr);
+        attributeString += theAttributes.getHandle(i);
 				if (i != theAttributes.size()-1) attributeString += ", ";
 			}
 			args->TraceMessage = "The request to cancel acquisition of a specified set of attributes (handles: {" + attributeString + "}) of the object (" + theObject + ") has been achieved.";
@@ -695,10 +738,12 @@ void FdAmb_Hla13::confirmAttributeOwnershipAcquisitionCancellation(RTI::ObjectHa
 			// Add to the Event Queue
 			wrapper->FdAmbEventQueue->Enqueue(args);
 		}
-		catch (Exception^ e){
-			MessageBox::Show("MSG-(GeneralException - confirmAttributeOwnershipAcquisitionCancellation):" + Environment::NewLine + e->ToString() + Environment::NewLine, "FdAmb_HLA13", MessageBoxButtons::OK, MessageBoxIcon::Error);
+		catch (System::Exception^ e) {
+			String^ msg = "FdAmb_Hla13-(Exception - discoverObjectInstance). Reason: " + gcnew String(e->ToString());
+			wrapper->FdAmbEventQueue->Enqueue(gcnew RaconEventArgs(msg, LogLevel::ERROR));
 		}
 };
+
 // requestAttributeOwnershipAssumption
 void FdAmb_Hla13::requestAttributeOwnershipAssumption(RTI::ObjectHandle theObject, const RTI::AttributeHandleSet& offeredAttributes, const char *theTag)
 				throw (
@@ -713,10 +758,11 @@ void FdAmb_Hla13::requestAttributeOwnershipAssumption(RTI::ObjectHandle theObjec
 			HlaOwnershipManagementEventArgs ^args = gcnew HlaOwnershipManagementEventArgs();
 			args->ObjectHandle = theObject;
 			args->Tag = gcnew String(theTag);
-			args->AttributeSet = gcnew RaconAttributeSet();
 			String^ attributeString;
 			for (unsigned int i=0; i < offeredAttributes.size(); i++){
-				args->AttributeSet->Attributes->Add(offeredAttributes.getHandle(i));
+        HlaAttribute^ attr = gcnew HlaAttribute();
+        attr->Handle = offeredAttributes.getHandle(i);
+        args->AttributeSet->Add(attr);
 				attributeString += offeredAttributes.getHandle(i);
 				if (i != offeredAttributes.size()-1) attributeString += ", ";
 			}
@@ -725,10 +771,12 @@ void FdAmb_Hla13::requestAttributeOwnershipAssumption(RTI::ObjectHandle theObjec
 			// Add to the Event Queue
 			wrapper->FdAmbEventQueue->Enqueue(args);
 		}
-		catch (Exception^ e){
-			MessageBox::Show("MSG-(GeneralException - requestAttributeOwnershipAssumption):" + Environment::NewLine + e->ToString() + Environment::NewLine, "FdAmb_HLA13", MessageBoxButtons::OK, MessageBoxIcon::Error);
+		catch (System::Exception^ e) {
+			String^ msg = "FdAmb_Hla13-(Exception - discoverObjectInstance). Reason: " + gcnew String(e->ToString());
+			wrapper->FdAmbEventQueue->Enqueue(gcnew RaconEventArgs(msg, LogLevel::ERROR));
 		}
 };
+
 // informAttributeOwnership
 void FdAmb_Hla13::informAttributeOwnership(RTI::ObjectHandle theObject, RTI::Handle theAttribute, RTI::FederateHandle  theOwner)
 				throw (
@@ -740,16 +788,18 @@ void FdAmb_Hla13::informAttributeOwnership(RTI::ObjectHandle theObject, RTI::Han
 			// Create Event Arguments
 			HlaOwnershipManagementEventArgs ^args = gcnew HlaOwnershipManagementEventArgs();
 			args->ObjectHandle = theObject;
-			args->AttributeSet = gcnew RaconAttributeSet();
-			args->AttributeSet->Attributes->Add(theAttribute);
+      HlaAttribute^ attr = gcnew HlaAttribute();
+      attr->Handle = theAttribute;
+      args->AttributeSet->Add(attr);
 			args->FederateHandle = theOwner;
 			args->TraceMessage = "Information about the ownership of attribute (handle: " + theAttribute + ") of the object (" + theObject + ") is received. The owner federate is " + theOwner;
 			args->EventType = RaconEventTypes::AttributeOwnershipInformed;
 			// Add to the Event Queue
 			wrapper->FdAmbEventQueue->Enqueue(args);
 		}
-		catch (Exception^ e){
-			MessageBox::Show("MSG-(GeneralException - informAttributeOwnership):" + Environment::NewLine + e->ToString() + Environment::NewLine, "FdAmb_HLA13", MessageBoxButtons::OK, MessageBoxIcon::Error);
+		catch (System::Exception^ e) {
+			String^ msg = "FdAmb_Hla13-(Exception - discoverObjectInstance). Reason: " + gcnew String(e->ToString());
+			wrapper->FdAmbEventQueue->Enqueue(gcnew RaconEventArgs(msg, LogLevel::ERROR));
 		}
 };
 // attributeIsNotOwned
@@ -763,16 +813,18 @@ void FdAmb_Hla13:: attributeIsNotOwned (RTI::ObjectHandle theObject, RTI::Handle
 			// Create Event Arguments
 			HlaOwnershipManagementEventArgs ^args = gcnew HlaOwnershipManagementEventArgs();
 			args->ObjectHandle = theObject;
-			args->AttributeSet = gcnew RaconAttributeSet();
-			args->AttributeSet->Attributes->Add(theAttribute);
-			args->FederateHandle = 0; // No Owner
+      HlaAttribute^ attr = gcnew HlaAttribute();
+      attr->Handle = theAttribute;
+      args->AttributeSet->Add(attr);
+      args->FederateHandle = 0; // No Owner
 			args->TraceMessage = "Information about the ownership of attribute (handle: " + theAttribute + ") of the object (" + theObject + ") is received. The attribute exists in the federation but is not currently owned by any federate.";
 			args->EventType = RaconEventTypes::AttributeOwnershipInformed;
 			// Add to the Event Queue
 			wrapper->FdAmbEventQueue->Enqueue(args);
 		}
-		catch (Exception^ e){
-			MessageBox::Show("MSG-(GeneralException - attributeIsNotOwned):" + Environment::NewLine + e->ToString() + Environment::NewLine, "FdAmb_HLA13", MessageBoxButtons::OK, MessageBoxIcon::Error);
+		catch (System::Exception^ e) {
+			String^ msg = "FdAmb_Hla13-(Exception - discoverObjectInstance). Reason: " + gcnew String(e->ToString());
+			wrapper->FdAmbEventQueue->Enqueue(gcnew RaconEventArgs(msg, LogLevel::ERROR));
 		}
 };
 // attributeOwnedByRTI
@@ -787,16 +839,18 @@ void FdAmb_Hla13:: attributeOwnedByRTI (RTI::ObjectHandle theObject, RTI::Handle
 			// Create Event Arguments
 			HlaOwnershipManagementEventArgs ^args = gcnew HlaOwnershipManagementEventArgs();
 			args->ObjectHandle = theObject;
-			args->AttributeSet = gcnew RaconAttributeSet();
-			args->AttributeSet->Attributes->Add(theAttribute);
-			args->FederateHandle = -1; // Owner is RTI
+      HlaAttribute^ attr = gcnew HlaAttribute();
+      attr->Handle = theAttribute;
+      args->AttributeSet->Add(attr);
+      args->FederateHandle = -1; // Owner is RTI
 			args->TraceMessage = "Information about the ownership of attribute (handle: " + theAttribute + ") of the object (" + theObject + ") is received. The attribute is currently owned internally by the RTI.";
 			args->EventType = RaconEventTypes::AttributeOwnershipInformed;
 			// Add to the Event Queue
 			wrapper->FdAmbEventQueue->Enqueue(args);
 		}
-		catch (Exception^ e){
-			MessageBox::Show("MSG-(GeneralException - attributeOwnedByRTI):" + Environment::NewLine + e->ToString() + Environment::NewLine, "FdAmb_HLA13", MessageBoxButtons::OK, MessageBoxIcon::Error);
+		catch (System::Exception^ e) {
+			String^ msg = "FdAmb_Hla13-(Exception - discoverObjectInstance). Reason: " + gcnew String(e->ToString());
+			wrapper->FdAmbEventQueue->Enqueue(gcnew RaconEventArgs(msg, LogLevel::ERROR));
 		}
 };
 
@@ -846,8 +900,8 @@ void FdAmb_Hla13::requestRetraction(RTI::EventRetractionHandle theHandle)
 throw (RTI::EventNotKnown, RTI::FederateInternalError){
 	// Create Event Arguments
 	HlaTimeManagementEventArgs ^args = gcnew HlaTimeManagementEventArgs();
-	args->RetractionHandle->SendingFederate = theHandle.sendingFederate;
-	args->RetractionHandle->SerialNumber = theHandle.theSerialNumber;
+	args->RetractionHandle = gcnew MessageRetraction(theHandle.theSerialNumber, theHandle.sendingFederate);// DeCode RetractionHandle
+
 	args->TraceMessage = "TSO event is being retracted. The event retraction serial no: " + args->RetractionHandle->SerialNumber + ". The sending federate handle: " + args->RetractionHandle->SerialNumber + ".";
 	args->EventType = RaconEventTypes::TimeAdvanceGrant;
 	// Add to the Event Queue

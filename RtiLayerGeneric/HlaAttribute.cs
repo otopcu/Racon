@@ -2,7 +2,7 @@
 Racon - RTI abstraction component for MS.NET (Racon)
 https://sites.google.com/site/okantopcu/racon
 
-Copyright © Okan Topçu, 2009-2016
+Copyright © Okan Topçu, 2009-2017
 otot.support@outlook.com
 
 This program is free software : you can redistribute it and / or modify
@@ -19,12 +19,11 @@ You should have received a copy of the GNU Lesser General Public License
 along with this program.If not, see <http://www.gnu.org/licenses/>.
 */
 
-using System;
-using System.Runtime.InteropServices;
-using System.Windows.Forms;
-
 namespace Racon.RtiLayer
 {
+  /// <summary>
+  /// HLA object attribute
+  /// </summary>
   public class HlaAttribute : HlaProperty
   {
     #region Properties
@@ -42,10 +41,26 @@ namespace Racon.RtiLayer
     {
       AttributePS = PSKind.Neither;
     }
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="name"></param>
+    /// <param name="ps"></param>
     public HlaAttribute(string name, PSKind ps) : this()
     {
       Name = name;
       AttributePS = ps;
+    }
+    #endregion
+
+    #region Methods
+    /// <summary>
+    /// Returns the name and handle of the attribute in form of "Name(Handle)"
+    /// </summary>
+    /// <returns></returns>
+    public override string ToString()
+    {
+      return Name + "(" + Handle + ")";
     }
     #endregion
 

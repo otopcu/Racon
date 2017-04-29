@@ -2,7 +2,7 @@
 RACoN - RTI abstraction component for MS.NET (RACoN)
 https://sites.google.com/site/okantopcu/racon
 
-Copyright © Okan Topçu, 2009-2016
+Copyright © Okan Topçu, 2009-2017
 otot.support@outlook.com
 
 This program is free software : you can redistribute it and / or modify
@@ -21,7 +21,6 @@ along with this program.If not, see <http://www.gnu.org/licenses/>.
 
 using System;
 using System.ComponentModel;
-using System.Windows.Forms;//MessageBox
 using System.Diagnostics.Contracts;
 // RACoN
 using Racon.RtiLayer;
@@ -30,12 +29,12 @@ using Racon.RtiLayer.Native;
 namespace Racon.ObjectModel
 {
   /// <summary>
-  /// CRegion
+  /// HLA13: CRegion
   /// </summary>
   public class CRegion : CHlaRegion
   {
     #region Fields
-    private CRtiAmb _rtiAmb;
+    private RtiAmb _rtiAmb;
     /// <summary>
     ///  Extent List - It should be defined and added to list for each extent according to dimension count.
     /// </summary>
@@ -51,7 +50,7 @@ namespace Racon.ObjectModel
     /// <summary>
     ///  RtiAmb reference.
     /// </summary>
-    public CRtiAmb RtiAmb
+    public RtiAmb RtiAmb
     {
       get { return _rtiAmb; }
       set
@@ -88,12 +87,13 @@ namespace Racon.ObjectModel
       try
       {
         Space = space;
-        RtiAmb.createRegion(this, (uint)Extents.Count, (int)space.Handle);
+        RtiAmb.createRegion(Name, (uint)Extents.Count, space.Handle);
         SetRangeBounds();
       }
       catch (Exception e)
       {
-        MessageBox.Show("MSG-(CreateRegion):" + Environment.NewLine + e.ToString(), "CRegion", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+        string msg = "EXC-(CreateRegion - CRegion): " + e.ToString();
+        // !!! add this to Racon logger
       }     
     }
 
@@ -110,14 +110,15 @@ namespace Racon.ObjectModel
         //Set Extent Limits for each dimension
         foreach (var extent in Extents)
         {
-          uint dimHandle = (uint)extent.Dimension.Handle;
-          setRangeLowerBound((uint)extentIndex, dimHandle, (uint)extent.LowerBound);
-          setRangeUpperBound((uint)extentIndex++, dimHandle, (uint)extent.UpperBound);
+          uint dimHandle = extent.Dimension.Handle;
+          setRangeLowerBound(extentIndex, dimHandle, (uint)extent.LowerBound);
+          setRangeUpperBound(extentIndex++, dimHandle, (uint)extent.UpperBound);
         }
       }
       catch (Exception e)
       {
-        MessageBox.Show("MSG-(SetRangeBounds):" + Environment.NewLine + e.ToString(), "CRegion", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+        string msg = "EXC-(SetRangeBounds - CRegion): " + e.ToString();
+        // !!! add this to Racon logger
       }
     }
     #endregion

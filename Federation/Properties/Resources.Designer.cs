@@ -70,7 +70,7 @@ namespace Racon.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 0.0.2.1.
+        ///   Looks up a localized string similar to 0.0.2.3.
         /// </summary>
         internal static string LibVersion {
             get {

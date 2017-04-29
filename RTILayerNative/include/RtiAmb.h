@@ -7,7 +7,7 @@
 Racon - RTI abstraction component for MS.NET (Racon)
 https://sites.google.com/site/okantopcu/racon
 
-Copyright © Okan Topçu, 2009-2016
+Copyright © Okan Topçu, 2009-2017
 otot.support@outlook.com
 
 This program is free software : you can redistribute it and / or modify
@@ -50,20 +50,8 @@ namespace Racon
 
 #pragma region Data Distribution Management
 			public:
-				// CHlaRegion is defined in C++
-				virtual bool associateRegionForUpdates(CHlaRegion ^, HlaObject ^, List<HlaAttribute^>^) = 0;
-				virtual bool changeAttributeOrderType(HlaObject ^, List<HlaAttribute^>^, OrderingHandle) = 0;
-				virtual bool changeInteractionOrderType(HlaInteractionClass ^, OrderingHandle) = 0;
-				virtual bool createRegion(CHlaRegion^, unsigned long, long) = 0;
-				virtual bool deleteRegion(CHlaRegion^) = 0;
-				virtual bool registerObjectInstanceWithRegion(HlaObject ^, List<HlaAttribute^>^, List<CHlaRegion^>^) = 0;
-				virtual bool requestClassAttributeValueUpdateWithRegion(HlaObjectClass ^, List<HlaAttribute^>^, CHlaRegion ^) = 0;
-				virtual bool sendInteraction(HlaInteraction ^, CHlaRegion ^) = 0;
-				virtual bool subscribeObjectClassAttributesWithRegion(HlaObjectClass ^, List<HlaAttribute^>^, CHlaRegion ^, Boolean) = 0;
-				virtual bool subscribeInteractionClass(HlaInteractionClass ^, CHlaRegion ^) = 0;
-				virtual bool unassociateRegionForUpdates(CHlaRegion ^, HlaObject ^) = 0;
-				virtual void unsubscribeInteractionClass(HlaInteractionClass ^, CHlaRegion ^) = 0;
-				virtual void unsubscribeObjectClassWithRegion(HlaObjectClass ^, CHlaRegion ^) = 0;
+				//virtual bool associateRegionForUpdates(CHlaRegion ^, HlaObject ^, List<HlaAttribute^>^) = 0;
+				//virtual bool unassociateRegionForUpdates(CHlaRegion ^, HlaObject ^) = 0;
 #pragma endregion
 
 #pragma endregion

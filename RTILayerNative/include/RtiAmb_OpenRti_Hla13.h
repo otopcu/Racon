@@ -2,7 +2,7 @@
 Racon - RTI abstraction component for MS.NET (Racon)
 https://sites.google.com/site/okantopcu/racon
 
-Copyright © Okan Topçu, 2009-2016
+Copyright © Okan Topçu, 2009-2017
 otot.support@outlook.com
 
 This program is free software : you can redistribute it and / or modify
@@ -52,8 +52,8 @@ namespace Racon
 #pragma region Fedaration Management
 			public:
 				// Connect
-				void connect(String ^localSetting) override {
-					// For IEEE1516-2010 - Pseudo Connect - Returns always connected
+				void connect(CallbackModel callbackModel, String ^localSetting) override {
+					// Pseudo Connect - Returns always connected
 					// OpenRTI HLA1.3 interprets federation execution names as urls: <protocol>://<address>/<path>/<name>
 					// Where the protocol overrides the protocol field from the string list.
 					connectionString = localSetting;
@@ -64,19 +64,19 @@ namespace Racon
 					{
 						msg += "the connection protocol is THREAD.";
 					}
-					this->OnFederateConnected(gcnew RaconEventArgs(msg));
+					this->OnFederateConnected(gcnew RaconEventArgs(""));
 				};
 
 				// Create Federation
 				void createFederation(String ^fedexec, String ^fdd) override {
 					fedexec = connectionString + "/" + fedexec;//e.g. fedexec = "rti://127.0.0.1:7777/CHAT";
-					RtiAmb_Hla13::createFederation(fedexec, fdd);
+					RtiAmb_Hla13::createFederation(fedexec, fdd, "");
 				};
 
 				// Join Federation
-				unsigned int joinFederation(String ^fedexec, String ^fdName) override {
+				unsigned int joinFederationExecution(String ^fedexec, String ^fdName) override {
 					fedexec = connectionString + "/" + fedexec;//e.g. fedexec = "rti://127.0.0.1:7777/CHAT";
-					return RtiAmb_Hla13::joinFederation(fedexec, fdName);// Call baseclass
+					return RtiAmb_Hla13::joinFederationExecution(fedexec, fdName);// Call baseclass
 				};
 
 				// Destroy Federation

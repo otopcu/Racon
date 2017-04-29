@@ -3,7 +3,7 @@ In project, modify RACoN.nuspec
 
 To create and update manually the NuGet package:
 1. Go to Deploy library
-2. in CMD: nuget pack ../FederationLayer.csproj -IncludeReferencedProjects -Properties Configuration=Release
+2. in CMD: nuget pack ../Racon.csproj -IncludeReferencedProjects -Properties Configuration=Release
 
 To create package (.nupkg) in each built:
 Add DeCo.csproj

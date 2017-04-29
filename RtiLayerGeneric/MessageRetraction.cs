@@ -19,47 +19,62 @@ You should have received a copy of the GNU Lesser General Public License
 along with this program.If not, see <http://www.gnu.org/licenses/>.
 */
 
-using System;
-using System.Collections.Generic; // List
-
 namespace Racon.RtiLayer
 {
   /// <summary>
-  /// HlaObjectClass
+  /// MessageRetraction
   /// </summary>
-  public class HlaObjectClass : HlaClass
+  public class MessageRetraction
   {
     #region Properties
     /// <summary>
-    ///  PrivilegeToDelete Attribute
+    /// Message retraction handle.
     /// </summary>
-    public HlaAttribute PrivilegeToDelete { get; set; }
-
+    public uint Handle { get; set; }
     /// <summary>
-    ///  PrivilegeToDelete Attribute
+    ///  Serial number - for HLA13 compability
     /// </summary>
-    public List<HlaAttribute> Attributes { get; set; }
+    public uint SerialNumber { get { return Handle; } }
+    /// <summary>
+    ///  Sending federate handle - for HLA13 compability
+    /// </summary>
+    public uint SendingFederate { get; set; }
     #endregion
 
     #region Constructors
     /// <summary>
     /// Constructor
     /// </summary>
-    public HlaObjectClass() : base()
+    public MessageRetraction() 
     {
-      Attributes = new List<HlaAttribute>();
-      PrivilegeToDelete = new HlaAttribute("HLAprivilegeToDeleteObject", PSKind.Neither);// !!! Naming only conforms to HLA1516-2010
-      //PrivilegeToDelete = new HlaAttribute("privilegeToDelete", PSKind.Neither);// !!! Naming only conforms to HLA13
-      Attributes.Add(PrivilegeToDelete);
+      //SerialNumber = 0;
+      //SendingFederate = 0;
     }
     /// <summary>
     /// 
     /// </summary>
-    /// <param name="name"></param>
-    /// <param name="ps"></param>
-    public HlaObjectClass(string name, PSKind ps) : base(name, ps)
+    /// <param name="serial"></param>
+    /// <param name="sender"></param>
+    public MessageRetraction(uint serial, uint sender) 
     {
+      Handle = serial;
+      SendingFederate = sender;
     }
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="handle"></param>
+    public MessageRetraction(uint handle)
+    {
+      Handle = handle;
+    }
+    //public MessageRetraction(string serial)
+    //{
+    //  // !!! OpenRTI does not support event retraction. returns handle numbers greater than uint.MaxValue for the second joined federate
+    //  uint no;
+    //  if (uint.TryParse(serial.Split('(', ')')[1], out no))
+    //    Handle = no;
+    //}
     #endregion
   }
 }

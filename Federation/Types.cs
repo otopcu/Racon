@@ -2,7 +2,7 @@
 RACoN - RTI abstraction component for MS.NET (RACoN)
 https://sites.google.com/site/okantopcu/racon
 
-Copyright © Okan Topçu, 2009-2016
+Copyright © Okan Topçu, 2009-2017
 otot.support@outlook.com
 
 This program is free software : you can redistribute it and / or modify
@@ -64,40 +64,6 @@ namespace Racon
   };
 
   /// <summary>
-  /// Enum debugging and information level
-  /// ALL < TRACE < INFO < WARN < ERROR < OFF
-  /// </summary>
-  public enum LogLevel
-  {
-    /// <summary>
-    /// All info is provided about RACoN events
-    /// </summary>
-    ALL = 0,
-    /// <summary>
-    /// This level provides detailed information about events including handles. Debug Level
-    /// </summary>
-    TRACE = 1,
-    /// <summary>
-    /// Only important info is provided.
-    /// </summary>
-    INFO = 2,
-    /// <summary>
-    /// Reports incorrect behavior, but RTI can continue. Production level
-    /// </summary>
-    WARN = 3,
-    /// <summary>
-    /// Reports application crashes, Racon must stop
-    /// </summary>
-    ERROR = 4,
-    /// <summary>
-    /// No information is provided
-    /// </summary>
-    OFF = 5
-  };
-
-  // 
-  // 
-  /// <summary>
   /// Enum Federation States
   /// Fedexec typical cycle: Initial -> Created -> Initial
   /// </summary>
@@ -106,11 +72,11 @@ namespace Racon
     /// <summary>
     /// Federation is not available (does not exist). Either it is deleted or not created yet.
     /// </summary>
-    FEDEX_DOESNOTEXIST, // 
+    FEDEX_DOESNOTEXIST,  
     /// <summary>
     ///  Federation is created.
     /// </summary>
-    FEDEX_EXISTS //
+    FEDEX_EXISTS 
   } ;
 
   /// <summary>
@@ -206,13 +172,13 @@ namespace Racon
   public enum OrderType
   {
     /// <summary>
-    /// Receive order
+    /// Receive order = 1 for HLA1516-2010
     /// </summary>
-    Receive,
+    Receive = 1,
     /// <summary>
-    /// TimeStamp
+    /// TimeStamp = 2 for HLA1516-2010
     /// </summary>
-    TimeStamp
+    TimeStamp = 2
   };
 
 }

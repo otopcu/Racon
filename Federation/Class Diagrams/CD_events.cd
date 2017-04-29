@@ -1,10 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ClassDiagram MajorVersion="1" MinorVersion="1">
-  <Class Name="Racon.Federation.CGenericFederate">
-    <Position X="4.5" Y="0.5" Width="2" />
+  <Class Name="Racon.CGenericFederate">
+    <Position X="4.75" Y="0.5" Width="2" />
     <Members>
       <Method Name="CGenericFederate" Hidden="true" />
-      <Method Name="EnableAsyncDelivery" Hidden="true" />
       <Method Name="FinalizeFederation" Hidden="true" />
       <Method Name="InitializeFederation" Hidden="true" />
       <Method Name="OnFederateStateChanged" Hidden="true" />
@@ -18,25 +17,19 @@
       <Compartment Name="Methods" Collapsed="true" />
       <Compartment Name="Fields" Collapsed="true" />
     </Compartments>
-    <AssociationLine Name="RtiAmb" Type="Racon.RtiLayer.CRtiAmb">
+    <AssociationLine Name="RtiAmb" Type="Racon.RtiLayer.RtiAmb">
       <MemberNameLabel ManuallyPlaced="true">
         <Position X="0.135" Y="0.093" />
       </MemberNameLabel>
     </AssociationLine>
     <TypeIdentifier>
-      <HashCode>wexFkcJA05gbpimAiAKEQqQMDQBiu1qxCMuubYBQcKs=</HashCode>
+      <HashCode>yexFkcps+7gb5i+jniKkQucMncAivX6xis+ufYFQ888=</HashCode>
       <FileName>Federation\GenericFederate.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
       <Property Name="RtiAmb" />
     </ShowAsAssociation>
-  </Class>
-  <Class Name="Racon.RtiLayer.CRtiAmb" Collapsed="true">
-    <Position X="7.25" Y="0.5" Width="1.5" />
-    <Compartments>
-      <Compartment Name="Methods" Collapsed="true" />
-    </Compartments>
-    <TypeIdentifier />
+    <Lollipop Position="0.2" />
   </Class>
   <Class Name="Racon.RtiLayer.CallbackManager">
     <Position X="0.5" Y="0.5" Width="3.75" />
@@ -47,7 +40,7 @@
     <TypeIdentifier />
   </Class>
   <Class Name="Racon.RtiLayer.RtiAmb">
-    <Position X="6.75" Y="1.5" Width="2.5" />
+    <Position X="7.5" Y="0.5" Width="2.5" />
     <Compartments>
       <Compartment Name="Properties" Collapsed="true" />
       <Compartment Name="Methods" Collapsed="true" />

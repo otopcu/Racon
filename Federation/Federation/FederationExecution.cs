@@ -2,7 +2,7 @@
 Racon - RTI abstraction component for MS.NET (Racon)
 https://sites.google.com/site/okantopcu/racon
 
-Copyright © Okan Topçu, 2009-2016
+Copyright © Okan Topçu, 2009-2017
 otot.support@outlook.com
 
 This program is free software : you can redistribute it and / or modify
@@ -24,19 +24,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Racon.Federation
+namespace Racon
 {
-  /// <summary>
-  /// The federation package (Federation) is the extension library for the simulations.
-  /// </summary>
-  /// 
-  /// <remarks>The library implements a federation execution and a generic federate, which is an extension point inherited by each federate (i.e. the simulation ap-plication-specific federate). The simulation layer classes directly include or extend the classes found in the federation package.
-  /// </remarks>
-  /// 
-  internal class NamespaceDoc
-  {
-    // Only for documentation of Namespace: Racon.Federation in Sandcastle
-  }
   /// <summary>
   /// Represents a federation execution.
   /// </summary>
@@ -44,17 +33,31 @@ namespace Racon.Federation
   /// <remarks>This class captures the all federation execution related data such as the name of the federation execution from the view of a joined federate.
   /// </remarks>
   public class CFederationExecution
-	{
-		#region Properties
+  {
+    #region Properties
     /// <summary>
     /// Federation execution name
     /// </summary>
     public string Name { get; set; }
 
+    private string _FDD;
     /// <summary>
     /// FDD (Federation Document Data) / FED (Federation Execution Data) file name with full path
     /// </summary>
-    public string FDD { get; set; }
+    public string FDD
+    {
+      get { return _FDD; }
+      set
+      {
+        _FDD = value;
+        FomModules.Add(_FDD);
+      }
+    }
+
+    /// <summary>
+    /// Fom Modules
+    /// </summary>
+    public List<string> FomModules { get; set; }
 
     /// <summary>
     /// Name of the Joined Federate in the Federation Execution
@@ -67,7 +70,7 @@ namespace Racon.Federation
     public string FederateType { get; set; }
 
     /// <summary>
-    /// Connection settings - localSettingsDesignator in Connect() call
+    /// Connection settings - local Settings Designator in Connect() call
     /// </summary>
     public string ConnectionSettings { get; set; }
 
@@ -78,13 +81,18 @@ namespace Racon.Federation
     /// Constructor
     /// </summary>
     public CFederationExecution()
-		{
+    {
       Name = "";
-      FDD = "";
+      _FDD = "";
       FederateName = "";
       FederateType = "";
       ConnectionSettings = "";
-		}
+      FomModules = new List<string>();
+    }
     #endregion
+
+    #region Methods
+    #endregion
+
   }
 }

@@ -30,18 +30,12 @@
     <ClCompile Include="RtiAmb_Hla1516e.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="RtiAmb_OpenRti_1516e.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="RtiAmb_Hla13.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\resource.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\RtiAmb.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Stdafx.h">

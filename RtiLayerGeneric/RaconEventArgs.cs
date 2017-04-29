@@ -2,7 +2,7 @@
 Racon - RTI abstraction component for MS.NET (Racon)
 https://sites.google.com/site/okantopcu/racon
 
-Copyright © Okan Topçu, 2009-2016
+Copyright © Okan Topçu, 2009-2017
 otot.support@outlook.com
 
 This program is free software : you can redistribute it and / or modify
@@ -21,15 +21,22 @@ along with this program.If not, see <http://www.gnu.org/licenses/>.
 
 using System;
 using System.ComponentModel;
+using System.Collections.Generic;
+
+#pragma warning disable 1591 // missing xml comment warning
 
 namespace Racon.RtiLayer
 {
+
   /// <summary>
   /// Event types 
   /// </summary>
   public enum RaconEventTypes
   {
-    NA, // The event type is not important - used for RTIAmb and Racon events. The others are used for FdAmb events
+    /// <summary>
+    /// The event  is used for logging purposes
+    /// </summary>
+    NA,  
     // FM
     ConnectionLost,
     FederationExecutionsReported,
@@ -43,6 +50,8 @@ namespace Racon.RtiLayer
     FederationSaved,
     FederationRestored,
     FederationRestoreBegun,
+    FederationSaveStatusResponse,
+    FederationRestoreStatusResponse,
     // DM
     StartRegistrationForObjectClassAdvised,
     StopRegistrationForObjectClassAdvised,
@@ -57,6 +66,7 @@ namespace Racon.RtiLayer
     TurnUpdatesOnForObjectInstanceAdvised,
     TurnUpdatesOffForObjectInstanceAdvised,
     // OwM
+    RequestDivestitureConfirmation,
     AttributeOwnershipReleaseRequested,
     AttributeOwnershipInformed,
     AttributeOwnershipAcquisitionNotified,
@@ -89,19 +99,38 @@ namespace Racon.RtiLayer
     /// Time
     /// </summary>
     public double Time;
+    /// <summary>
+    /// LogLevel for event
+    /// </summary>
+    public LogLevel Level;
     #endregion
 
     #region Constructors
     /// <summary>
-    /// Constructor
+    /// Default constructor
     /// </summary>
     public RaconEventArgs()
     {
+      EventType = RaconEventTypes.NA;
       TraceMessage = "A Racon event is occured.";
+      Level = LogLevel.TRACE;
     }
-    public RaconEventArgs(string val)
+    /// <summary>
+    /// constructor with 1 parameter
+    /// </summary>
+    /// <param name="val"></param>
+    public RaconEventArgs(string val) : this()
     {
       TraceMessage = val;
+    }
+    /// <summary>
+    /// constructor with 2 parameters
+    /// </summary>
+    /// <param name="val"></param>
+    /// <param name="level"></param>
+    public RaconEventArgs(string val, LogLevel level) : this(val)
+    {
+      Level = level;
     }
     #endregion
   }
@@ -117,7 +146,7 @@ namespace Racon.RtiLayer
     /// </summary>
     public string Label { get; set; }
     /// <summary>
-    /// Reason. A string value for services such as ConnectionLost
+    /// Reason. A string value for services such as ConnectionLost, FederationSaved
     /// </summary>
     public string Reason { get; set; }
     /// <summary>
@@ -141,6 +170,7 @@ namespace Racon.RtiLayer
     public HlaFederationManagementEventArgs()
     {
       Success = false;
+      Reason = "";
       FederateHandle = 0;
       Tag = "";
     }
@@ -156,7 +186,7 @@ namespace Racon.RtiLayer
     /// <summary>
     /// EventRetractionHandle
     /// </summary>
-    public EventRetractionHandle RetractionHandle { get; set; }
+    public MessageRetraction RetractionHandle { get; set; }
     #endregion
 
     #region Constructors
@@ -165,11 +195,10 @@ namespace Racon.RtiLayer
     /// </summary>
     public HlaTimeManagementEventArgs()
     {
-      RetractionHandle = new EventRetractionHandle();
+      RetractionHandle = new MessageRetraction();
     }
     #endregion
   }
-
 
   /// <summary>
   /// CHlaDeclarationManagementEventArgs 
@@ -218,9 +247,9 @@ namespace Racon.RtiLayer
     /// </summary>
     public string Tag { get; set; }
     /// <summary>
-    /// RaconAttributeSet
+    /// AttributeSet
     /// </summary>
-    public RaconAttributeSet AttributeSet { get; set; }
+    public List<HlaAttribute> AttributeSet { get; set; }
     #endregion
 
     #region Constructors
@@ -232,7 +261,7 @@ namespace Racon.RtiLayer
       ObjectHandle = 0;
       FederateHandle = 0;
       Tag = "";
-      AttributeSet = new RaconAttributeSet();
+      AttributeSet = new List<HlaAttribute>();
     }
     #endregion
   }
@@ -244,7 +273,7 @@ namespace Racon.RtiLayer
   {
     #region Properties
     /// <summary>
-    /// Tag
+    /// Attributes
     /// </summary>
     public BindingList<uint> Attributes { get; set; }
     #endregion
@@ -258,6 +287,10 @@ namespace Racon.RtiLayer
       Attributes = new BindingList<uint>();
     }
     #endregion
+    /// <summary>
+    /// AddAttribute
+    /// </summary>
+    /// <param name="_attr"></param>
     public void AddAttribute(HlaAttribute _attr)
     {
       Attributes.Add(_attr.Handle);

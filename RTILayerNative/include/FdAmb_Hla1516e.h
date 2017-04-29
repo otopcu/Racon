@@ -2,7 +2,7 @@
 Racon - RTI abstraction component for MS.NET (Racon)
 https://sites.google.com/site/okantopcu/racon
 
-Copyright © Okan Topçu, 2009-2016
+Copyright © Okan Topçu, 2009-2017
 otot.support@outlook.com
 
 This program is free software : you can redistribute it and / or modify
@@ -21,8 +21,8 @@ along with this program.If not, see <http://www.gnu.org/licenses/>.
 
 #pragma once
 #include <iostream> // for using std
-#include <RTI\NullFederateAmbassador.h>
 #include <vcclr.h> // For gcroot<>
+#include <RTI\NullFederateAmbassador.h>
 #include "Helpers_Hla1516e.h"
 
 using namespace System;
@@ -33,20 +33,19 @@ namespace Racon
 {
 	namespace RtiLayer {
 		namespace Native {
-			//ref class CallbackManager;
 
 			public class FdAmb_Hla1516e : public rti1516e::NullFederateAmbassador
 			{
 				// Fields
 			private:
 				gcroot<CallbackManager^> wrapper;
-				OmHla1516e* om; // Native object model tracker
+				NomHla1516e* om; // Native object model tracker
 
 				// Methods
 #pragma region Methods
 			public:
 				// Constructor
-				FdAmb_Hla1516e(CallbackManager^, OmHla1516e*);
+				FdAmb_Hla1516e(CallbackManager^, NomHla1516e*);
 				// Destructor
 				virtual ~FdAmb_Hla1516e(void) throw() {}
 
@@ -112,54 +111,53 @@ namespace Racon
 					throw (
 						rti1516e::FederateInternalError);
 
-
 				// 4.23
-				virtual void federationSaveStatusResponse(
-					rti1516e::FederateHandleSaveStatusPairVector const &
-					theFederateStatusVector)
-					throw (
-						rti1516e::FederateInternalError) {}
+        virtual void federationSaveStatusResponse(
+          rti1516e::FederateHandleSaveStatusPairVector const &
+          theFederateStatusVector)
+          throw (
+            rti1516e::FederateInternalError);
 
 				// 4.25
-				virtual void requestFederationRestoreSucceeded(
-					std::wstring const & label)
-					throw (
-						rti1516e::FederateInternalError) {}
+        virtual void requestFederationRestoreSucceeded(
+          std::wstring const & label)
+          throw (
+            rti1516e::FederateInternalError);
 
-				virtual void requestFederationRestoreFailed(
-					std::wstring const & label)
-					throw (
-						rti1516e::FederateInternalError) {}
+        virtual void requestFederationRestoreFailed(
+          std::wstring const & label)
+          throw (
+            rti1516e::FederateInternalError);
 
 				// 4.26
-				virtual void federationRestoreBegun()
-					throw (
-						rti1516e::FederateInternalError) {}
+        virtual void federationRestoreBegun()
+          throw (
+            rti1516e::FederateInternalError);
 
 				// 4.27
-				virtual void initiateFederateRestore(
-					std::wstring const & label,
-					std::wstring const & federateName,
-					rti1516e::FederateHandle handle)
-					throw (
-						rti1516e::FederateInternalError) {}
+        virtual void initiateFederateRestore(
+          std::wstring const & label,
+          std::wstring const & federateName,
+          rti1516e::FederateHandle handle)
+          throw (
+            rti1516e::FederateInternalError);
 
 				// 4.29
-				virtual void federationRestored()
-					throw (
-						rti1516e::FederateInternalError) {}
+        virtual void federationRestored()
+          throw (
+            rti1516e::FederateInternalError);
 
-				virtual void federationNotRestored(
-					rti1516e::RestoreFailureReason theRestoreFailureReason)
-					throw (
-						rti1516e::FederateInternalError) {}
+        virtual void federationNotRestored(
+          rti1516e::RestoreFailureReason theRestoreFailureReason)
+          throw (
+            rti1516e::FederateInternalError);
 
 				// 4.32
-				virtual void federationRestoreStatusResponse(
-					rti1516e::FederateRestoreStatusVector const &
-					theFederateRestoreStatusVector)
-					throw (
-						rti1516e::FederateInternalError) {}
+        virtual void federationRestoreStatusResponse(
+          rti1516e::FederateRestoreStatusVector const &
+          theFederateRestoreStatusVector)
+          throw (
+            rti1516e::FederateInternalError);
 
 #pragma endregion // Federation Management Services
 
@@ -407,69 +405,69 @@ namespace Racon
 
 #pragma region Ownership Management Services
 				// 7.4
-				virtual void requestAttributeOwnershipAssumption(
-					rti1516e::ObjectInstanceHandle theObject,
-					rti1516e::AttributeHandleSet const & offeredAttributes,
-					rti1516e::VariableLengthData const & theUserSuppliedTag)
-					throw (
-						rti1516e::FederateInternalError) {}
+        virtual void requestAttributeOwnershipAssumption(
+          rti1516e::ObjectInstanceHandle theObject,
+          rti1516e::AttributeHandleSet const & offeredAttributes,
+          rti1516e::VariableLengthData const & theUserSuppliedTag)
+          throw (
+            rti1516e::FederateInternalError);
 
 				// 7.5
-				virtual void requestDivestitureConfirmation(
-					rti1516e::ObjectInstanceHandle theObject,
-					rti1516e::AttributeHandleSet const & releasedAttributes)
-					throw (
-						rti1516e::FederateInternalError) {}
+        virtual void requestDivestitureConfirmation(
+          rti1516e::ObjectInstanceHandle theObject,
+          rti1516e::AttributeHandleSet const & releasedAttributes)
+          throw (
+            rti1516e::FederateInternalError);
 
 				// 7.7
-				virtual void attributeOwnershipAcquisitionNotification(
-					rti1516e::ObjectInstanceHandle theObject,
-					rti1516e::AttributeHandleSet const & securedAttributes,
-					rti1516e::VariableLengthData const & theUserSuppliedTag)
-					throw (
-						rti1516e::FederateInternalError) {}
+        virtual void attributeOwnershipAcquisitionNotification(
+          rti1516e::ObjectInstanceHandle theObject,
+          rti1516e::AttributeHandleSet const & securedAttributes,
+          rti1516e::VariableLengthData const & theUserSuppliedTag)
+          throw (
+            rti1516e::FederateInternalError);
 
 				// 7.10
-				virtual void attributeOwnershipUnavailable(
-					rti1516e::ObjectInstanceHandle theObject,
-					rti1516e::AttributeHandleSet const & theAttributes)
-					throw (
-						rti1516e::FederateInternalError) {}
+        virtual void attributeOwnershipUnavailable(
+          rti1516e::ObjectInstanceHandle theObject,
+          rti1516e::AttributeHandleSet const & theAttributes)
+          throw (
+            rti1516e::FederateInternalError);
 
 				// 7.11
-				virtual void requestAttributeOwnershipRelease(
-					rti1516e::ObjectInstanceHandle theObject,
-					rti1516e::AttributeHandleSet const & candidateAttributes,
-					rti1516e::VariableLengthData const & theUserSuppliedTag)
-					throw (
-						rti1516e::FederateInternalError) {}
+        virtual void requestAttributeOwnershipRelease(
+          rti1516e::ObjectInstanceHandle theObject,
+          rti1516e::AttributeHandleSet const & candidateAttributes,
+          rti1516e::VariableLengthData const & theUserSuppliedTag)
+          throw (
+            rti1516e::FederateInternalError);
 
 				// 7.16
-				virtual void confirmAttributeOwnershipAcquisitionCancellation(
-					rti1516e::ObjectInstanceHandle theObject,
-					rti1516e::AttributeHandleSet const & theAttributes)
-					throw (
-						rti1516e::FederateInternalError) {}
+        virtual void confirmAttributeOwnershipAcquisitionCancellation(
+          rti1516e::ObjectInstanceHandle theObject,
+          rti1516e::AttributeHandleSet const & theAttributes)
+          throw (
+            rti1516e::FederateInternalError);
 
 				// 7.18
-				virtual void informAttributeOwnership(
-					rti1516e::ObjectInstanceHandle theObject,
-					rti1516e::AttributeHandle theAttribute,
-					rti1516e::FederateHandle theOwner)
-					throw (
-						rti1516e::FederateInternalError) {}
+        virtual void informAttributeOwnership(
+          rti1516e::ObjectInstanceHandle theObject,
+          rti1516e::AttributeHandle theAttribute,
+          rti1516e::FederateHandle theOwner)
+          throw (
+            rti1516e::FederateInternalError);
 
-				virtual void attributeIsNotOwned(
-					rti1516e::ObjectInstanceHandle theObject,
-					rti1516e::AttributeHandle theAttribute)
-					throw (
-						rti1516e::FederateInternalError) {}
+        virtual void attributeIsNotOwned(
+          rti1516e::ObjectInstanceHandle theObject,
+          rti1516e::AttributeHandle theAttribute)
+          throw (
+            rti1516e::FederateInternalError);
 
-				virtual void attributeIsOwnedByRTI(
-					rti1516e::ObjectInstanceHandle theObject,
-					rti1516e::AttributeHandle theAttribute)
-					throw (
-						rti1516e::FederateInternalError) {}
+        virtual void attributeIsOwnedByRTI(
+          rti1516e::ObjectInstanceHandle theObject,
+          rti1516e::AttributeHandle theAttribute)
+          throw (
+            rti1516e::FederateInternalError);
 
 #pragma endregion // Ownership Management Services
 
@@ -478,25 +476,25 @@ namespace Racon
 				virtual void timeRegulationEnabled(
 					rti1516e::LogicalTime const & theFederateTime)
 					throw (
-						rti1516e::FederateInternalError) {}
+						rti1516e::FederateInternalError);
 
 				// 8.6
 				virtual void timeConstrainedEnabled(
 					rti1516e::LogicalTime const & theFederateTime)
 					throw (
-						rti1516e::FederateInternalError) {}
+						rti1516e::FederateInternalError);
 
 				// 8.13
 				virtual void timeAdvanceGrant(
 					rti1516e::LogicalTime const & theTime)
 					throw (
-						rti1516e::FederateInternalError) {}
+						rti1516e::FederateInternalError);
 
 				// 8.22
 				virtual void requestRetraction(
 					rti1516e::MessageRetractionHandle theHandle)
 					throw (
-						rti1516e::FederateInternalError) {}
+						rti1516e::FederateInternalError);
 #pragma endregion // Time Management Services
 
 #pragma endregion

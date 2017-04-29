@@ -1,5 +1,5 @@
-﻿/*
-Racon - RTI abstraction component for MS.NET (Racon)
+﻿/* 
+RACoN - RTI abstraction component for MS.NET (RACoN)
 https://sites.google.com/site/okantopcu/racon
 
 Copyright © Okan Topçu, 2009-2017
@@ -19,39 +19,41 @@ You should have received a copy of the GNU Lesser General Public License
 along with this program.If not, see <http://www.gnu.org/licenses/>.
 */
 
-using System;
-using System.ComponentModel;
 
 namespace Racon.RtiLayer
 {
   /// <summary>
-  /// HLA interaction class
+  /// CRegion
   /// </summary>
-  public class HlaInteractionClass : HlaClass
+  public class HlaRegion
   {
+    #region Fields
+    #endregion
+
     #region Properties
     /// <summary>
-    ///  Parameters
+    /// Name 
     /// </summary>
-    public BindingList<HlaParameter> Parameters { get; set; }
+    public string Name { get; set; }
+    /// <summary>
+    /// Handle
+    /// </summary>
+    public uint Handle { get; set; }
     #endregion
 
     #region Constructors
     /// <summary>
-    /// Constructor
+    ///  CRegion constructor.
     /// </summary>
-    public HlaInteractionClass() : base()
+    public HlaRegion(string name)
+      : base()
     {
-      Parameters = new BindingList<HlaParameter>();
-    }
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="name"></param>
-    /// <param name="ps"></param>
-    public HlaInteractionClass(string name, PSKind ps) : base(name, ps)
-    {
+      Name = name;
     }
     #endregion
+
+    #region Methods
+    #endregion
+
   }
 }

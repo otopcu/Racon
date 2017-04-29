@@ -2,7 +2,7 @@
 Racon - RTI abstraction component for MS.NET (Racon)
 https://sites.google.com/site/okantopcu/racon
 
-Copyright © Okan Topçu, 2009-2016
+Copyright © Okan Topçu, 2009-2017
 otot.support@outlook.com
 
 This program is free software : you can redistribute it and / or modify
@@ -36,7 +36,13 @@ namespace Racon
 #pragma region Ctor/Dtor
 			public:
 				RtiAmb_Dmso_Hla13(CallbackManager^ eventManager) : RtiAmb_Hla13(eventManager) {
-					RtiVersion = "DMSO RTI 1.3NG v6";
+          try {
+            RtiVersion = "DMSO RTI 1.3NG v6";
+          }
+          catch (System::Exception^ e) {
+            String^ msg = "RtiAmb_Dmso_Hla13-(Exception - Ctor). The native rti ambassador pointer creation  is failed. This may indicate a corrupted/a wrong RTI.rid file. Reason: " + gcnew String(e->ToString());
+            this->OnRTIEventOccured(gcnew RaconEventArgs(msg, LogLevel::ERROR));
+          }
 				};
 
 				~RtiAmb_Dmso_Hla13()

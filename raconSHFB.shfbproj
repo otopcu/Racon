@@ -18,12 +18,11 @@
     <HtmlHelpName>Documentation</HtmlHelpName>
     <Language>en-US</Language>
     <DocumentationSources>
-      <DocumentationSource sourceFile="Federation\Output\bin\Release\RACoN.XML" />
-<DocumentationSource sourceFile="Federation\Output\bin\Release\RACoN.dll" />
-<DocumentationSource sourceFile="RtiLayerGeneric\bin\Release\Racon.RtiLayer.XML" />
-<DocumentationSource sourceFile="RtiLayerGeneric\bin\Release\Racon.RtiLayer.dll" />
-<DocumentationSource sourceFile="RTILayerNative\Output\bin\Release\Racon.RtiLayer.xml" />
-<DocumentationSource sourceFile="RTILayerNative\Output\bin\Release\Racon.RtiLayer.dll" /></DocumentationSources>
+      <DocumentationSource sourceFile="Federation\Output\bin\Release\Racon.dll" />
+<DocumentationSource sourceFile="Federation\Output\bin\Release\Racon.RtiLayer.dll" />
+<DocumentationSource sourceFile="Federation\Output\bin\Release\Racon.RtiLayer.Native.dll" />
+<DocumentationSource sourceFile="Federation\Output\bin\Release\Racon.RtiLayer.xml" />
+<DocumentationSource sourceFile="Federation\Output\bin\Release\Racon.XML" /></DocumentationSources>
     <BuildAssemblerVerbosity>OnlyWarningsAndErrors</BuildAssemblerVerbosity>
     <HelpFileFormat>HtmlHelp1</HelpFileFormat>
     <IndentHtml>False</IndentHtml>

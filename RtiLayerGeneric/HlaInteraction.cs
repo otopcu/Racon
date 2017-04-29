@@ -2,7 +2,7 @@
 Racon - RTI abstraction component for MS.NET (Racon)
 https://sites.google.com/site/okantopcu/racon
 
-Copyright © Okan Topçu, 2009-2016
+Copyright © Okan Topçu, 2009-2017
 otot.support@outlook.com
 
 This program is free software : you can redistribute it and / or modify
@@ -26,6 +26,9 @@ using System.ComponentModel;
 
 namespace Racon.RtiLayer
 {
+  /// <summary>
+  /// HLA interaction
+  /// </summary>
   public class HlaInteraction
   {
     #region Properties
@@ -61,11 +64,20 @@ namespace Racon.RtiLayer
       Parameters = new BindingList<HlaParameter>();
       //RetractionHandle = new EventRetractionHandle();
     }
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="ic"></param>
     public HlaInteraction(HlaInteractionClass ic) : this()
     {
       ClassHandle = ic.Handle;
       ClassName = ic.Name;
     }
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="ic"></param>
+    /// <param name="tag"></param>
     public HlaInteraction(HlaInteractionClass ic, string tag) : this(ic)
     {
       Tag = tag;
@@ -73,15 +85,29 @@ namespace Racon.RtiLayer
     #endregion
 
     #region Methods
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="_parameter"></param>
     public void AddParameter(HlaParameter _parameter)
     {
       Parameters.Add(_parameter);
     }
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="_parameter"></param>
+    /// <param name="value"></param>
     public void AddParameterValue(HlaParameter _parameter, string value)
     {
       _parameter.AddValue(value);
       Parameters.Add(_parameter);
     }
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="_parameter"></param>
+    /// <param name="value"></param>
     public void AddParameterValue(HlaParameter _parameter, DateTime value)
     {
       _parameter.AddValue(value);
@@ -92,6 +118,12 @@ namespace Racon.RtiLayer
     //  _parameter.AddValue(value);
     //  Parameters.Add(_parameter);
     //}
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <typeparam name="_type"></typeparam>
+    /// <param name="_parameter"></param>
+    /// <param name="value"></param>
     public void AddParameterValue<_type>(HlaParameter _parameter, _type value) where _type : struct
     //public void AddParameterValue<_type>(HlaParameter _parameter, _type value) where _type : struct, IConvertible, IComparable, IFormattable
     {

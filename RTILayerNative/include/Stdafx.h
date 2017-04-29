@@ -7,5 +7,6 @@
 #include "RtiAmb_Dmso_Hla13.h"
 #include "RtiAmb_Portico_Hla13.h"
 #include "RtiAmb_OpenRti_Hla13.h"
+#include "RtiAmb_OpenRti_1516e.h"
 
 

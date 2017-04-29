@@ -2,7 +2,7 @@
 RACoN - RTI abstraction component for MS.NET (RACoN)
 https://sites.google.com/site/okantopcu/racon
 
-Copyright © Okan Topçu, 2009-2016
+Copyright © Okan Topçu, 2009-2017
 otot.support@outlook.com
 
 This program is free software : you can redistribute it and / or modify
@@ -19,7 +19,7 @@ You should have received a copy of the GNU Lesser General Public License
 along with this program.If not, see <http://www.gnu.org/licenses/>.
 */
 
-using System.ComponentModel;
+using System.Collections.Generic;
 // RACoN
 using Racon.RtiLayer;
 using Racon.RtiLayer.Native;
@@ -47,24 +47,29 @@ namespace Racon.ObjectModel
     /// <summary>
     /// Interaction Class List
     /// </summary>
-    public BindingList<HlaInteractionClass> ICList;
+    public List<HlaInteractionClass> ICList;
 
     /// <summary>
     /// Object Class List
     /// </summary>
-    public BindingList<HlaObjectClass> OCList;
+    public List<HlaObjectClass> OCList;
 
     /// <summary>
     ///Routing Space List for HLA13
     /// </summary>
-    public BindingList<CRoutingSpace> RSList;
+    public List<CRoutingSpace> RSList;
     #endregion
 
     #region Properties
     /// <summary>
+    /// Dimensions
+    /// </summary>
+    public List<HlaDimension> Dimensions { get; set; }
+
+    /// <summary>
     /// RtiAmb reference.
     /// </summary>
-    public CRtiAmb RtiAmb { get; set; }
+    public RtiAmb RtiAmb { get; set; }
     #endregion
 
     #region Constructors
@@ -72,12 +77,13 @@ namespace Racon.ObjectModel
     /// CObjectModel constructor.
     /// </summary>
     public CObjectModel()
-      : base()
+      //: base()
     {
       RtiAmb = null;
-      ICList = new BindingList<HlaInteractionClass>();
-      OCList = new BindingList<HlaObjectClass>();
-      RSList = new BindingList<CRoutingSpace>();
+      ICList = new List<HlaInteractionClass>();
+      OCList = new List<HlaObjectClass>();
+      RSList = new List<CRoutingSpace>();
+      Dimensions = new List<HlaDimension>();
     }
     #endregion
 
@@ -87,7 +93,7 @@ namespace Racon.ObjectModel
     /// </summary>
     public void AddToObjectModel(HlaObjectClass oc)
     {
-      this.OCList.Add(oc);
+      OCList.Add(oc);
     }
 
     /// <summary>
@@ -95,16 +101,25 @@ namespace Racon.ObjectModel
     /// </summary>
     public void AddToObjectModel(HlaInteractionClass ic)
     {
-      this.ICList.Add(ic);
+      ICList.Add(ic);
     }
 
     /// <summary>
-    /// Adds a routing space to object model.
+    /// Adds a dimension to object model.
+    /// </summary>
+    /// <param name="dimension"></param>
+    public void AddToObjectModel(HlaDimension dimension)
+    {
+      Dimensions.Add(dimension);
+    }
+
+    /// <summary>
+    /// HLA13: Adds a routing space to object model.
     /// </summary>
     public void AddToObjectModel(CRoutingSpace rs)
     {
-      rs.RtiAmb = this.RtiAmb;
-      this.RSList.Add(rs);
+      rs.RtiAmb = RtiAmb;
+      RSList.Add(rs);
     }
     #endregion
 

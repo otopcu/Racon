@@ -3,7 +3,7 @@
 Racon - RTI abstraction component for MS.NET (Racon)
 https://sites.google.com/site/okantopcu/racon
 
-Copyright © Okan Topçu, 2009-2016
+Copyright © Okan Topçu, 2009-2017
 otot.support@outlook.com
 
 This program is free software : you can redistribute it and / or modify
@@ -21,8 +21,7 @@ along with this program.If not, see <http://www.gnu.org/licenses/>.
 */
 
 using System;
-using System.ComponentModel;
-using System.Runtime.InteropServices;
+using System.Collections.Generic;
 
 namespace Racon.RtiLayer
 {
@@ -55,7 +54,7 @@ namespace Racon.RtiLayer
     /// <summary>
     ///  Attributes
     /// </summary>
-    public BindingList<HlaAttribute> Attributes { get; set; }
+    public List<HlaAttribute> Attributes { get; set; }
     #endregion
 
     #region Constructors
@@ -66,18 +65,30 @@ namespace Racon.RtiLayer
     {
       Tag = "";
       Name = "";
-      Attributes = new BindingList<HlaAttribute>();
+      Attributes = new List<HlaAttribute>();
       //RetractionHandle = new EventRetractionHandle();
     }
+    /// <summary>
+    /// Constructor
+    /// </summary>
+    /// <param name="oc"></param>
     public HlaObject(HlaObjectClass oc) : this()
     {
       Type = oc;
     }
+    /// <summary>
+    /// Ctor
+    /// </summary>
+    /// <param name="oc"></param>
+    /// <param name="name"></param>
     public HlaObject(HlaObjectClass oc, string name) : this(oc)
     {
       Name = name;
     }
-    // Copy Constructor
+    /// <summary>
+    /// Copy Constructor
+    /// </summary>
+    /// <param name="obj"></param>
     public HlaObject(HlaObject obj) : this()
     {
       Name = obj.Name;
@@ -90,20 +101,40 @@ namespace Racon.RtiLayer
     #endregion
 
     #region Methods
+    /// <summary>
+    /// Add attribute
+    /// </summary>
+    /// <param name="attribute"></param>
     public void AddAttribute(HlaAttribute attribute)
     {
       Attributes.Add(attribute);
     }
+    /// <summary>
+    /// AddAttributeValue
+    /// </summary>
+    /// <param name="attribute"></param>
+    /// <param name="value"></param>
     public void AddAttributeValue(HlaAttribute attribute, string value)
     {
       attribute.AddValue(value);
       Attributes.Add(attribute);
     }
+    /// <summary>
+    /// AddAttributeValue
+    /// </summary>
+    /// <param name="attribute"></param>
+    /// <param name="value"></param>
     public void AddAttributeValue(HlaAttribute attribute, DateTime value)
     {
       attribute.AddValue(value);
       Attributes.Add(attribute);
     }
+    /// <summary>
+    /// AddAttributeValue
+    /// </summary>
+    /// <typeparam name="_type"></typeparam>
+    /// <param name="attribute"></param>
+    /// <param name="value"></param>
     public void AddAttributeValue<_type>(HlaAttribute attribute, _type value) where _type : struct
     {
       attribute.AddValue(value);
