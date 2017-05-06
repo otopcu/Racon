@@ -21,4 +21,6 @@ You can influence this project by sending your feedback. Please, contact project
 for any comments, offers, remarks, ideas, etc. 
 
 Sample Federations:
-- Chat Federation: https://github.com/otopcu/Chat
+- Chat Federation (Basic): https://github.com/otopcu/Chat
+- Chat Federation (DDM): https://github.com/otopcu/Chat/tree/DDM
+
