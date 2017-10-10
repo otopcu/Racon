@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26730.16
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Racon", "Federation\Racon.csproj", "{C9B50F36-C483-4EA2-8A36-D2B0787AFF21}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -50,7 +50,8 @@ Global
 		{C9B50F36-C483-4EA2-8A36-D2B0787AFF21}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{C9B50F36-C483-4EA2-8A36-D2B0787AFF21}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{C9B50F36-C483-4EA2-8A36-D2B0787AFF21}.Release|Win32.ActiveCfg = Release|x86
-		{C9B50F36-C483-4EA2-8A36-D2B0787AFF21}.Release|x64.ActiveCfg = Release|Any CPU
+		{C9B50F36-C483-4EA2-8A36-D2B0787AFF21}.Release|x64.ActiveCfg = Release|x64
+		{C9B50F36-C483-4EA2-8A36-D2B0787AFF21}.Release|x64.Build.0 = Release|x64
 		{C9B50F36-C483-4EA2-8A36-D2B0787AFF21}.Release|x86.ActiveCfg = Release|x86
 		{C9B50F36-C483-4EA2-8A36-D2B0787AFF21}.Release|x86.Build.0 = Release|x86
 		{BF7B1E1D-55EB-4581-8009-5E2757F9C8C6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -73,8 +74,8 @@ Global
 		{BF7B1E1D-55EB-4581-8009-5E2757F9C8C6}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{BF7B1E1D-55EB-4581-8009-5E2757F9C8C6}.Release|Win32.ActiveCfg = Release|Any CPU
 		{BF7B1E1D-55EB-4581-8009-5E2757F9C8C6}.Release|Win32.Build.0 = Release|Any CPU
-		{BF7B1E1D-55EB-4581-8009-5E2757F9C8C6}.Release|x64.ActiveCfg = Release|Any CPU
-		{BF7B1E1D-55EB-4581-8009-5E2757F9C8C6}.Release|x64.Build.0 = Release|Any CPU
+		{BF7B1E1D-55EB-4581-8009-5E2757F9C8C6}.Release|x64.ActiveCfg = Release|x64
+		{BF7B1E1D-55EB-4581-8009-5E2757F9C8C6}.Release|x64.Build.0 = Release|x64
 		{BF7B1E1D-55EB-4581-8009-5E2757F9C8C6}.Release|x86.ActiveCfg = Release|Any CPU
 		{BF7B1E1D-55EB-4581-8009-5E2757F9C8C6}.Release|x86.Build.0 = Release|Any CPU
 		{BF7E0C2F-FB62-491B-AB11-77B9041F29E4}.Debug|Any CPU.ActiveCfg = Debug|Win32
@@ -93,11 +94,15 @@ Global
 		{BF7E0C2F-FB62-491B-AB11-77B9041F29E4}.Release|Mixed Platforms.Build.0 = Release|Win32
 		{BF7E0C2F-FB62-491B-AB11-77B9041F29E4}.Release|Win32.ActiveCfg = Release|Win32
 		{BF7E0C2F-FB62-491B-AB11-77B9041F29E4}.Release|Win32.Build.0 = Release|Win32
-		{BF7E0C2F-FB62-491B-AB11-77B9041F29E4}.Release|x64.ActiveCfg = Release|Win32
+		{BF7E0C2F-FB62-491B-AB11-77B9041F29E4}.Release|x64.ActiveCfg = Release|x64
+		{BF7E0C2F-FB62-491B-AB11-77B9041F29E4}.Release|x64.Build.0 = Release|x64
 		{BF7E0C2F-FB62-491B-AB11-77B9041F29E4}.Release|x86.ActiveCfg = Release|Win32
 		{BF7E0C2F-FB62-491B-AB11-77B9041F29E4}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {3A6F7A2B-B42F-44C4-A50D-ACFD0018335D}
 	EndGlobalSection
 EndGlobal
