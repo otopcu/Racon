@@ -15,18 +15,18 @@ is a popular approach in many HLA-based projects.
 
 ## What's New?
 ### 0.0.2.4 (07.06.17):
-*Binary distribution is win64/x64 now.
-*Support for all user-supplied tags. Now, RACoN can encode/decode all tags in various datatypes.
-*Encoding/decoding mechanism is restructured.
+* Binary distribution is win64/x64 now.
+* Support for all user-supplied tags. Now, RACoN can encode/decode all tags in various datatypes.
+* Encoding/decoding mechanism is restructured.
 
 ### 0.0.2.3 (29.04.17):
-*HLA1516e Ownership management services are implemented.
-*DDM services are re-implemented for HLA Evolved.
-*GetDimensionHandle() and GetDimensionName() services are implemented.
-*GetFederateHandle() and GetFederateName() services are implemented.
-*Multiple FOM modules are supported.
-*Some overloads for Create and Join federation execution services are added.
-*System.Windows.Forms reference is removed.
+* HLA1516e Ownership management services are implemented.
+* DDM services are re-implemented for HLA Evolved.
+* GetDimensionHandle() and GetDimensionName() services are implemented.
+* GetFederateHandle() and GetFederateName() services are implemented.
+* Multiple FOM modules are supported.
+* Some overloads for Create and Join federation execution services are added.
+* System.Windows.Forms reference is removed.
 
 ## Remarks
 Please note that this is a research and an academic library that is not intended for a production environment. 
