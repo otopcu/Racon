@@ -44,7 +44,7 @@ namespace Racon
       public:
         RtiAmb_OpenRti_1516e(CallbackManager^ eventManager) : RtiAmb_Hla1516e(eventManager) {
           try {
-            RtiVersion = gcnew String(rti1516e::rtiName().c_str()) + " v" + gcnew String(rti1516e::rtiVersion().c_str()) + " (OpenRTI-0.8.0b win32)";// rtiVersion() returns 1.0
+            RtiVersion = gcnew String(rti1516e::rtiName().c_str()) + " v" + gcnew String(rti1516e::rtiVersion().c_str()) + " (OpenRTI-0.9.0 win64)";// rtiVersion() returns 1.0
           }
           catch (System::Exception^ e) {
             String^ msg = "RtiAmb_OpenRti_1516e-(Exception - Ctor). The native rti ambassador pointer creation  is failed. This may indicate a corrupted/a wrong RTI.rid file. Please ensure that RTI.rid is provided by Portico distribution. Reason: " + gcnew String(e->ToString());

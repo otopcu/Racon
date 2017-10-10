@@ -104,8 +104,8 @@
     <TargetName>Racon.RtiLayer.Native</TargetName>
     <ExecutablePath>$(ExecutablePath_x64);$(ExecutablePath);</ExecutablePath>
     <ReferencePath>$(VC_ReferencesPath_x64);</ReferencePath>
-    <OutDir>$(ProjectDir)\Output\$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>$(ProjectDir)\Output\$(Platform)\$(Configuration)\Tmp</IntDir>
+    <OutDir>$(ProjectDir)Output\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(ProjectDir)Output\$(Platform)\$(Configuration)\Tmp\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ExecutablePath>C:\Program Files (x86)\OpenRTI\bin;$(ExecutablePath)</ExecutablePath>
@@ -200,7 +200,7 @@
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <BuildLog>
-      <Path>$(ProjectDir)\Output\$(Platform)\$(Configuration)\$(MSBuildProjectName).log</Path>
+      <Path>$(ProjectDir)Output\$(Platform)\$(Configuration)\$(MSBuildProjectName).log</Path>
     </BuildLog>
   </ItemDefinitionGroup>
   <ItemGroup>
