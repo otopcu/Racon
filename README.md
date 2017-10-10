@@ -13,8 +13,11 @@ The RACoN provides the .NET wrapper classes for the RTI and RTI-specific data st
 As it offers more maintainable, robust, and portable methods, developing an abstraction layer (wrapper) over RTI 
 is a popular approach in many HLA-based projects.
 
+## Programmer's Guide
+[Guide to Distributed Simulation with HLA](Guide to Distributed Simulation with HLA)
+
 ## What's New?
-### 0.0.2.4 (07.06.17):
+### 0.0.2.4 (10.10.17):
 * Binary distribution is win64/x64 now.
 * Support for all user-supplied tags. Now, RACoN can encode/decode all tags in various datatypes.
 * Encoding/decoding mechanism is restructured.
