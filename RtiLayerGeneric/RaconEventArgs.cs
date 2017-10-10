@@ -243,13 +243,17 @@ namespace Racon.RtiLayer
     /// </summary>
     public uint FederateHandle { get; set; }
     /// <summary>
-    /// Tag
+    /// Tag - HLA13
     /// </summary>
-    public string Tag { get; set; }
+    public string TagHLA13 { get; set; }
     /// <summary>
     /// AttributeSet
     /// </summary>
     public List<HlaAttribute> AttributeSet { get; set; }
+    /// <summary>
+    ///  User-Supplied Tag.
+    /// </summary>
+    public VariableLengthDataWrapper Tag { get; set; }
     #endregion
 
     #region Constructors
@@ -260,8 +264,9 @@ namespace Racon.RtiLayer
     {
       ObjectHandle = 0;
       FederateHandle = 0;
-      Tag = "";
+      TagHLA13 = "";
       AttributeSet = new List<HlaAttribute>();
+      Tag = new VariableLengthDataWrapper();
     }
     #endregion
   }

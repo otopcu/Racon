@@ -50,6 +50,10 @@ namespace Racon.RtiLayer
     ///  Supplemental remove info.
     /// </summary>
     public SupplementalRemoveInfo SupplementalRemoveInfo { get; set; }
+    /// <summary>
+    ///  User-Supplied Tag.
+    /// </summary>
+    public VariableLengthDataWrapper Tag { get; set; }
     #endregion
 
     #region Constructors
@@ -62,6 +66,7 @@ namespace Racon.RtiLayer
       RetractionHandle = new MessageRetraction();
       SupplementalReflectInfo = new SupplementalReflectInfo();
       SupplementalRemoveInfo = new SupplementalRemoveInfo();
+      Tag = new VariableLengthDataWrapper();
     }
     #endregion
 

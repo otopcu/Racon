@@ -83,8 +83,8 @@ namespace Racon {
 
 #pragma region Object Management
 			public:
-				virtual bool deleteObjectInstance(HlaObject ^) override;
-				virtual MessageRetraction^ deleteObjectInstance(HlaObject ^, Double) override;
+				virtual bool deleteObjectInstance(HlaObject ^, String^) override;
+				virtual MessageRetraction^ deleteObjectInstance(HlaObject ^, Double, String^) override;
 				virtual bool registerObject(HlaObject ^) override;
 				virtual bool registerObject(HlaObject ^, String^) override;
 				virtual bool updateAttributeValues(HlaObject ^) override;

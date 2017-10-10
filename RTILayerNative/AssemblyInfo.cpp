@@ -52,7 +52,7 @@ using namespace System::Security::Permissions;
 // You can specify all the value or you can default the Revision and Build Numbers
 // by using the '*' as shown below:
 
-[assembly:AssemblyVersionAttribute("0.0.2.3")];
+[assembly:AssemblyVersionAttribute("0.0.2.4")];
 
 [assembly:ComVisible(false)];
 

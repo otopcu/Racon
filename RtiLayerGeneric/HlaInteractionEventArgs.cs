@@ -29,7 +29,6 @@ namespace Racon.RtiLayer
   /// </summary>
   public class HlaInteractionEventArgs : RaconEventArgs
   {
-
     #region Properties
     /// <summary>
     /// interaction instance
@@ -43,6 +42,10 @@ namespace Racon.RtiLayer
     ///  Supplemental info.
     /// </summary>
     public SupplementalReceiveInfo SupplementalReceiveInfo { get; set; }
+    /// <summary>
+    ///  User-Supplied Tag.
+    /// </summary>
+    public VariableLengthDataWrapper Tag { get; set; }
     #endregion
 
     #region Constructors
@@ -54,6 +57,7 @@ namespace Racon.RtiLayer
       Interaction = new HlaInteraction();
       RetractionHandle = new MessageRetraction();
       SupplementalReceiveInfo = new SupplementalReceiveInfo();
+      Tag = new VariableLengthDataWrapper();
     }
     #endregion
 

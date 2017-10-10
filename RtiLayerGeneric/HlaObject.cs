@@ -135,7 +135,7 @@ namespace Racon.RtiLayer
     /// <typeparam name="_type"></typeparam>
     /// <param name="attribute"></param>
     /// <param name="value"></param>
-    public void AddAttributeValue<_type>(HlaAttribute attribute, _type value) where _type : struct
+    public void AddAttributeValue<_type>(HlaAttribute attribute, _type value) 
     {
       attribute.AddValue(value);
       Attributes.Add(attribute);

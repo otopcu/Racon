@@ -25,6 +25,7 @@ along with this program.If not, see <http://www.gnu.org/licenses/>.
 */
 
 using System;
+using System.Runtime.InteropServices;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;//BackgroundWorker
@@ -356,7 +357,7 @@ namespace Racon
     #region FdAmb Callback Event Handlers
     #region FM handlers
     /// <summary>
-    /// Federate ambassador callback
+    /// IEEE1516.1-2010 4.4: Connection Lost
     /// </summary>
     public virtual void FdAmb_ConnectionLost(object sender, HlaFederationManagementEventArgs data)
     {
@@ -366,92 +367,91 @@ namespace Racon
       if (res) Disconnect();
     }
     /// <summary>
-    /// IEEE1516-2010 4.8: Federate ambassador callback for Federation Executions Reported
+    /// IEEE1516.1-2010 4.8: Federation Executions Reported. Federate ambassador callback to get the federation executions
     /// </summary>
     public virtual void FdAmb_FederationExecutionsReported(object sender, HlaFederationManagementEventArgs data)
     {
       logger.Add(data.TraceMessage, data.Level);
     }
     /// <summary>
-    /// FdAmb_OnSynchronizationPointRegistrationConfirmedHandler
+    /// IEEE1516.1-2010 4.12a: FdAmb_OnSynchronizationPointRegistrationConfirmedHandler
     /// </summary>
     public virtual void FdAmb_OnSynchronizationPointRegistrationConfirmedHandler(object sender, HlaFederationManagementEventArgs data)
     {
       logger.Add(data.TraceMessage, data.Level);
     }
     /// <summary>
-    /// FdAmb_OnSynchronizationPointRegistrationFailedHandler
+    /// IEEE1516.1-2010 4.12b: FdAmb_OnSynchronizationPointRegistrationFailedHandler
     /// </summary>
     public virtual void FdAmb_OnSynchronizationPointRegistrationFailedHandler(object sender, HlaFederationManagementEventArgs data)
     {
       logger.Add(data.TraceMessage, data.Level);
     }
     /// <summary>
-    /// Federate ambassador callback. FdAmb_SynchronizationPointAnnounced.
+    /// IEEE1516.1-2010 4.13: Federate ambassador callback. FdAmb_SynchronizationPointAnnounced.
     /// </summary>
     public virtual void FdAmb_SynchronizationPointAnnounced(object sender, HlaFederationManagementEventArgs data)
     {
       logger.Add(data.TraceMessage, data.Level);
     }
     /// <summary>
-    /// Federate ambassador callback. FdAmb_FederationSynchronized
+    /// IEEE1516.1-2010 4.15: Federate ambassador callback. FdAmb_FederationSynchronized
     /// </summary>
     public virtual void FdAmb_FederationSynchronized(object sender, HlaFederationManagementEventArgs data)
     {
       logger.Add(data.TraceMessage, data.Level);
     }
     /// <summary>
-    /// Federate ambassador callback
+    /// IEEE1516.1-2010 4.17: Federate ambassador callback
     /// </summary>
     public virtual void FdAmb_InitiateFederateSaveHandler(object sender, HlaFederationManagementEventArgs data)
     {
       logger.Add(data.TraceMessage, data.Level);
     }
     /// <summary>
-    /// IEEE1516-2010 4.22: FdAmb_FederationSaveStatusResponse
-    /// </summary>
-    public virtual void FdAmb_FederationSaveStatusResponse(object sender, HlaFederationManagementEventArgs data)
-    {
-      logger.Add(data.TraceMessage, data.Level);
-    }
-    /// <summary>
-    /// Federate ambassador callback
-    /// </summary>
-    public virtual void FdAmb_InitiateFederateRestoreHandler(object sender, HlaFederationManagementEventArgs data)
-    {
-      logger.Add(data.TraceMessage, data.Level);
-    }
-
-    /// <summary>
-    /// Federate ambassador callback
-    /// </summary>
-    public virtual void FdAmb_ConfirmFederationRestorationRequestHandler(object sender, HlaFederationManagementEventArgs data)
-    {
-      logger.Add(data.TraceMessage, data.Level);
-    }
-    /// <summary>
-    /// Federate ambassador callback
+    /// IEEE1516.1-2010 4.20: Federate ambassador callback
     /// </summary>
     public virtual void FdAmb_FederationSaved(object sender, HlaFederationManagementEventArgs data)
     {
       logger.Add(data.TraceMessage, data.Level);
     }
     /// <summary>
-    /// Federate ambassador callback
+    /// IEEE1516.1-2010 4.22: FdAmb_FederationSaveStatusResponse
     /// </summary>
-    public virtual void FdAmb_FederationRestored(object sender, HlaFederationManagementEventArgs data)
+    public virtual void FdAmb_FederationSaveStatusResponse(object sender, HlaFederationManagementEventArgs data)
     {
       logger.Add(data.TraceMessage, data.Level);
     }
     /// <summary>
-    /// Federate ambassador callback
+    /// IEEE1516.1-2010 4.25: Federate ambassador callback
+    /// </summary>
+    public virtual void FdAmb_ConfirmFederationRestorationRequestHandler(object sender, HlaFederationManagementEventArgs data)
+    {
+      logger.Add(data.TraceMessage, data.Level);
+    }
+    /// <summary>
+    /// IEEE1516.1-2010 4.26: Federate ambassador callback
     /// </summary>
     public virtual void FdAmb_FederationRestoreBegun(object sender, HlaFederationManagementEventArgs data)
     {
       logger.Add(data.TraceMessage, data.Level);
     }
     /// <summary>
-    /// IEEE1516-2010 4.32: FdAmb_FederationRestoreStatusResponse
+    /// IEEE1516.1-2010 4.27: Federate ambassador callback
+    /// </summary>
+    public virtual void FdAmb_InitiateFederateRestoreHandler(object sender, HlaFederationManagementEventArgs data)
+    {
+      logger.Add(data.TraceMessage, data.Level);
+    }
+    /// <summary>
+    /// IEEE1516.1-2010 4.29: Federate ambassador callback
+    /// </summary>
+    public virtual void FdAmb_FederationRestored(object sender, HlaFederationManagementEventArgs data)
+    {
+      logger.Add(data.TraceMessage, data.Level);
+    }
+    /// <summary>
+    /// IEEE1516.1-2010 4.32: FdAmb_FederationRestoreStatusResponse
     /// </summary>
     public virtual void FdAmb_FederationRestoreStatusResponse(object sender, HlaFederationManagementEventArgs data)
     {
@@ -809,7 +809,7 @@ namespace Racon
         //StatusMessage = "Event Type = " + AnEventInstance.EventType;
         switch (AnEventInstance.EventType)
         {
-          // FM
+          #region FM
           case RaconEventTypes.ConnectionLost:
             OnConnectionLost((HlaFederationManagementEventArgs)AnEventInstance);
             break;
@@ -852,8 +852,8 @@ namespace Racon
           case RaconEventTypes.FederationRestoreStatusResponse:
             OnFederationRestoreStatusResponse((HlaFederationManagementEventArgs)AnEventInstance);
             break;
-
-          // DM
+          #endregion
+          #region DM
           case RaconEventTypes.StartRegistrationForObjectClassAdvised:
             OnStartRegistrationForObjectClassAdvised((HlaDeclarationManagementEventArgs)AnEventInstance);
             break;
@@ -866,37 +866,35 @@ namespace Racon
           case RaconEventTypes.TurnInteractionsOnAdvised:
             OnTurnInteractionsOnAdvised((HlaDeclarationManagementEventArgs)AnEventInstance);
             break;
-
-          // OM
+          #endregion
+          #region OM
           case RaconEventTypes.ObjectDiscovered:
             OnObjectDiscovered((HlaObjectEventArgs)AnEventInstance);
             //StatusMessage = "here-1";
             break;
           case RaconEventTypes.ObjectRemoved:
-            OnObjectRemoved((HlaObjectEventArgs)AnEventInstance);
-            //StatusMessage = "here-2";
+            HlaObjectEventArgs args = (HlaObjectEventArgs)AnEventInstance;
+            OnObjectRemoved(args);
+            args.Tag.FreeIntPtrMemory(); // free tag
             break;
           case RaconEventTypes.InteractionReceived:
             HlaInteractionEventArgs interactionArgs = (HlaInteractionEventArgs)AnEventInstance;
             OnInteractionReceived(interactionArgs);
             foreach (var obj in interactionArgs.Interaction.Parameters)
-            {
               obj.FreeIntPtrMemory();
-              //FreeIntPtrMemory(obj.Value);
-            }
+            interactionArgs.Tag.FreeIntPtrMemory(); // Free tag
             break;
           case RaconEventTypes.AttributeValueUpdateRequested:
-            OnAttributeValueUpdateRequested((HlaObjectEventArgs)AnEventInstance);
-            //StatusMessage = "here-4";
+            HlaObjectEventArgs args2 = (HlaObjectEventArgs)AnEventInstance;
+            OnAttributeValueUpdateRequested(args2);
+            args2.Tag.FreeIntPtrMemory(); // Free tag
             break;
           case RaconEventTypes.ObjectAttributesReflected:
-            HlaObjectEventArgs objectArgs = (HlaObjectEventArgs)AnEventInstance;
-            OnObjectAttributesReflected(objectArgs);
-            foreach (var obj in objectArgs.ObjectInstance.Attributes)
-            {
-              obj.FreeIntPtrMemory();
-              //FreeIntPtrMemory(obj.Value);
-            }
+            HlaObjectEventArgs args3 = (HlaObjectEventArgs)AnEventInstance;
+            OnObjectAttributesReflected(args3);
+            foreach (var attr in args3.ObjectInstance.Attributes)
+              attr.FreeIntPtrMemory();
+            args3.Tag.FreeIntPtrMemory(); // Free tag
             break;
           case RaconEventTypes.TurnUpdatesOnForObjectInstanceAdvised:
             OnTurnUpdatesOnForObjectInstanceAdvised((HlaObjectEventArgs)AnEventInstance);
@@ -904,13 +902,15 @@ namespace Racon
           case RaconEventTypes.TurnUpdatesOffForObjectInstanceAdvised:
             OnTurnUpdatesOffForObjectInstanceAdvised((HlaObjectEventArgs)AnEventInstance);
             break;
-
-          // OwM
+          #endregion
+          #region OwM
           case RaconEventTypes.RequestDivestitureConfirmation:
             OnRequestDivestitureConfirmation((HlaOwnershipManagementEventArgs)AnEventInstance);
             break;
           case RaconEventTypes.AttributeOwnershipAssumptionRequested:
-            OnAttributeOwnershipAssumptionRequested((HlaOwnershipManagementEventArgs)AnEventInstance);
+            HlaOwnershipManagementEventArgs args5 = (HlaOwnershipManagementEventArgs)AnEventInstance;
+            OnAttributeOwnershipAssumptionRequested(args5);
+            args5.Tag.FreeIntPtrMemory(); // Free tag
             break;
           case RaconEventTypes.AttributeOwnershipAcquisitionCancellationConfirmed:
             OnAttributeOwnershipAcquisitionCancellationConfirmed((HlaOwnershipManagementEventArgs)AnEventInstance);
@@ -919,18 +919,23 @@ namespace Racon
             OnAttributeOwnershipUnavailable((HlaOwnershipManagementEventArgs)AnEventInstance);
             break;
           case RaconEventTypes.AttributeOwnershipAcquisitionNotified:
-            OnAttributeOwnershipAcquisitionNotified((HlaOwnershipManagementEventArgs)AnEventInstance);
+            HlaOwnershipManagementEventArgs args4 = (HlaOwnershipManagementEventArgs)AnEventInstance;
+            OnAttributeOwnershipAcquisitionNotified(args4);
+            args4.Tag.FreeIntPtrMemory(); // Free tag
             break;
           case RaconEventTypes.AttributeOwnershipDivestitureNotified:
             OnAttributeOwnershipDivestitureNotified((HlaOwnershipManagementEventArgs)AnEventInstance);
             break;
           case RaconEventTypes.AttributeOwnershipReleaseRequested:
-            OnAttributeOwnershipReleaseRequested((HlaOwnershipManagementEventArgs)AnEventInstance);
+            HlaOwnershipManagementEventArgs args6 = (HlaOwnershipManagementEventArgs)AnEventInstance;
+            OnAttributeOwnershipReleaseRequested(args6);
+            args6.Tag.FreeIntPtrMemory(); // Free tag
             break;
           case RaconEventTypes.AttributeOwnershipInformed:
             OnAttributeOwnershipInformed((HlaOwnershipManagementEventArgs)AnEventInstance);
             break;
-
+          #endregion
+          #region TM
           // TM
           case RaconEventTypes.TimeConstrainedEnabled:
             OnTimeConstrainedEnabled((HlaTimeManagementEventArgs)AnEventInstance);
@@ -947,6 +952,7 @@ namespace Racon
           default: // just log
             logger.Add(AnEventInstance.TraceMessage, AnEventInstance.Level);
             break;
+            #endregion
         }
       }
       #endregion
@@ -1844,7 +1850,6 @@ namespace Racon
     {
       return _rtiAmb.unsubscribeObjectClassWithRegions(oc, pairs);
     }
-
     /// <summary>
     /// HLA13: Unsubscribe Object Class With Region
     /// </summary>
@@ -1865,7 +1870,6 @@ namespace Racon
     {
       return _rtiAmb.subscribeInteractionClassWithRegions(ic, regions, indicator);
     }
-
     /// <summary>
     /// HLA13: Subscribe Interaction With Region
     /// </summary>
@@ -1885,7 +1889,6 @@ namespace Racon
     {
       return _rtiAmb.unSubscribeInteractionClassWithRegions(ic, regions);
     }
-
     /// <summary>
     /// HLA13: Unsubscribe Interaction Class With Region
     /// </summary>
@@ -1900,22 +1903,31 @@ namespace Racon
     /// </summary>
     /// <param name="ic"></param>
     /// <param name="regions"></param>
+    /// <param name="user_supplied_tag"></param>
     /// <returns></returns>
-    public virtual bool SendInteractionWithRegions(HlaInteractionClass ic, List<HlaRegion> regions)
+    public virtual bool SendInteractionWithRegions<_Type>(HlaInteractionClass ic, List<HlaRegion> regions, _Type user_supplied_tag)
     {
-      return _rtiAmb.sendInteractionWithRegions(ic, regions, ic.Tag);
-    }
+      // Convert to variable length data
+      VariableLengthDataWrapper tag = new VariableLengthDataWrapper();
+      tag.AddData(user_supplied_tag);
 
+      return _rtiAmb.sendInteractionWithRegions(ic, regions, tag);
+    }
     /// <summary>
     /// IEEE1516.1-2010 9.12: sendInteractionWithRegions with timestamp
     /// </summary>
     /// <param name="ic"></param>
     /// <param name="regions"></param>
+    /// <param name="user_supplied_tag"></param>
     /// <param name="timestamp"></param>
     /// <returns></returns>
-    public virtual MessageRetraction SendInteractionWithRegions(HlaInteractionClass ic, List<HlaRegion> regions, double timestamp)
+    public virtual MessageRetraction SendInteractionWithRegions<_Type>(HlaInteractionClass ic, List<HlaRegion> regions, _Type user_supplied_tag, double timestamp)
     {
-      return _rtiAmb.sendInteractionWithRegions(ic, regions, ic.Tag, timestamp);
+      // Convert to variable length data
+      VariableLengthDataWrapper tag = new VariableLengthDataWrapper();
+      tag.AddData(user_supplied_tag);
+
+      return _rtiAmb.sendInteractionWithRegions(ic, regions, tag, timestamp);
     }
 
     /// <summary>
@@ -1923,13 +1935,16 @@ namespace Racon
     /// </summary>
     /// <param name="oc"></param>
     /// <param name="pairs"></param>
-    /// <param name="tag"></param>
+    /// <param name="user_supplied_tag"></param>
     /// <returns></returns>
-    public virtual bool RequestAttributeValueUpdateWithRegions(HlaObjectClass oc, AttributeHandleSetRegionHandleSetPairVector pairs, string tag)
+    public virtual bool RequestAttributeValueUpdateWithRegions<_Type>(HlaObjectClass oc, AttributeHandleSetRegionHandleSetPairVector pairs, _Type user_supplied_tag)
     {
+      // Convert to variable length data
+      VariableLengthDataWrapper tag = new VariableLengthDataWrapper();
+      tag.AddData(user_supplied_tag);
+
       return _rtiAmb.requestClassAttributeValueUpdateWithRegions(oc, pairs, tag);
     }
-
     /// <summary>
     /// HLA13: Request Class Attribute Value Update w/ Region
     /// </summary>
@@ -1943,109 +1958,138 @@ namespace Racon
 
     #region Object Management
     /// <summary>
-    /// Delete Object Instance
+    /// IEEE1516.1-2010 6.10: UpdateAttributeValues
     /// </summary>
-    virtual public bool DeleteObjectInstance(HlaObject obj)
+    /// <returns>True if method call is succesfull.</returns>
+    virtual public bool UpdateAttributeValues<_Type>(HlaObject theObject, _Type user_supplied_tag)
     {
-      if (_rtiAmb.deleteObjectInstance(obj)) return true;
+      #region Contracts
+      // Preconditions
+      //a) The federate is connected to the RTI.
+      //b) The federation execution exists.
+      Contract.Requires(FederationExecutionState == FederationExecutionStates.FEDEX_EXISTS, " at UpdateAttributeValues().");
+      //c) The federate is joined to that federation execution.
+      Contract.Requires(FederateState.HasFlag(FederateStates.JOINED), " at UpdateAttributeValues().");
+      //d) The joined federate owns the instance attributes for which values are provided.
+      Contract.Requires(theObject.Handle != 0, " at UpdateAttributeValues().");
+      //e) The attributes are defined in the FDD.
+      //Contract.Requires(theObject.Type.Attributes.Count != 0, " at UpdateAttributeValues().");
+      //f) An object instance with the specified designator exists.
+      //g) The joined federate knows about the object instance with the specified designator.
+      //h) The timestamp value shall be in accordance with the constraints stated in Clause 8 (if optional timestamp argument is supplied).
+      //i) If the optional timestamp argument is supplied to this service invocation, the invoking joined federate is time-regulating, and it has invoked the Delete Object Instance service for the specified object instance with a timestamp argument (while time-regulating), then the update’s timestamp shall be less than or equal to the delete’s timestamp.
+      //j) Federate save not in progress.
+      //k) Federate restore not in progress.
+
+      // Postconditions
+      // a) The new instance attribute values have been supplied to the RTI.
+      #endregion
+
+      // Convert to variable length data
+      VariableLengthDataWrapper tag = new VariableLengthDataWrapper();
+      tag.AddData(user_supplied_tag);
+
+      return _rtiAmb.updateAttributeValues(theObject, tag);
+    }
+    /// <summary>
+    /// IEEE1516.1-2010 6.10: UpdateAttributeValues with timestamp
+    /// </summary>
+    virtual public MessageRetraction UpdateAttributeValues<_Type>(HlaObject theObject, _Type user_supplied_tag, double timestamp)
+    {
+      #region Contracts
+      // Preconditions
+      //a) The federate is connected to the RTI.
+      //b) The federation execution exists.
+      Contract.Requires(FederationExecutionState == FederationExecutionStates.FEDEX_EXISTS, " at UpdateAttributeValues().");
+      //c) The federate is joined to that federation execution.
+      Contract.Requires(FederateState.HasFlag(FederateStates.JOINED), " at UpdateAttributeValues().");
+      //d) The joined federate owns the instance attributes for which values are provided.
+      Contract.Requires(theObject.Handle != 0, " at UpdateAttributeValues().");
+      //e) The attributes are defined in the FDD.
+      //Contract.Requires(theObject.Type.Attributes.Count != 0, " at UpdateAttributeValues().");
+      //f) An object instance with the specified designator exists.
+      //g) The joined federate knows about the object instance with the specified designator.
+      //h) The timestamp value shall be in accordance with the constraints stated in Clause 8 (if optional timestamp argument is supplied).
+      //i) If the optional timestamp argument is supplied to this service invocation, the invoking joined federate is time-regulating, and it has invoked the Delete Object Instance service for the specified object instance with a timestamp argument (while time-regulating), then the update’s timestamp shall be less than or equal to the delete’s timestamp.
+      //j) Federate save not in progress.
+      //k) Federate restore not in progress.
+
+      // Postconditions
+      // a) The new instance attribute values have been supplied to the RTI.
+      #endregion
+
+      // Convert to variable length data
+      VariableLengthDataWrapper tag = new VariableLengthDataWrapper();
+      tag.AddData(user_supplied_tag);
+
+      return _rtiAmb.updateAttributeValues(theObject, tag, timestamp);
+    }
+    /// <summary>
+    /// HLA13: UpdateAttributeValues
+    /// </summary>
+    /// <param name="theObject"></param>
+    /// <returns></returns>
+    virtual public bool UpdateAttributeValues(HlaObject theObject)
+    {
+      if (_rtiAmb.updateAttributeValues(theObject)) return true;
       else return false;
+    }
+    /// <summary>
+    /// HLA13: UpdateAttributeValues
+    /// </summary>
+    /// <param name="theObject"></param>
+    /// <param name="timestamp"></param>
+    /// <returns></returns>
+    virtual public MessageRetraction UpdateAttributeValues(HlaObject theObject, double timestamp)
+    {
+      return _rtiAmb.updateAttributeValues(theObject, timestamp);
     }
 
     /// <summary>
-    /// Schedule to delete Object Instance at a specified time
+    /// IEEE1516.1-2010 6.12: Sends an interaction. If a region is specified then send the interaction in that region.
     /// </summary>
-    virtual public MessageRetraction DeleteObjectInstance(HlaObject obj, double time)
+    /// <param name="theInteraction">HLA interaction to be sent.</param>
+    /// <param name="user_supplied_tag"></param>
+    /// <returns>True if method call is succesfull.</returns>
+    virtual public bool SendInteraction<_Type>(HlaInteraction theInteraction, _Type user_supplied_tag)
     {
-      return _rtiAmb.deleteObjectInstance(obj, time);
-    }
+      // Convert to variable length data
+      VariableLengthDataWrapper tag = new VariableLengthDataWrapper();
+      tag.AddData(user_supplied_tag);
 
-    /// <summary>
-    /// Request Attribute Value Update
-    /// </summary>
-    /// <param name="theClass">HLA Object Class</param>
-    /// <returns>True if method call is succesfull.</returns>
-    /// <remarks>This method is called to request an update of the values of all attributes for all objects related to the specified HLA object class in the parameter.
-    /// </remarks>
-    virtual public bool RequestAttributeValueUpdate(HlaObjectClass theClass)
-    {
-      //List<HlaAttribute> attributes = new List<HlaAttribute>();
-      //foreach (var attribute in theClass.Attributes)
-      //{
-      //  attributes.Add(attribute);
-      //}
-      if (_rtiAmb.requestAttributeValueUpdate(theClass, theClass.Attributes.ToList())) return true;
-      else return false;
+      return _rtiAmb.sendInteraction(theInteraction, tag);
     }
     /// <summary>
-    /// Request Attribute Value Update
+    /// IEEE1516.1-2010 6.12: Send Interaction with timestamp.
     /// </summary>
-    /// <param name="theClass">HLA Object Class</param>
-    /// <param name="attributes">The attribute set that update requested.</param>
-    /// <returns>True if method call is succesfull.</returns>
-    /// <remarks>This method is called to request an update of the values of the selected attributes for all objects related to the specified HLA object class in the parameter.
-    /// </remarks>
-    /// <example>
-    /// This sample shows how to call the requestClassAttributeValueUpdate() method with some selected attributes.
-    /// <code>
-    /// List&lt;HlaAttribute&gt; attributes = new List&lt;HlaAttribute&gt;();
-    /// attributes.Add(Som.UserOC.NickName);
-    /// attributes.Add(Som.UserOC.Status);
-    /// RequestAttributeValueUpdate(Som.UserOC, attributes);
-    /// </code>
-    /// </example>
-    virtual public bool RequestAttributeValueUpdate(HlaObjectClass theClass, List<HlaAttribute> attributes)
+    /// <param name="theInteraction">HLA interaction to be sent.</param>
+    /// <param name="user_supplied_tag"></param>
+    /// <param name="timestamp">timestamp.</param>
+    /// <returns> returns Event Retraction Handle.</returns>
+    virtual public MessageRetraction SendInteraction<_Type>(HlaInteraction theInteraction, _Type user_supplied_tag, double timestamp)
     {
-      if (_rtiAmb.requestAttributeValueUpdate(theClass, attributes)) return true;
-      else return false;
-    }
-    /// <summary>
-    /// Request Attribute Value Update
-    /// </summary>
-    /// <param name="theObject">HLA Object</param>
-    /// <returns>True if method call is succesfull.</returns>
-    /// <remarks>This method requests an update of the values of all attributes for a specific HLA object specified in the parameter.
-    /// </remarks>
-    virtual public bool RequestAttributeValueUpdate(HlaObject theObject)
-    {
-      //HlaObjectClass oc = _som.OCList.SingleOrDefault(p => p.Handle == theObject.ClassHandle); // returns null if not found
-      bool res = false;
-      //if (oc != null)
-      try
-      {
-        res = RequestAttributeValueUpdate(theObject, theObject.Type.Attributes.ToList()); // if user forgets to set type of the object, then an exception generated
-      }
-      catch (Exception e)
-      {
-        logger.Add("When requesting attribute value, the object type for (" + theObject.Name + ") is not set. " + e.Message, LogLevel.WARN);
-      }
-      return res;
-    }
-    /// <summary>
-    /// Request Attribute Value Update
-    /// </summary>
-    /// <param name="theObject">HLA Object</param>
-    /// <param name="attributes">The attribute set that update requested.</param>
-    /// <returns>True if method call is succesfull.</returns>
-    /// <remarks>This method requests an update of the values of the selected attributes for a specific HLA object specified in the parameter.
-    /// </remarks>
-    /// <example>
-    /// This sample shows how to call the requestClassAttributeValueUpdate() method with some selected attributes.
-    /// <code>
-    /// List&lt;HlaAttribute&gt; attributes = new List&lt;HlaAttribute&gt;();
-    /// attributes.Add(Som.UserOC.NickName);
-    /// attributes.Add(Som.UserOC.Status);
-    /// RequestAttributeValueUpdate(UserObject, attributes);
-    /// </code>
-    /// </example>
-    virtual public bool RequestAttributeValueUpdate(HlaObject theObject, List<HlaAttribute> attributes)
-    {
-      return (_rtiAmb.requestAttributeValueUpdate(theObject, attributes));
-    }
+      // Convert to variable length data
+      VariableLengthDataWrapper tag = new VariableLengthDataWrapper();
+      tag.AddData(user_supplied_tag);
 
+      return _rtiAmb.sendInteraction(theInteraction, tag, timestamp);
+    }
     /// <summary>
-    /// Sends an interaction. If a region is specified then send the interaction in that region.
+    /// HLA13: SendInteraction
     /// </summary>
-    /// <returns>True if method call is succesfull.</returns>
+    /// <param name="theInteraction"></param>
+    /// <param name="timestamp"></param>
+    /// <returns></returns>
+    virtual public MessageRetraction SendInteraction(HlaInteraction theInteraction, double timestamp)
+    {
+      return _rtiAmb.sendInteraction(theInteraction, timestamp);
+    }
+    /// <summary>
+    /// HLA13: SendInteraction
+    /// </summary>
+    /// <param name="theInteraction"></param>
+    /// <param name="region"></param>
+    /// <returns></returns>
     virtual public bool SendInteraction(HlaInteraction theInteraction, HlaRegion region = null)
     {
       bool res = false;
@@ -2059,14 +2103,170 @@ namespace Racon
     }
 
     /// <summary>
-    /// Send Interaction with timestamp.
+    /// IEEE1516.1-2010 6.14: Delete Object Instance. With user-supplied tag.
     /// </summary>
-    /// <param name="theInteraction">HLA interaction to be sent.</param>
-    /// <param name="timestamp">timestamp.</param>
-    /// <returns> returns Event Retraction Handle.</returns>
-    virtual public MessageRetraction SendInteraction(HlaInteraction theInteraction, double timestamp)
+    /// <param name="obj">HLA Object</param>
+    /// <param name="user_supplied_tag">User-Supplied Tag</param>
+    /// <returns>true/false</returns>
+    virtual public bool DeleteObjectInstance<_Type>(HlaObject obj, _Type user_supplied_tag)
     {
-      return _rtiAmb.sendInteraction(theInteraction, timestamp);
+      // Convert to IntPtr
+      VariableLengthDataWrapper tag = new VariableLengthDataWrapper();
+      tag.AddData(user_supplied_tag);
+
+      if (_rtiAmb.deleteObjectInstance(obj, tag)) return true;
+      else return false;
+    }
+    /// <summary>
+    /// IEEE1516.1-2010 6.14: Schedule to delete Object Instance at a specified time. user-supplied tag.
+    /// </summary>
+    /// <param name="obj">HLA Object</param>
+    /// <param name="user_supplied_tag">User-Supplied Tag</param>
+    /// <param name="timestamp">Timestamp</param>
+    /// <returns>true/false</returns>
+    virtual public MessageRetraction DeleteObjectInstance<_Type>(HlaObject obj, _Type user_supplied_tag, double timestamp)
+    {
+      // Convert to IntPtr
+      VariableLengthDataWrapper tag = new VariableLengthDataWrapper();
+      tag.AddData(user_supplied_tag);
+
+      return (_rtiAmb.deleteObjectInstance(obj, tag, timestamp));
+    }
+    /// <summary>
+    /// HLA13: Delete Object Instance. Null user-supplied tag.
+    /// </summary>
+    virtual public bool DeleteObjectInstance(HlaObject obj)
+    {
+      if (_rtiAmb.deleteObjectInstance(obj, obj.Tag)) return true;
+      else return false;
+    }
+    /// <summary>
+    /// HLA13: Delete Object Instance. Null user-supplied tag.
+    /// </summary>
+    virtual public MessageRetraction DeleteObjectInstance(HlaObject obj, double timestamp)
+    {
+      return (_rtiAmb.deleteObjectInstance(obj, timestamp, obj.Tag));
+    }
+
+    /// <summary>
+    /// Request Attribute Value Update
+    /// </summary>
+    /// <param name="theClass">HLA Object Class</param>
+    /// <param name="user_supplied_tag">user_supplied_tag</param>
+    /// <returns>True if method call is succesfull.</returns>
+    /// <remarks>This method is called to request an update of the values of all attributes for all objects related to the specified HLA object class in the parameter.
+    /// </remarks>
+    virtual public bool RequestAttributeValueUpdate<_Type>(HlaObjectClass theClass, _Type user_supplied_tag)
+    {
+      //List<HlaAttribute> attributes = new List<HlaAttribute>();
+      //foreach (var attribute in theClass.Attributes)
+      //{
+      //  attributes.Add(attribute);
+      //}
+
+      // Convert to IntPtr
+      VariableLengthDataWrapper tag = new VariableLengthDataWrapper();
+      tag.AddData(user_supplied_tag);
+
+      return RequestAttributeValueUpdate(theClass, theClass.Attributes.ToList(), tag);
+    }
+    /// <summary>
+    /// Request Attribute Value Update
+    /// </summary>
+    /// <param name="theClass">HLA Object Class</param>
+    /// <param name="attributes">The attribute set that update requested.</param>
+    /// <param name="user_supplied_tag">user_supplied_tag</param>
+    /// <returns>True if method call is succesfull.</returns>
+    /// <remarks>This method is called to request an update of the values of the selected attributes for all objects related to the specified HLA object class in the parameter.
+    /// </remarks>
+    /// <example>
+    /// This sample shows how to call the requestClassAttributeValueUpdate() method with some selected attributes.
+    /// <code>
+    /// List&lt;HlaAttribute&gt; attributes = new List&lt;HlaAttribute&gt;();
+    /// attributes.Add(Som.UserOC.NickName);
+    /// attributes.Add(Som.UserOC.Status);
+    /// RequestAttributeValueUpdate(Som.UserOC, attributes);
+    /// </code>
+    /// </example>
+    virtual public bool RequestAttributeValueUpdate<_Type>(HlaObjectClass theClass, List<HlaAttribute> attributes, _Type user_supplied_tag)
+    {
+      // Convert to IntPtr
+      VariableLengthDataWrapper tag = new VariableLengthDataWrapper();
+      tag.AddData(user_supplied_tag);
+
+      return _rtiAmb.requestAttributeValueUpdate(theClass, attributes, tag);
+    }
+    /// <summary>
+    /// Request Attribute Value Update
+    /// </summary>
+    /// <param name="theObject">HLA Object</param>
+    /// <param name="user_supplied_tag">user_supplied_tag</param>
+    /// <returns>True if method call is succesfull.</returns>
+    /// <remarks>This method requests an update of the values of all attributes for a specific HLA object specified in the parameter.
+    /// </remarks>
+    virtual public bool RequestAttributeValueUpdate<_Type>(HlaObject theObject, _Type user_supplied_tag)
+    {
+      // Convert to IntPtr
+      VariableLengthDataWrapper tag = new VariableLengthDataWrapper();
+      tag.AddData(user_supplied_tag);
+
+      //HlaObjectClass oc = _som.OCList.SingleOrDefault(p => p.Handle == theObject.ClassHandle); // returns null if not found
+      bool res = false;
+      try
+      {
+        res = _rtiAmb.requestAttributeValueUpdate(theObject, theObject.Type.Attributes.ToList(), tag);// if user forgets to set type of the object, then an exception is generated
+      }
+      catch (Exception e)
+      {
+        logger.Add("When requesting attribute value, the object type for (" + theObject.Name + ") is not set. " + e.Message, LogLevel.WARN);
+      }
+      return res;
+    }
+    /// <summary>
+    /// Request Attribute Value Update
+    /// </summary>
+    /// <param name="theObject">HLA Object</param>
+    /// <param name="attributes">The attribute set that update requested.</param>
+    /// <param name="user_supplied_tag">user_supplied_tag</param>
+    /// <returns>True if method call is succesfull.</returns>
+    /// <remarks>This method requests an update of the values of the selected attributes for a specific HLA object specified in the parameter.
+    /// </remarks>
+    /// <example>
+    /// This sample shows how to call the requestClassAttributeValueUpdate() method with some selected attributes.
+    /// <code>
+    /// List&lt;HlaAttribute&gt; attributes = new List&lt;HlaAttribute&gt;();
+    /// attributes.Add(Som.UserOC.NickName);
+    /// attributes.Add(Som.UserOC.Status);
+    /// RequestAttributeValueUpdate(UserObject, attributes);
+    /// </code>
+    /// </example>
+    virtual public bool RequestAttributeValueUpdate<_Type>(HlaObject theObject, List<HlaAttribute> attributes, _Type user_supplied_tag)
+    {
+      // Convert to IntPtr
+      VariableLengthDataWrapper tag = new VariableLengthDataWrapper();
+      tag.AddData(user_supplied_tag);
+
+      return (_rtiAmb.requestAttributeValueUpdate(theObject, attributes, tag));
+    }
+    /// <summary>
+    /// HLA13: RequestAttributeValueUpdate (object class)
+    /// </summary>
+    /// <param name="theClass"></param>
+    /// <param name="attributes"></param>
+    /// <returns></returns>
+    virtual public bool RequestAttributeValueUpdate(HlaObjectClass theClass, List<HlaAttribute> attributes)
+    {
+      return _rtiAmb.requestAttributeValueUpdate(theClass, attributes);
+    }
+    /// <summary>
+    /// HLA13: RequestAttributeValueUpdate (object)
+    /// </summary>
+    /// <param name="theObject"></param>
+    /// <param name="attributes"></param>
+    /// <returns></returns>
+    virtual public bool RequestAttributeValueUpdate(HlaObject theObject, List<HlaAttribute> attributes)
+    {
+      return (_rtiAmb.requestAttributeValueUpdate(theObject, attributes));
     }
 
     /// <summary>
@@ -2108,68 +2308,6 @@ namespace Racon
       else return false;
     }
 
-    /// <summary>
-    ///UpdateAttributeValues
-    /// </summary>
-    /// <returns>True if method call is succesfull.</returns>
-    virtual public bool UpdateAttributeValues(HlaObject theObject)
-    {
-      #region Contracts
-      // Preconditions
-      //a) The federate is connected to the RTI.
-      //b) The federation execution exists.
-      Contract.Requires(FederationExecutionState == FederationExecutionStates.FEDEX_EXISTS, " at UpdateAttributeValues().");
-      //c) The federate is joined to that federation execution.
-      Contract.Requires(FederateState.HasFlag(FederateStates.JOINED), " at UpdateAttributeValues().");
-      //d) The joined federate owns the instance attributes for which values are provided.
-      Contract.Requires(theObject.Handle != 0, " at UpdateAttributeValues().");
-      //e) The attributes are defined in the FDD.
-      //Contract.Requires(theObject.Type.Attributes.Count != 0, " at UpdateAttributeValues().");
-      //f) An object instance with the specified designator exists.
-      //g) The joined federate knows about the object instance with the specified designator.
-      //h) The timestamp value shall be in accordance with the constraints stated in Clause 8 (if optional timestamp argument is supplied).
-      //i) If the optional timestamp argument is supplied to this service invocation, the invoking joined federate is time-regulating, and it has invoked the Delete Object Instance service for the specified object instance with a timestamp argument (while time-regulating), then the update’s timestamp shall be less than or equal to the delete’s timestamp.
-      //j) Federate save not in progress.
-      //k) Federate restore not in progress.
-
-      // Postconditions
-      // a) The new instance attribute values have been supplied to the RTI.
-      #endregion
-      if (_rtiAmb.updateAttributeValues(theObject))
-      {
-        return true;
-      }
-      else return false;
-    }
-
-    /// <summary>
-    ///UpdateAttributeValues with timestamp
-    /// </summary>
-    virtual public MessageRetraction UpdateAttributeValues(HlaObject theObject, Double timestamp)
-    {
-      #region Contracts
-      // Preconditions
-      //a) The federate is connected to the RTI.
-      //b) The federation execution exists.
-      Contract.Requires(FederationExecutionState == FederationExecutionStates.FEDEX_EXISTS, " at UpdateAttributeValues().");
-      //c) The federate is joined to that federation execution.
-      Contract.Requires(FederateState.HasFlag(FederateStates.JOINED), " at UpdateAttributeValues().");
-      //d) The joined federate owns the instance attributes for which values are provided.
-      Contract.Requires(theObject.Handle != 0, " at UpdateAttributeValues().");
-      //e) The attributes are defined in the FDD.
-      //Contract.Requires(theObject.Type.Attributes.Count != 0, " at UpdateAttributeValues().");
-      //f) An object instance with the specified designator exists.
-      //g) The joined federate knows about the object instance with the specified designator.
-      //h) The timestamp value shall be in accordance with the constraints stated in Clause 8 (if optional timestamp argument is supplied).
-      //i) If the optional timestamp argument is supplied to this service invocation, the invoking joined federate is time-regulating, and it has invoked the Delete Object Instance service for the specified object instance with a timestamp argument (while time-regulating), then the update’s timestamp shall be less than or equal to the delete’s timestamp.
-      //j) Federate save not in progress.
-      //k) Federate restore not in progress.
-
-      // Postconditions
-      // a) The new instance attribute values have been supplied to the RTI.
-      #endregion
-      return _rtiAmb.updateAttributeValues(theObject, timestamp);
-    }
     #endregion // Object Management
 
     #region Ownership Management
@@ -2204,7 +2342,7 @@ namespace Racon
     }
 
     /// <summary>
-    /// IEEE1516.1-2010 7.3 and HLA13 
+    /// IEEE1516.1-2010 7.3 
     /// </summary>
     /// <remarks>
     /// Initiates an attempt to release ownership of a specified set of instance-attributes for a specified object instance. 
@@ -2212,9 +2350,9 @@ namespace Racon
     /// </remarks>
     /// <param name="theObject"></param>
     /// <param name="attributeSet"></param>
-    /// <param name="tag"></param>
+    /// <param name="user_supplied_tag"></param>
     /// <returns></returns>
-    virtual public bool NegotiatedAttributeOwnershipDivestiture(HlaObject theObject, List<HlaAttribute> attributeSet, string tag)
+    virtual public bool NegotiatedAttributeOwnershipDivestiture<_Type>(HlaObject theObject, List<HlaAttribute> attributeSet, _Type user_supplied_tag)
     {
       #region Contracts
       // Preconditions
@@ -2231,9 +2369,11 @@ namespace Racon
       // Postconditions
       #endregion
 
+      // Convert to IntPtr
+      VariableLengthDataWrapper tag = new VariableLengthDataWrapper();
+      tag.AddData(user_supplied_tag);
       return _rtiAmb.negotiatedAttributeOwnershipDivestiture(theObject, attributeSet, tag);
     }
-
     /// <summary>
     /// Racon
     /// </summary>
@@ -2242,9 +2382,9 @@ namespace Racon
     /// In the absence of an acquiring federate, the instance-attributes will continue to be owned by the divesting federate.
     /// </remarks>
     /// <param name="theObject"></param>
-    /// <param name="tag"></param>
+    /// <param name="user_supplied_tag"></param>
     /// <returns></returns>
-    virtual public bool NegotiatedAttributeOwnershipDivestiture(HlaObject theObject, string tag)
+    virtual public bool NegotiatedAttributeOwnershipDivestiture<_Type>(HlaObject theObject, _Type user_supplied_tag)
     {
       #region Contracts
       // Preconditions
@@ -2261,7 +2401,20 @@ namespace Racon
       // Postconditions
       #endregion
 
-      return NegotiatedAttributeOwnershipDivestiture(theObject, theObject.Type.Attributes, tag);
+      // Convert to IntPtr
+      VariableLengthDataWrapper tag = new VariableLengthDataWrapper();
+      tag.AddData(user_supplied_tag);
+      return _rtiAmb.negotiatedAttributeOwnershipDivestiture(theObject, theObject.Type.Attributes, tag);
+    }
+    /// <summary>
+    /// HLA13: NegotiatedAttributeOwnershipDivestiture
+    /// </summary>
+    /// <param name="theObject"></param>
+    /// <param name="attributeSet"></param>
+    /// <returns></returns>
+    virtual public bool NegotiatedAttributeOwnershipDivestiture(HlaObject theObject, List<HlaAttribute> attributeSet)
+    {
+      return _rtiAmb.negotiatedAttributeOwnershipDivestiture(theObject, attributeSet, theObject.Tag);
     }
 
     /// <summary>
@@ -2269,24 +2422,27 @@ namespace Racon
     /// </summary>
     /// <param name="theObject"></param>
     /// <param name="attributeSet"></param>
-    /// <param name="tag"></param>
+    /// <param name="user_supplied_tag"></param>
     /// <returns></returns>
-    public virtual bool ConfirmDivestiture(HlaObject theObject, List<HlaAttribute> attributeSet, string tag)
+    public virtual bool ConfirmDivestiture<_Type>(HlaObject theObject, List<HlaAttribute> attributeSet, _Type user_supplied_tag)
     {
+      // Convert to IntPtr
+      VariableLengthDataWrapper tag = new VariableLengthDataWrapper();
+      tag.AddData(user_supplied_tag);
       return _rtiAmb.confirmDivestiture(theObject, attributeSet, tag);
     }
 
     /// <summary>
-    /// IEEE1516.1-2010 7.8 and HLA13 
+    /// IEEE1516.1-2010 7.8 
     /// </summary>
     /// <remarks>
     /// Initiates an attempt to acquire a specified set of attributes of an object instance. 
     /// </remarks>
     /// <param name="theObject"></param>
     /// <param name="attributeSet"></param>
-    /// <param name="tag"></param>
+    /// <param name="user_supplied_tag"></param>
     /// <returns></returns>
-    virtual public bool AttributeOwnershipAcquisition(HlaObject theObject, List<HlaAttribute> attributeSet ,string tag)
+    virtual public bool AttributeOwnershipAcquisition<_Type>(HlaObject theObject, List<HlaAttribute> attributeSet, _Type user_supplied_tag)
     {
       #region Contracts
       // Preconditions
@@ -2303,9 +2459,12 @@ namespace Racon
       // Postconditions
       #endregion
 
+      // Convert to IntPtr
+      VariableLengthDataWrapper tag = new VariableLengthDataWrapper();
+      tag.AddData(user_supplied_tag);
+
       return _rtiAmb.attributeOwnershipAcquisition(theObject, attributeSet, tag);
     }
-
     /// <summary>
     /// Racon
     /// </summary>
@@ -2313,9 +2472,9 @@ namespace Racon
     /// Initiates an attempt to acquire all attributes of an object instance. 
     /// </remarks>
     /// <param name="theObject"></param>
-    /// <param name="tag"></param>
+    /// <param name="user_supplied_tag"></param>
     /// <returns></returns>
-    virtual public bool AttributeOwnershipAcquisition(HlaObject theObject, string tag)
+    virtual public bool AttributeOwnershipAcquisition<_Type>(HlaObject theObject, _Type user_supplied_tag)
     {
       #region Contracts
       // Preconditions
@@ -2332,7 +2491,22 @@ namespace Racon
       // Postconditions
       #endregion
 
-      return AttributeOwnershipAcquisition(theObject, theObject.Type.Attributes, tag);
+      // Convert to IntPtr
+      VariableLengthDataWrapper tag = new VariableLengthDataWrapper();
+      tag.AddData(user_supplied_tag);
+
+      return _rtiAmb.attributeOwnershipAcquisition(theObject, theObject.Type.Attributes, tag);
+    }
+    /// <summary>
+    /// HLA13: AttributeOwnershipAcquisition
+    /// </summary>
+    /// <param name="theObject"></param>
+    /// <param name="attributeSet"></param>
+    /// <param name="tag"></param>
+    /// <returns></returns>
+    virtual public bool AttributeOwnershipAcquisition(HlaObject theObject, List<HlaAttribute> attributeSet)
+    {
+      return _rtiAmb.attributeOwnershipAcquisition(theObject, attributeSet, theObject.Tag);
     }
 
     /// <summary>
@@ -2733,7 +2907,7 @@ namespace Racon
     /// <returns>GALT definition indicator returns True if GALT is defined</returns>
     public virtual bool queryGALT(out double Galt)
     {
-     return _rtiAmb.queryGALT(out Galt);
+      return _rtiAmb.queryGALT(out Galt);
     }
 
     /// <summary>

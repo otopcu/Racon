@@ -418,71 +418,202 @@ namespace Racon.RtiLayer
 
     #region Object Management
     /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="o"></param>
-    /// <returns></returns>
-    public abstract bool deleteObjectInstance(HlaObject o);
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="o"></param>
-    /// <param name="d"></param>
-    /// <returns></returns>
-    public abstract MessageRetraction deleteObjectInstance(HlaObject o, double d);
-    /// <summary>
-    /// 
+    /// IEEE1516.1-2010 6.8
     /// </summary>
     /// <param name="o"></param>
     /// <returns></returns>
     public abstract bool registerObject(HlaObject o);
     /// <summary>
-    /// 
+    /// IEEE1516.1-2010 6.8
     /// </summary>
     /// <param name="o"></param>
     /// <param name="s"></param>
     /// <returns></returns>
     public abstract bool registerObject(HlaObject o, string s);
+
     /// <summary>
-    /// 
+    /// IEEE1516.1-2010 6.10
     /// </summary>
-    /// <param name="o"></param>
+    /// <param name="obj"></param>
+    /// <param name="tag"></param>
     /// <returns></returns>
-    public abstract bool updateAttributeValues(HlaObject o);
+    public virtual bool updateAttributeValues(HlaObject obj, VariableLengthDataWrapper tag)
+    {
+      OnRTIEventOccured(new RaconEventArgs("updateAttributeValues(HlaObject obj, VariableLengthDataWrapper tag) is IEEE1516.1-2010 specific.", LogLevel.WARN));
+      return false;
+    }
     /// <summary>
-    /// 
+    /// IEEE1516.1-2010 6.10
     /// </summary>
-    /// <param name="o"></param>
-    /// <param name="d"></param>
+    /// <param name="obj"></param>
+    /// <param name="tag"></param>
+    /// <param name="timestamp"></param>
     /// <returns></returns>
-    public abstract MessageRetraction updateAttributeValues(HlaObject o, double d);
+    public virtual MessageRetraction updateAttributeValues(HlaObject obj, VariableLengthDataWrapper tag, double timestamp)
+    {
+      OnRTIEventOccured(new RaconEventArgs("deleteObjectInstance(HlaObject o, VariableLengthDataWrapper tag) is IEEE1516.1-2010 specific.", LogLevel.WARN));
+      return null;
+    }
     /// <summary>
-    /// 
+    /// HLA13 - updateAttributeValues
     /// </summary>
-    /// <param name="i"></param>
+    /// <param name="obj"></param>
     /// <returns></returns>
-    public abstract bool sendInteraction(HlaInteraction i);
+    public virtual bool updateAttributeValues(HlaObject obj)
+    {
+      OnRTIEventOccured(new RaconEventArgs("updateAttributeValues(HlaObject obj is HLA 1.3 specific.", LogLevel.WARN));
+      return false;
+    }
     /// <summary>
-    /// 
+    /// HLA13 - updateAttributeValues
     /// </summary>
-    /// <param name="i"></param>
-    /// <param name="d"></param>
+    /// <param name="obj"></param>
+    /// <param name="timestamp"></param>
     /// <returns></returns>
-    public abstract MessageRetraction sendInteraction(HlaInteraction i, double d);
+    public virtual MessageRetraction updateAttributeValues(HlaObject obj, double timestamp)
+    {
+      OnRTIEventOccured(new RaconEventArgs("updateAttributeValues(HlaObject obj, double timestamp) is HLA 1.3 specific.", LogLevel.WARN));
+      return null;
+    }
+
     /// <summary>
-    /// 
+    /// IEEE1516.1-2010 6.12
     /// </summary>
-    /// <param name="o"></param>
-    /// <param name="l"></param>
+    /// <param name="interaction"></param>
+    /// <param name="tag"></param>
     /// <returns></returns>
-    public abstract bool requestAttributeValueUpdate(HlaObjectClass o, List<HlaAttribute> l);
+    public virtual bool sendInteraction(HlaInteraction interaction, VariableLengthDataWrapper tag)
+    {
+      OnRTIEventOccured(new RaconEventArgs("sendInteraction(HlaInteraction interaction, VariableLengthDataWrapper tag) is IEEE1516.1-2010 specific.", LogLevel.WARN));
+      return false;
+    }
     /// <summary>
-    /// 
+    /// IEEE1516.1-2010 6.12
     /// </summary>
-    /// <param name="o"></param>
-    /// <param name="l"></param>
+    /// <param name="interaction"></param>
+    /// <param name="tag"></param>
+    /// <param name="timestamp"></param>
     /// <returns></returns>
-    public abstract bool requestAttributeValueUpdate(HlaObject o, List<HlaAttribute> l);
+    public virtual MessageRetraction sendInteraction(HlaInteraction interaction, VariableLengthDataWrapper tag, double timestamp)
+    {
+      OnRTIEventOccured(new RaconEventArgs("sendInteraction(HlaInteraction interaction, VariableLengthDataWrapper tag, double timestamp) is IEEE1516.1-2010 specific.", LogLevel.WARN));
+      return null;
+    }
+    /// <summary>
+    /// HLA13: sendInteraction
+    /// </summary>
+    /// <param name="interaction"></param>
+    /// <returns></returns>
+    public virtual bool sendInteraction(HlaInteraction interaction)
+    {
+      OnRTIEventOccured(new RaconEventArgs("sendInteraction(HlaInteraction interaction) is HLA 1.3 specific.", LogLevel.WARN));
+      return false;
+    }
+    /// <summary>
+    /// HLA13: sendInteraction
+    /// </summary>
+    /// <param name="interaction"></param>
+    /// <param name="timestamp"></param>
+    /// <returns></returns>
+    public virtual MessageRetraction sendInteraction(HlaInteraction interaction, double timestamp)
+    {
+      OnRTIEventOccured(new RaconEventArgs("sendInteraction(HlaInteraction interaction, double timestamp) is HLA 1.3 specific.", LogLevel.WARN));
+      return null;
+    }
+
+    /// <summary>
+    /// IEEE1516.1-2010 6.14
+    /// </summary>
+    /// <param name="obj">HLA Object</param>
+    /// <param name="tag">User-Supplied Tag</param>
+    /// <returns></returns>
+    public virtual bool deleteObjectInstance(HlaObject obj, VariableLengthDataWrapper tag)
+    {
+      OnRTIEventOccured(new RaconEventArgs("deleteObjectInstance(HlaObject o, VariableLengthDataWrapper tag) is IEEE1516.1-2010 specific.", LogLevel.WARN));
+      return false;
+    }
+    /// <summary>
+    /// IEEE1516.1-2010 6.14
+    /// </summary>
+    /// <param name="obj">HLA Object</param>
+    /// <param name="tag">User-Supplied Tag</param>
+    /// <param name="timestamp">Timestamp</param>
+    /// <returns></returns>
+    public virtual MessageRetraction deleteObjectInstance(HlaObject obj, VariableLengthDataWrapper tag, double timestamp)
+    {
+      OnRTIEventOccured(new RaconEventArgs("deleteObjectInstance(HlaObject obj, VariableLengthDataWrapper tag, double time) is IEEE1516.1-2010 specific.", LogLevel.WARN));
+      return null;
+    }
+    /// <summary>
+    /// HLA13 - deleteObjectInstance
+    /// </summary>
+    /// <param name="obj"></param>
+    /// <param name="tag"></param>
+    /// <returns></returns>
+    public virtual bool deleteObjectInstance(HlaObject obj, string tag)
+    {
+      OnRTIEventOccured(new RaconEventArgs("deleteObjectInstance(HlaObject obj, string tag) is HLA 1.3 specific.", LogLevel.WARN));
+      return false;
+    }
+    /// <summary>
+    /// HLA13 - deleteObjectInstance
+    /// </summary>
+    /// <param name="obj"></param>
+    /// <param name="time"></param>
+    /// <param name="tag"></param>
+    /// <returns></returns>
+    public virtual MessageRetraction deleteObjectInstance(HlaObject obj, double time, string tag)
+    {
+      OnRTIEventOccured(new RaconEventArgs("deleteObjectInstance(HlaObject obj, double time, string tag) is HLA 1.3 specific.", LogLevel.WARN));
+      return null;
+    }
+
+    /// <summary>
+    /// IEEE1516.1-2010 6.19
+    /// </summary>
+    /// <param name="obj"></param>
+    /// <param name="attributes"></param>
+    /// <param name="tag"></param>
+    /// <returns></returns>
+    public virtual bool requestAttributeValueUpdate(HlaObjectClass obj, List<HlaAttribute> attributes, VariableLengthDataWrapper tag)
+    {
+      OnRTIEventOccured(new RaconEventArgs("requestAttributeValueUpdate(HlaObjectClass obj, List<HlaAttribute> attributes, VariableLengthDataWrapper tag) is IEEE1516.1-2010 specific.", LogLevel.WARN));
+      return false;
+    }
+    /// <summary>
+    /// IEEE1516.1-2010 6.19
+    /// </summary>
+    /// <param name="obj"></param>
+    /// <param name="attributes"></param>
+    /// <param name="tag"></param>
+    /// <returns></returns>
+    public virtual bool requestAttributeValueUpdate(HlaObject obj, List<HlaAttribute> attributes, VariableLengthDataWrapper tag)
+    {
+      OnRTIEventOccured(new RaconEventArgs("requestAttributeValueUpdate(HlaObject obj, List<HlaAttribute> attributes, VariableLengthDataWrapper tag) is IEEE1516.1-2010 specific.", LogLevel.WARN));
+      return false;
+    }
+    /// <summary>
+    /// HLA13: requestAttributeValueUpdate - OC
+    /// </summary>
+    /// <param name="obj"></param>
+    /// <param name="attributes"></param>
+    /// <returns></returns>
+    public virtual bool requestAttributeValueUpdate(HlaObjectClass obj, List<HlaAttribute> attributes)
+    {
+      OnRTIEventOccured(new RaconEventArgs("bool requestAttributeValueUpdate(HlaObjectClass obj, List<HlaAttribute> attributes) is HLA 1.3 specific.", LogLevel.WARN));
+      return false;
+    }
+    /// <summary>
+    /// HLA13: requestAttributeValueUpdate - object
+    /// </summary>
+    /// <param name="obj"></param>
+    /// <param name="attributes"></param>
+    /// <returns></returns>
+    public virtual bool requestAttributeValueUpdate(HlaObject obj, List<HlaAttribute> attributes)
+    {
+      OnRTIEventOccured(new RaconEventArgs("requestAttributeValueUpdate(HlaObject obj, List<HlaAttribute> attributes) is HLA 1.3 specific.", LogLevel.WARN));
+      return false;
+    }
     #endregion
 
     #region Ownership Management
@@ -496,13 +627,29 @@ namespace Racon.RtiLayer
     public abstract bool unconditionalAttributeOwnershipDivestiture(HlaObject o, List<HlaAttribute> attributeSet);
 
     /// <summary>
-    /// IEEE1516.1-2010 7.3 and HLA13 
+    /// IEEE1516.1-2010 7.3 
     /// </summary>
     /// <param name="o"></param>
     /// <param name="attributeSet"></param>
     /// <param name="tag"></param>
     /// <returns></returns>
-    public abstract bool negotiatedAttributeOwnershipDivestiture(HlaObject o, List<HlaAttribute> attributeSet, string tag);
+    public virtual bool negotiatedAttributeOwnershipDivestiture(HlaObject o, List<HlaAttribute> attributeSet, VariableLengthDataWrapper tag)
+    {
+      OnRTIEventOccured(new RaconEventArgs("negotiatedAttributeOwnershipDivestiture(HlaObject o, List<HlaAttribute> attributeSet, VariableLengthDataWrapper tag) is IEEE1516.1-2010 specific.", LogLevel.WARN));
+      return false;
+    }
+    /// <summary>
+    /// HLA13: negotiatedAttributeOwnershipDivestiture
+    /// </summary>
+    /// <param name="o"></param>
+    /// <param name="attributeSet"></param>
+    /// <param name="tag"></param>
+    /// <returns></returns>
+    public virtual bool negotiatedAttributeOwnershipDivestiture(HlaObject o, List<HlaAttribute> attributeSet, string tag)
+    {
+      OnRTIEventOccured(new RaconEventArgs("negotiatedAttributeOwnershipDivestiture(HlaObject o, List<HlaAttribute> attributeSet, string tag) is HLA 1.3 specific.", LogLevel.WARN));
+      return false;
+    }
 
     /// <summary>
     /// IEEE1516-2010 7.6
@@ -511,7 +658,7 @@ namespace Racon.RtiLayer
     /// <param name="attributeSet"></param>
     /// <param name="tag"></param>
     /// <returns></returns>
-    public virtual bool confirmDivestiture(HlaObject theObject, List<HlaAttribute> attributeSet, string tag)
+    public virtual bool confirmDivestiture(HlaObject theObject, List<HlaAttribute> attributeSet, VariableLengthDataWrapper tag)
     {
       // Default implementation - so, native classes do not need to override
       OnRTIEventOccured(new RaconEventArgs("ConfirmDivestiture() is IEEE1516.1-2010 specific.", LogLevel.WARN));
@@ -519,13 +666,30 @@ namespace Racon.RtiLayer
     }
 
     /// <summary>
-    /// IEEE1516.1-2010 7.8 and HLA13 
+    /// IEEE1516.1-2010 7.8 
     /// </summary>
     /// <param name="theObject"></param>
     /// <param name="attributeSet"></param>
     /// <param name="tag"></param>
     /// <returns></returns>
-    public abstract bool attributeOwnershipAcquisition(HlaObject theObject, List<HlaAttribute> attributeSet, string tag);
+    public virtual bool attributeOwnershipAcquisition(HlaObject theObject, List<HlaAttribute> attributeSet, VariableLengthDataWrapper tag)
+    {
+      OnRTIEventOccured(new RaconEventArgs("requestAttributeValueUpdate(HlaObject obj, List<HlaAttribute> attributes, VariableLengthDataWrapper tag) is IEEE1516.1-2010 specific.", LogLevel.WARN));
+      return false;
+    }
+
+    /// <summary>
+    /// HLA13: attributeOwnershipAcquisition
+    /// </summary>
+    /// <param name="theObject"></param>
+    /// <param name="attributeSet"></param>
+    /// <param name="tag"></param>
+    /// <returns></returns>
+    public virtual bool attributeOwnershipAcquisition(HlaObject theObject, List<HlaAttribute> attributeSet, string tag)
+    {
+      OnRTIEventOccured(new RaconEventArgs("attributeOwnershipAcquisition(HlaObject theObject, List<HlaAttribute> attributeSet, string tag)) is HLA 1.3 specific.", LogLevel.WARN));
+      return false;
+    }
 
     /// <summary>
     /// IEEE1516.1-2010 7.9 and HLA13 
@@ -715,7 +879,6 @@ namespace Racon.RtiLayer
       return false;
     }
 
-
     /// <summary>
     /// IEEE1516.1-2010 9.8: subscribeObjectClassAttributesWithRegions
     /// </summary>
@@ -822,7 +985,7 @@ namespace Racon.RtiLayer
     /// <param name="regions"></param>
     /// <param name="tag"></param>
     /// <returns></returns>
-    public virtual bool sendInteractionWithRegions(HlaInteractionClass ic, List<HlaRegion> regions, string tag)
+    public virtual bool sendInteractionWithRegions(HlaInteractionClass ic, List<HlaRegion> regions, VariableLengthDataWrapper tag)
     {
       // Default implementation - so, native classes do not need to override
       OnRTIEventOccured(new RaconEventArgs("sendInteractionWithRegions is only used for IEEE1516-2010. Use other overloaded methods for HLA13.", LogLevel.WARN));
@@ -836,7 +999,7 @@ namespace Racon.RtiLayer
     /// <param name="tag"></param>
     /// <param name="timestamp"></param>
     /// <returns></returns>
-    public virtual MessageRetraction sendInteractionWithRegions(HlaInteractionClass ic, List<HlaRegion> regions, string tag, double timestamp)
+    public virtual MessageRetraction sendInteractionWithRegions(HlaInteractionClass ic, List<HlaRegion> regions, VariableLengthDataWrapper tag, double timestamp)
     {
       // Default implementation - so, native classes do not need to override
       OnRTIEventOccured(new RaconEventArgs("sendInteractionWithRegions is only used for IEEE1516-2010. Use other overloaded methods for HLA13.", LogLevel.WARN));
@@ -862,7 +1025,7 @@ namespace Racon.RtiLayer
     /// <param name="pairs"></param>
     /// <param name="tag"></param>
     /// <returns></returns>
-    public virtual bool requestClassAttributeValueUpdateWithRegions(HlaObjectClass oc, AttributeHandleSetRegionHandleSetPairVector pairs, string tag)
+    public virtual bool requestClassAttributeValueUpdateWithRegions(HlaObjectClass oc, AttributeHandleSetRegionHandleSetPairVector pairs, VariableLengthDataWrapper tag)
     {
       // Default implementation - so, native classes do not need to override
       OnRTIEventOccured(new RaconEventArgs("requestClassAttributeValueUpdateWithRegions is only used for IEEE1516-2010. Use other overloaded methods for HLA13.", LogLevel.WARN));

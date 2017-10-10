@@ -492,7 +492,7 @@ void FdAmb_Hla13::removeObjectInstance (RTI::ObjectHandle theObject, const char 
 		HlaObject->ObjectInstance->Handle = theObject;
 		HlaObject->ObjectInstance->Tag = gcnew String(theTag);
 
-		HlaObject->TraceMessage = "The object (handle: " + theObject + ") is removed.";
+		HlaObject->TraceMessage = "The object (handle: " + theObject + ") is removed. Reason: " + HlaObject->ObjectInstance->Tag;
 		HlaObject->EventType = RaconEventTypes::ObjectRemoved;
 		// Add to the Event Queue
 		wrapper->FdAmbEventQueue->Enqueue(HlaObject);
@@ -595,7 +595,7 @@ void FdAmb_Hla13::requestAttributeOwnershipRelease (RTI::ObjectHandle theObject,
 			// Create Event Arguments
 			HlaOwnershipManagementEventArgs ^args = gcnew HlaOwnershipManagementEventArgs();
 			args->ObjectHandle = theObject;
-			args->Tag = gcnew String(theTag);
+			args->TagHLA13 = gcnew String(theTag);
 			String^ attributeString;
 			for (unsigned int i=0; i < candidateAttributes.size(); i++){
         HlaAttribute^ attr = gcnew HlaAttribute();
@@ -757,7 +757,7 @@ void FdAmb_Hla13::requestAttributeOwnershipAssumption(RTI::ObjectHandle theObjec
 			// Create Event Arguments
 			HlaOwnershipManagementEventArgs ^args = gcnew HlaOwnershipManagementEventArgs();
 			args->ObjectHandle = theObject;
-			args->Tag = gcnew String(theTag);
+			args->TagHLA13 = gcnew String(theTag);
 			String^ attributeString;
 			for (unsigned int i=0; i < offeredAttributes.size(); i++){
         HlaAttribute^ attr = gcnew HlaAttribute();

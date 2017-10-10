@@ -26,6 +26,8 @@ along with this program.If not, see <http://www.gnu.org/licenses/>.
 #include "Helpers_Hla1516e.h"
 #include "FdAmb_Hla1516e.h"
 
+using namespace System;
+using namespace System::Runtime::InteropServices;
 using namespace rti1516e;
 // Racon
 using namespace Racon::RtiLayer;
@@ -268,7 +270,7 @@ throw (
     HlaFederationManagementEventArgs ^args = gcnew HlaFederationManagementEventArgs();
     args->Success = false;
     args->Reason = ToString(theSaveFailureReason);
-    args->TraceMessage = "RTI informs that federation-wide save has completed, but one or more federates have failed to correctly save their state. Save Failure Reason: " + args->Reason; 
+    args->TraceMessage = "RTI informs that federation-wide save has completed, but one or more federates have failed to correctly save their state. Save Failure Reason: " + args->Reason;
     args->EventType = RaconEventTypes::FederationSaved;
     // Add to the Event Queue
     wrapper->FdAmbEventQueue->Enqueue(args);
@@ -310,145 +312,145 @@ throw (rti1516e::FederateInternalError) {
 };
 
 // 4.25 - requestFederationRestoreSucceeded/requestFederationRestoreFailed
-void FdAmb_Hla1516e::requestFederationRestoreSucceeded (std::wstring const & label)
-  throw (rti1516e::FederateInternalError){
-    try{
-      // Create Event Arguments
-      HlaFederationManagementEventArgs ^args = gcnew HlaFederationManagementEventArgs();
-      args->Label = gcnew String(label.c_str());
-      args->Success = true;
-      args->TraceMessage = "RTI informs that a request to attempt to restore (save label: " + args->Label + ") has been accepted.";
-      args->EventType = RaconEventTypes::FederationRestorationRequestConfirmed;
-      // Add to the Event Queue
-      wrapper->FdAmbEventQueue->Enqueue(args);
-    }
+void FdAmb_Hla1516e::requestFederationRestoreSucceeded(std::wstring const & label)
+throw (rti1516e::FederateInternalError) {
+  try {
+    // Create Event Arguments
+    HlaFederationManagementEventArgs ^args = gcnew HlaFederationManagementEventArgs();
+    args->Label = gcnew String(label.c_str());
+    args->Success = true;
+    args->TraceMessage = "RTI informs that a request to attempt to restore (save label: " + args->Label + ") has been accepted.";
+    args->EventType = RaconEventTypes::FederationRestorationRequestConfirmed;
+    // Add to the Event Queue
+    wrapper->FdAmbEventQueue->Enqueue(args);
+  }
 #pragma region exceptions
-    catch (FederateInternalError& e) {
-      String^ msg = "FdAmb_Hla1516e-(FederateInternalError - requestFederationRestoreSucceeded). Reason: " + gcnew String(e.what().c_str());
-      wrapper->FdAmbEventQueue->Enqueue(gcnew RaconEventArgs(msg, LogLevel::ERROR));
-    }
-    catch (System::Exception^ e) {
-      String^ msg = "FdAmb_Hla1516e-(Exception - requestFederationRestoreSucceeded). Reason: " + gcnew String(e->ToString());
-      wrapper->FdAmbEventQueue->Enqueue(gcnew RaconEventArgs(msg, LogLevel::ERROR));
-    }
+  catch (FederateInternalError& e) {
+    String^ msg = "FdAmb_Hla1516e-(FederateInternalError - requestFederationRestoreSucceeded). Reason: " + gcnew String(e.what().c_str());
+    wrapper->FdAmbEventQueue->Enqueue(gcnew RaconEventArgs(msg, LogLevel::ERROR));
+  }
+  catch (System::Exception^ e) {
+    String^ msg = "FdAmb_Hla1516e-(Exception - requestFederationRestoreSucceeded). Reason: " + gcnew String(e->ToString());
+    wrapper->FdAmbEventQueue->Enqueue(gcnew RaconEventArgs(msg, LogLevel::ERROR));
+  }
 #pragma endregion
 }
-void FdAmb_Hla1516e::requestFederationRestoreFailed (std::wstring const & label)
-  throw (rti1516e::FederateInternalError) {
-    try{
-      // Create Event Arguments
-      HlaFederationManagementEventArgs ^args = gcnew HlaFederationManagementEventArgs();
-      args->Label = gcnew String(label.c_str());
-      args->Success = false;
-      args->TraceMessage = "RTI informs that a request to attempt to restore (save label: " + args->Label + ") has been denied.";
-      args->EventType = RaconEventTypes::FederationRestorationRequestConfirmed;
-      // Add to the Event Queue
-      wrapper->FdAmbEventQueue->Enqueue(args);
-    }
+void FdAmb_Hla1516e::requestFederationRestoreFailed(std::wstring const & label)
+throw (rti1516e::FederateInternalError) {
+  try {
+    // Create Event Arguments
+    HlaFederationManagementEventArgs ^args = gcnew HlaFederationManagementEventArgs();
+    args->Label = gcnew String(label.c_str());
+    args->Success = false;
+    args->TraceMessage = "RTI informs that a request to attempt to restore (save label: " + args->Label + ") has been denied.";
+    args->EventType = RaconEventTypes::FederationRestorationRequestConfirmed;
+    // Add to the Event Queue
+    wrapper->FdAmbEventQueue->Enqueue(args);
+  }
 #pragma region exceptions
-    catch (FederateInternalError& e) {
-      String^ msg = "FdAmb_Hla1516e-(FederateInternalError - requestFederationRestoreFailed). Reason: " + gcnew String(e.what().c_str());
-      wrapper->FdAmbEventQueue->Enqueue(gcnew RaconEventArgs(msg, LogLevel::ERROR));
-    }
-    catch (System::Exception^ e) {
-      String^ msg = "FdAmb_Hla1516e-(Exception - requestFederationRestoreFailed). Reason: " + gcnew String(e->ToString());
-      wrapper->FdAmbEventQueue->Enqueue(gcnew RaconEventArgs(msg, LogLevel::ERROR));
-    }
+  catch (FederateInternalError& e) {
+    String^ msg = "FdAmb_Hla1516e-(FederateInternalError - requestFederationRestoreFailed). Reason: " + gcnew String(e.what().c_str());
+    wrapper->FdAmbEventQueue->Enqueue(gcnew RaconEventArgs(msg, LogLevel::ERROR));
+  }
+  catch (System::Exception^ e) {
+    String^ msg = "FdAmb_Hla1516e-(Exception - requestFederationRestoreFailed). Reason: " + gcnew String(e->ToString());
+    wrapper->FdAmbEventQueue->Enqueue(gcnew RaconEventArgs(msg, LogLevel::ERROR));
+  }
 #pragma endregion
 }
 
 // 4.26 - federationRestoreBegun
-void FdAmb_Hla1516e::federationRestoreBegun ()
-  throw (rti1516e::FederateInternalError) {
-    try{
-      // Create Event Arguments
-      HlaFederationManagementEventArgs ^args = gcnew HlaFederationManagementEventArgs();
-      args->TraceMessage = "RTI advises the federate that a federation-wide restoration has begun";
-      args->EventType = RaconEventTypes::FederationRestoreBegun;
-      // Add to the Event Queue
-      wrapper->FdAmbEventQueue->Enqueue(args);
-    }
+void FdAmb_Hla1516e::federationRestoreBegun()
+throw (rti1516e::FederateInternalError) {
+  try {
+    // Create Event Arguments
+    HlaFederationManagementEventArgs ^args = gcnew HlaFederationManagementEventArgs();
+    args->TraceMessage = "RTI advises the federate that a federation-wide restoration has begun";
+    args->EventType = RaconEventTypes::FederationRestoreBegun;
+    // Add to the Event Queue
+    wrapper->FdAmbEventQueue->Enqueue(args);
+  }
 #pragma region exceptions
-    catch (FederateInternalError& e) {
-      String^ msg = "FdAmb_Hla1516e-(FederateInternalError - federationRestoreBegun). Reason: " + gcnew String(e.what().c_str());
-      wrapper->FdAmbEventQueue->Enqueue(gcnew RaconEventArgs(msg, LogLevel::ERROR));
-    }
-    catch (System::Exception^ e) {
-      String^ msg = "FdAmb_Hla1516e-(Exception - federationRestoreBegun). Reason: " + gcnew String(e->ToString());
-      wrapper->FdAmbEventQueue->Enqueue(gcnew RaconEventArgs(msg, LogLevel::ERROR));
-    }
+  catch (FederateInternalError& e) {
+    String^ msg = "FdAmb_Hla1516e-(FederateInternalError - federationRestoreBegun). Reason: " + gcnew String(e.what().c_str());
+    wrapper->FdAmbEventQueue->Enqueue(gcnew RaconEventArgs(msg, LogLevel::ERROR));
+  }
+  catch (System::Exception^ e) {
+    String^ msg = "FdAmb_Hla1516e-(Exception - federationRestoreBegun). Reason: " + gcnew String(e->ToString());
+    wrapper->FdAmbEventQueue->Enqueue(gcnew RaconEventArgs(msg, LogLevel::ERROR));
+  }
 #pragma endregion
 }
 
 // 4.27 - initiateFederateRestore
-void FdAmb_Hla1516e::initiateFederateRestore (std::wstring const & label, std::wstring const & federateName, rti1516e::FederateHandle handle)
-  throw (rti1516e::FederateInternalError){
-    try{
-      // Create Event Arguments
-      HlaFederationManagementEventArgs ^args = gcnew HlaFederationManagementEventArgs();
-      args->Label = gcnew String(label.c_str());
-      args->FederateHandle = Handle2Long(handle);
-      args->TraceMessage = "RTI initiates a federate restore (save label: " + args->Label + ")(federate handle: " + args->FederateHandle + ").";
-      args->EventType = RaconEventTypes::InitiateFederateRestore;
-      // Add to the Event Queue
-      wrapper->FdAmbEventQueue->Enqueue(args);
-    }
+void FdAmb_Hla1516e::initiateFederateRestore(std::wstring const & label, std::wstring const & federateName, rti1516e::FederateHandle handle)
+throw (rti1516e::FederateInternalError) {
+  try {
+    // Create Event Arguments
+    HlaFederationManagementEventArgs ^args = gcnew HlaFederationManagementEventArgs();
+    args->Label = gcnew String(label.c_str());
+    args->FederateHandle = Handle2Long(handle);
+    args->TraceMessage = "RTI initiates a federate restore (save label: " + args->Label + ")(federate handle: " + args->FederateHandle + ").";
+    args->EventType = RaconEventTypes::InitiateFederateRestore;
+    // Add to the Event Queue
+    wrapper->FdAmbEventQueue->Enqueue(args);
+  }
 #pragma region exceptions
-    catch (FederateInternalError& e) {
-      String^ msg = "FdAmb_Hla1516e-(FederateInternalError - initiateFederateRestore). Reason: " + gcnew String(e.what().c_str());
-      wrapper->FdAmbEventQueue->Enqueue(gcnew RaconEventArgs(msg, LogLevel::ERROR));
-    }
-    catch (System::Exception^ e) {
-      String^ msg = "FdAmb_Hla1516e-(Exception - initiateFederateRestore). Reason: " + gcnew String(e->ToString());
-      wrapper->FdAmbEventQueue->Enqueue(gcnew RaconEventArgs(msg, LogLevel::ERROR));
-    }
+  catch (FederateInternalError& e) {
+    String^ msg = "FdAmb_Hla1516e-(FederateInternalError - initiateFederateRestore). Reason: " + gcnew String(e.what().c_str());
+    wrapper->FdAmbEventQueue->Enqueue(gcnew RaconEventArgs(msg, LogLevel::ERROR));
+  }
+  catch (System::Exception^ e) {
+    String^ msg = "FdAmb_Hla1516e-(Exception - initiateFederateRestore). Reason: " + gcnew String(e->ToString());
+    wrapper->FdAmbEventQueue->Enqueue(gcnew RaconEventArgs(msg, LogLevel::ERROR));
+  }
 #pragma endregion
 }
 
 // 4.29 - federationRestored/federationNotRestored
-void FdAmb_Hla1516e::federationRestored ()
-  throw (rti1516e::FederateInternalError) {
-    try{
-      // Create Event Arguments
-      HlaFederationManagementEventArgs ^args = gcnew HlaFederationManagementEventArgs();
-      args->Success = true;
-      args->TraceMessage = "RTI informs that federation-wide restore has completed successfully.";
-      args->EventType = RaconEventTypes::FederationRestored;
-      // Add to the Event Queue
-      wrapper->FdAmbEventQueue->Enqueue(args);
-    }
+void FdAmb_Hla1516e::federationRestored()
+throw (rti1516e::FederateInternalError) {
+  try {
+    // Create Event Arguments
+    HlaFederationManagementEventArgs ^args = gcnew HlaFederationManagementEventArgs();
+    args->Success = true;
+    args->TraceMessage = "RTI informs that federation-wide restore has completed successfully.";
+    args->EventType = RaconEventTypes::FederationRestored;
+    // Add to the Event Queue
+    wrapper->FdAmbEventQueue->Enqueue(args);
+  }
 #pragma region exceptions
-    catch (FederateInternalError& e) {
-      String^ msg = "FdAmb_Hla1516e-(FederateInternalError - federationRestored). Reason: " + gcnew String(e.what().c_str());
-      wrapper->FdAmbEventQueue->Enqueue(gcnew RaconEventArgs(msg, LogLevel::ERROR));
-    }
-    catch (System::Exception^ e) {
-      String^ msg = "FdAmb_Hla1516e-(Exception - federationRestored). Reason: " + gcnew String(e->ToString());
-      wrapper->FdAmbEventQueue->Enqueue(gcnew RaconEventArgs(msg, LogLevel::ERROR));
-    }
+  catch (FederateInternalError& e) {
+    String^ msg = "FdAmb_Hla1516e-(FederateInternalError - federationRestored). Reason: " + gcnew String(e.what().c_str());
+    wrapper->FdAmbEventQueue->Enqueue(gcnew RaconEventArgs(msg, LogLevel::ERROR));
+  }
+  catch (System::Exception^ e) {
+    String^ msg = "FdAmb_Hla1516e-(Exception - federationRestored). Reason: " + gcnew String(e->ToString());
+    wrapper->FdAmbEventQueue->Enqueue(gcnew RaconEventArgs(msg, LogLevel::ERROR));
+  }
 #pragma endregion
 }
-void FdAmb_Hla1516e::federationNotRestored (rti1516e::RestoreFailureReason theRestoreFailureReason)
-  throw (rti1516e::FederateInternalError) {
-    try{
-      // Create Event Arguments
-      HlaFederationManagementEventArgs ^args = gcnew HlaFederationManagementEventArgs();
-      args->Success = false;
-      args->Reason = ToString(theRestoreFailureReason);
-      args->TraceMessage = "RTI informs that federation-wide restore has completed, but one or more federates have failed to correctly restore their state. Restore failure reason: " + args->Reason;
-      args->EventType = RaconEventTypes::FederationRestored;
-      // Add to the Event Queue
-      wrapper->FdAmbEventQueue->Enqueue(args);
-    }
+void FdAmb_Hla1516e::federationNotRestored(rti1516e::RestoreFailureReason theRestoreFailureReason)
+throw (rti1516e::FederateInternalError) {
+  try {
+    // Create Event Arguments
+    HlaFederationManagementEventArgs ^args = gcnew HlaFederationManagementEventArgs();
+    args->Success = false;
+    args->Reason = ToString(theRestoreFailureReason);
+    args->TraceMessage = "RTI informs that federation-wide restore has completed, but one or more federates have failed to correctly restore their state. Restore failure reason: " + args->Reason;
+    args->EventType = RaconEventTypes::FederationRestored;
+    // Add to the Event Queue
+    wrapper->FdAmbEventQueue->Enqueue(args);
+  }
 #pragma region exceptions
-    catch (FederateInternalError& e) {
-      String^ msg = "FdAmb_Hla1516e-(FederateInternalError - federationNotRestored). Reason: " + gcnew String(e.what().c_str());
-      wrapper->FdAmbEventQueue->Enqueue(gcnew RaconEventArgs(msg, LogLevel::ERROR));
-    }
-    catch (System::Exception^ e) {
-      String^ msg = "FdAmb_Hla1516e-(Exception - federationNotRestored). Reason: " + gcnew String(e->ToString());
-      wrapper->FdAmbEventQueue->Enqueue(gcnew RaconEventArgs(msg, LogLevel::ERROR));
-    }
+  catch (FederateInternalError& e) {
+    String^ msg = "FdAmb_Hla1516e-(FederateInternalError - federationNotRestored). Reason: " + gcnew String(e.what().c_str());
+    wrapper->FdAmbEventQueue->Enqueue(gcnew RaconEventArgs(msg, LogLevel::ERROR));
+  }
+  catch (System::Exception^ e) {
+    String^ msg = "FdAmb_Hla1516e-(Exception - federationNotRestored). Reason: " + gcnew String(e->ToString());
+    wrapper->FdAmbEventQueue->Enqueue(gcnew RaconEventArgs(msg, LogLevel::ERROR));
+  }
 #pragma endregion
 }
 
@@ -606,7 +608,6 @@ throw (rti1516e::FederateInternalError) {
   }
 #pragma endregion
 };
-
 // 6.9 - Discover Object Instance
 void FdAmb_Hla1516e::discoverObjectInstance(rti1516e::ObjectInstanceHandle theObject, rti1516e::ObjectClassHandle theObjectClass, std::wstring const & theObjectInstanceName, rti1516e::FederateHandle producingFederate)
 throw (rti1516e::FederateInternalError) {
@@ -636,19 +637,16 @@ throw (rti1516e::FederateInternalError) {
 };
 
 // 6.11 - Reflect Attributes
-void FdAmb_Hla1516e::reflectAttributeValues(
-  rti1516e::ObjectInstanceHandle theObject,
-  rti1516e::AttributeHandleValueMap const & theAttributeValues,
-  rti1516e::VariableLengthData const & theUserSuppliedTag,
-  rti1516e::OrderType sentOrder,
-  rti1516e::TransportationType theType,
-  rti1516e::SupplementalReflectInfo theReflectInfo)
+void FdAmb_Hla1516e::reflectAttributeValues( rti1516e::ObjectInstanceHandle theObject, rti1516e::AttributeHandleValueMap const & theAttributeValues, rti1516e::VariableLengthData const & theUserSuppliedTag, rti1516e::OrderType sentOrder, rti1516e::TransportationType theType, rti1516e::SupplementalReflectInfo theReflectInfo)
   throw (rti1516e::FederateInternalError) {
   try {
     // Create Event Arguments
     HlaObjectEventArgs ^args = gcnew HlaObjectEventArgs();
     args->ObjectInstance->Handle = toULong(theObject.toString());
-    args->ObjectInstance->Tag = gcnew String((char*)(theUserSuppliedTag.data()));
+    // Tag
+    char *buffer = (char*)malloc(theUserSuppliedTag.size());
+    memcpy(buffer, (void *)(theUserSuppliedTag.data()), theUserSuppliedTag.size()); // Copy data to buffer
+    args->Tag->Data = IntPtr(buffer);
 
     AttributeHandleValueMap::const_iterator iterator;
     for (iterator = theAttributeValues.begin(); iterator != theAttributeValues.end(); iterator++)
@@ -660,7 +658,7 @@ void FdAmb_Hla1516e::reflectAttributeValues(
       memcpy(buffer, (void *)((*iterator).second.data()), (*iterator).second.size());
       // Pass the value 
       HlaAttribute^ attr = gcnew HlaAttribute();
-      attr->AddValue(IntPtr(buffer));
+      attr->Value = IntPtr(buffer);
       attr->Handle = toULong(gcnew String((*iterator).first.toString().c_str()));// Convert to Rom handle
       args->ObjectInstance->Attributes->Add(attr);
     }
@@ -686,24 +684,19 @@ void FdAmb_Hla1516e::reflectAttributeValues(
   }
 #pragma endregion
 };
-
 // 6.11 - Reflect Attributes w/ time
-void FdAmb_Hla1516e::reflectAttributeValues(
-  rti1516e::ObjectInstanceHandle theObject,
-  rti1516e::AttributeHandleValueMap const & theAttributeValues,
-  rti1516e::VariableLengthData const & theUserSuppliedTag,
-  rti1516e::OrderType sentOrder,
-  rti1516e::TransportationType theType,
-  rti1516e::LogicalTime const & theTime,
-  rti1516e::OrderType receivedOrder,
-  rti1516e::SupplementalReflectInfo theReflectInfo)
+void FdAmb_Hla1516e::reflectAttributeValues( rti1516e::ObjectInstanceHandle theObject, rti1516e::AttributeHandleValueMap const & theAttributeValues,
+  rti1516e::VariableLengthData const & theUserSuppliedTag, rti1516e::OrderType sentOrder, rti1516e::TransportationType theType, rti1516e::LogicalTime const & theTime, rti1516e::OrderType receivedOrder, rti1516e::SupplementalReflectInfo theReflectInfo)
   throw (rti1516e::FederateInternalError) {
   try {
     // Create Event Arguments
     HlaObjectEventArgs ^args = gcnew HlaObjectEventArgs();
     args->ObjectInstance->Handle = toULong(theObject.toString());
-    args->ObjectInstance->Tag = gcnew String((char*)(theUserSuppliedTag.data()));
-    // Decode Time
+    // Tag
+    char *buffer = (char*)malloc(theUserSuppliedTag.size());
+    memcpy(buffer, (void *)(theUserSuppliedTag.data()), theUserSuppliedTag.size()); // Copy data to buffer
+    args->Tag->Data = IntPtr(buffer);
+    // Time
     args->Time = double::Parse(gcnew String(theTime.toString().c_str()));
 
     AttributeHandleValueMap::const_iterator iterator;
@@ -716,7 +709,7 @@ void FdAmb_Hla1516e::reflectAttributeValues(
       memcpy(buffer, (void *)((*iterator).second.data()), (*iterator).second.size());
       // Pass the value 
       HlaAttribute^ attr = gcnew HlaAttribute();
-      attr->AddValue(IntPtr(buffer));
+      attr->Value = IntPtr(buffer);
       attr->Handle = toULong(gcnew String((*iterator).first.toString().c_str()));// Convert to Rom handle
       args->ObjectInstance->Attributes->Add(attr);
     }
@@ -742,26 +735,19 @@ void FdAmb_Hla1516e::reflectAttributeValues(
   }
 #pragma endregion
 };
-
 // 6.11 - Reflect Attributes w/ time + retraction
-void FdAmb_Hla1516e::reflectAttributeValues(
-  rti1516e::ObjectInstanceHandle theObject,
-  rti1516e::AttributeHandleValueMap const & theAttributeValues,
-  rti1516e::VariableLengthData const & theUserSuppliedTag,
-  rti1516e::OrderType sentOrder,
-  rti1516e::TransportationType theType,
-  rti1516e::LogicalTime const & theTime,
-  rti1516e::OrderType receivedOrder,
-  rti1516e::MessageRetractionHandle theHandle,
-  rti1516e::SupplementalReflectInfo theReflectInfo)
+void FdAmb_Hla1516e::reflectAttributeValues(rti1516e::ObjectInstanceHandle theObject, rti1516e::AttributeHandleValueMap const & theAttributeValues, rti1516e::VariableLengthData const & theUserSuppliedTag, rti1516e::OrderType sentOrder, rti1516e::TransportationType theType, rti1516e::LogicalTime const & theTime, rti1516e::OrderType receivedOrder, rti1516e::MessageRetractionHandle theHandle, rti1516e::SupplementalReflectInfo theReflectInfo)
   throw (rti1516e::FederateInternalError) {
   try {
     // Create Event Arguments
     HlaObjectEventArgs ^args = gcnew HlaObjectEventArgs();
     args->ObjectInstance->Handle = toULong(theObject.toString());
-    args->ObjectInstance->Tag = gcnew String((char*)(theUserSuppliedTag.data()));
     args->Time = double::Parse(gcnew String(theTime.toString().c_str()));// Decode Time
     args->RetractionHandle = gcnew MessageRetraction(toULong(theHandle.toString()));// DeCode RetractionHandle
+    // Tag
+    char *buffer = (char*)malloc(theUserSuppliedTag.size());
+    memcpy(buffer, (void *)(theUserSuppliedTag.data()), theUserSuppliedTag.size()); // Copy data to buffer
+    args->Tag->Data = IntPtr(buffer);
 
     AttributeHandleValueMap::const_iterator iterator;
     for (iterator = theAttributeValues.begin(); iterator != theAttributeValues.end(); iterator++)
@@ -773,7 +759,7 @@ void FdAmb_Hla1516e::reflectAttributeValues(
       memcpy(buffer, (void *)((*iterator).second.data()), (*iterator).second.size());
       // Pass the value 
       HlaAttribute^ attr = gcnew HlaAttribute();
-      attr->AddValue(IntPtr(buffer));
+      attr->Value = IntPtr(buffer);
       attr->Handle = toULong(gcnew String((*iterator).first.toString().c_str()));// Convert to Rom handle
       args->ObjectInstance->Attributes->Add(attr);
     }
@@ -807,7 +793,10 @@ throw (rti1516e::FederateInternalError) {
     // Create Event Arguments
     HlaInteractionEventArgs ^args = gcnew HlaInteractionEventArgs();
     args->Interaction->ClassHandle = toULong(theInteraction.toString());
-    args->Interaction->Tag = gcnew String((char*)(theUserSuppliedTag.data()));
+    // Tag
+    char *buffer = (char*)malloc(theUserSuppliedTag.size());
+    memcpy(buffer, (void *)(theUserSuppliedTag.data()), theUserSuppliedTag.size()); // Copy data to buffer
+    args->Tag->Data = IntPtr(buffer);
 
     // Parameter count = theParameterValues.size()
     //args->TraceMessage += "Parameter Count: " + theParameterValues.size();
@@ -829,7 +818,7 @@ throw (rti1516e::FederateInternalError) {
       ////  args->TraceMessage += " Value: " + Marshal::PtrToStringAnsi(IntPtr(buffer));
       // Pass the value
       HlaParameter^ para = gcnew HlaParameter();
-      para->AddValue(IntPtr(buffer));
+      para->Value = IntPtr(buffer);
       para->Handle = toULong(gcnew String(iterator.first.toString().c_str()));// Convert to Rom handle
       args->Interaction->Parameters->Add(para);
     }
@@ -861,24 +850,18 @@ throw (rti1516e::FederateInternalError) {
   }
 #pragma endregion
 };
-
 // 6.13 - receiveInteraction2 w/ time
-void FdAmb_Hla1516e::receiveInteraction(
-  rti1516e::InteractionClassHandle theInteraction,
-  rti1516e::ParameterHandleValueMap const & theParameterValues,
-  rti1516e::VariableLengthData const & theUserSuppliedTag,
-  rti1516e::OrderType sentOrder,
-  rti1516e::TransportationType theType,
-  rti1516e::LogicalTime const & theTime,
-  rti1516e::OrderType receivedOrder,
-  rti1516e::SupplementalReceiveInfo theReceiveInfo)
+void FdAmb_Hla1516e::receiveInteraction(rti1516e::InteractionClassHandle theInteraction, rti1516e::ParameterHandleValueMap const & theParameterValues, rti1516e::VariableLengthData const & theUserSuppliedTag, rti1516e::OrderType sentOrder, rti1516e::TransportationType theType, rti1516e::LogicalTime const & theTime, rti1516e::OrderType receivedOrder, rti1516e::SupplementalReceiveInfo theReceiveInfo)
   throw (rti1516e::FederateInternalError) {
   try {
     // Create Event Arguments
     HlaInteractionEventArgs ^args = gcnew HlaInteractionEventArgs();
     args->Interaction->ClassHandle = toULong(theInteraction.toString()); ;
-    args->Interaction->Tag = gcnew String((char*)(theUserSuppliedTag.data()));
     args->Time = double::Parse(gcnew String(theTime.toString().c_str()));// Decode Time
+    // Tag
+    char *buffer = (char*)malloc(theUserSuppliedTag.size());
+    memcpy(buffer, (void *)(theUserSuppliedTag.data()), theUserSuppliedTag.size()); // Copy data to buffer
+    args->Tag->Data = IntPtr(buffer);
 
     for (auto iterator : theParameterValues)
     {
@@ -888,7 +871,7 @@ void FdAmb_Hla1516e::receiveInteraction(
       memcpy(buffer, (void *)(iterator.second.data()), iterator.second.size());
       // Pass the value
       HlaParameter^ para = gcnew HlaParameter();
-      para->AddValue(IntPtr(buffer));
+      para->Value = IntPtr(buffer);
       para->Handle = toULong(gcnew String(iterator.first.toString().c_str()));// Convert to Rom handle
       args->Interaction->Parameters->Add(para);
     }
@@ -920,27 +903,20 @@ void FdAmb_Hla1516e::receiveInteraction(
   }
 #pragma endregion
 };
-
 // 6.13 - receiveInteraction3 w/ time + retraction
 // !!! doesnot trigger - OpenRTI does not support
-void FdAmb_Hla1516e::receiveInteraction(
-  rti1516e::InteractionClassHandle theInteraction,
-  rti1516e::ParameterHandleValueMap const & theParameterValues,
-  rti1516e::VariableLengthData const & theUserSuppliedTag,
-  rti1516e::OrderType sentOrder,
-  rti1516e::TransportationType theType,
-  rti1516e::LogicalTime const & theTime,
-  rti1516e::OrderType receivedOrder,
-  rti1516e::MessageRetractionHandle theHandle,
-  rti1516e::SupplementalReceiveInfo theReceiveInfo)
+void FdAmb_Hla1516e::receiveInteraction(rti1516e::InteractionClassHandle theInteraction, rti1516e::ParameterHandleValueMap const & theParameterValues, rti1516e::VariableLengthData const & theUserSuppliedTag, rti1516e::OrderType sentOrder, rti1516e::TransportationType theType, rti1516e::LogicalTime const & theTime, rti1516e::OrderType receivedOrder, rti1516e::MessageRetractionHandle theHandle, rti1516e::SupplementalReceiveInfo theReceiveInfo)
   throw (rti1516e::FederateInternalError) {
   try {
     // Create Event Arguments
     HlaInteractionEventArgs ^args = gcnew HlaInteractionEventArgs();
     args->Interaction->ClassHandle = toULong(theInteraction.toString()); ;
-    args->Interaction->Tag = gcnew String((char*)(theUserSuppliedTag.data()));
     args->Time = double::Parse(gcnew String(theTime.toString().c_str()));// Decode Time
     args->RetractionHandle = gcnew MessageRetraction(toULong(theHandle.toString()));// DeCode RetractionHandle
+    // Tag
+    char *buffer = (char*)malloc(theUserSuppliedTag.size());
+    memcpy(buffer, (void *)(theUserSuppliedTag.data()), theUserSuppliedTag.size()); // Copy data to buffer
+    args->Tag->Data = IntPtr(buffer);
 
     for (auto iterator : theParameterValues)
     {
@@ -950,7 +926,7 @@ void FdAmb_Hla1516e::receiveInteraction(
       memcpy(buffer, (void *)(iterator.second.data()), iterator.second.size());
       // Pass the value
       HlaParameter^ para = gcnew HlaParameter();
-      para->AddValue(IntPtr(buffer));
+      para->Value = IntPtr(buffer);
       para->Handle = toULong(gcnew String(iterator.first.toString().c_str()));// Convert to Rom handle
       args->Interaction->Parameters->Add(para);
     }
@@ -1024,16 +1000,18 @@ throw (rti1516e::FederateInternalError) {
     // Create Event Arguments
     HlaObjectEventArgs ^args = gcnew HlaObjectEventArgs();
     args->ObjectInstance->Handle = toULong(theObject.toString());
-    args->ObjectInstance->Tag = gcnew String((char*)(theUserSuppliedTag.data()));
-
+    // Allocate new memory for tag
+    char *buffer = (char*)malloc(theUserSuppliedTag.size());
+    memcpy(buffer, (void *)(theUserSuppliedTag.data()), theUserSuppliedTag.size()); // Copy data to buffer
+    args->Tag->Data = IntPtr(buffer);
     // Update Nom
     om->Objects.erase(args->ObjectInstance->Handle);
-    args->TraceMessage = "The object (handle: " + args->ObjectInstance->Handle + ") is removed. Tag: " + args->ObjectInstance->Tag;
+    args->TraceMessage = "The object (handle: " + args->ObjectInstance->Handle + ") is removed. ";
     if (theRemoveInfo.hasProducingFederate)
     {
       args->SupplementalRemoveInfo->HasProducingFederate = true;
       args->SupplementalRemoveInfo->ProducingFederateHandle = toULong(theRemoveInfo.producingFederate.toString());
-      args->TraceMessage += ". Producing Federate: " + toULong(theRemoveInfo.producingFederate.toString());
+      args->TraceMessage += "Producing Federate: " + toULong(theRemoveInfo.producingFederate.toString());
     }
     args->EventType = RaconEventTypes::ObjectRemoved;
     // Add to the Event Queue
@@ -1050,7 +1028,6 @@ throw (rti1516e::FederateInternalError) {
   }
 #pragma endregion
 };
-
 // 6.15 - Remove Object Instance w/ time
 void FdAmb_Hla1516e::removeObjectInstance(rti1516e::ObjectInstanceHandle theObject, rti1516e::VariableLengthData const & theUserSuppliedTag, rti1516e::OrderType sentOrder, rti1516e::LogicalTime const & theTime, rti1516e::OrderType receivedOrder, rti1516e::SupplementalRemoveInfo theRemoveInfo)
 throw (rti1516e::FederateInternalError) {
@@ -1058,13 +1035,16 @@ throw (rti1516e::FederateInternalError) {
     // Create Event Arguments
     HlaObjectEventArgs ^args = gcnew HlaObjectEventArgs();
     args->ObjectInstance->Handle = toULong(theObject.toString());
-    args->ObjectInstance->Tag = gcnew String((char*)(theUserSuppliedTag.data()));
+    // Allocate new memory for tag
+    char *buffer = (char*)malloc(theUserSuppliedTag.size());
+    memcpy(buffer, (void *)(theUserSuppliedTag.data()), theUserSuppliedTag.size()); // Copy data to buffer
+    args->Tag->Data = IntPtr(buffer);
     // Decode Time
     args->Time = double::Parse(gcnew String(theTime.toString().c_str()));
 
     // Update Nom
     om->Objects.erase(args->ObjectInstance->Handle);
-    args->TraceMessage = "The object (handle: " + args->ObjectInstance->Handle + ") is removed. Tag: " + args->ObjectInstance->Tag + ". Event Timestamp = " + args->Time;
+    args->TraceMessage = "The object (handle: " + args->ObjectInstance->Handle + ") is removed. Event Timestamp = " + args->Time;
     if (theRemoveInfo.hasProducingFederate)
     {
       args->SupplementalRemoveInfo->HasProducingFederate = true;
@@ -1086,29 +1066,24 @@ throw (rti1516e::FederateInternalError) {
   }
 #pragma endregion
 };
-
 // 6.15 - Remove Object Instance w/ time + retraction
-void FdAmb_Hla1516e::removeObjectInstance(
-  rti1516e::ObjectInstanceHandle theObject,
-  rti1516e::VariableLengthData const & theUserSuppliedTag,
-  rti1516e::OrderType sentOrder,
-  rti1516e::LogicalTime const & theTime,
-  rti1516e::OrderType receivedOrder,
-  rti1516e::MessageRetractionHandle theHandle,
-  rti1516e::SupplementalRemoveInfo theRemoveInfo)
+void FdAmb_Hla1516e::removeObjectInstance(rti1516e::ObjectInstanceHandle theObject, rti1516e::VariableLengthData const & theUserSuppliedTag, rti1516e::OrderType sentOrder, rti1516e::LogicalTime const & theTime, rti1516e::OrderType receivedOrder, rti1516e::MessageRetractionHandle theHandle, rti1516e::SupplementalRemoveInfo theRemoveInfo)
   throw (rti1516e::FederateInternalError) {
   /// !!! sentOrder, receivedOrder not used
   try {
     // Create Event Arguments
     HlaObjectEventArgs ^args = gcnew HlaObjectEventArgs();
     args->ObjectInstance->Handle = toULong(theObject.toString());
-    args->ObjectInstance->Tag = gcnew String((char*)(theUserSuppliedTag.data()));
+    // Allocate new memory for tag
+    char *buffer = (char*)malloc(theUserSuppliedTag.size());
+    memcpy(buffer, (void *)(theUserSuppliedTag.data()), theUserSuppliedTag.size()); // Copy data to buffer
+    args->Tag->Data = IntPtr(buffer);
     args->Time = double::Parse(gcnew String(theTime.toString().c_str()));// Decode Time
     args->RetractionHandle = gcnew MessageRetraction(toULong(theHandle.toString()));// DeCode RetractionHandle
 
     // Update Nom
     om->Objects.erase(args->ObjectInstance->Handle);
-    args->TraceMessage = "The object (handle: " + args->ObjectInstance->Handle + ") is removed. Tag: " + args->ObjectInstance->Tag + ". Event Timestamp = " + args->Time + ". Retraction handle = " + gcnew String(theHandle.toString().c_str());
+    args->TraceMessage = "The object (handle: " + args->ObjectInstance->Handle + ") is removed. Event Timestamp = " + args->Time + ". Retraction handle = " + gcnew String(theHandle.toString().c_str());
     if (theRemoveInfo.hasProducingFederate)
     {
       args->SupplementalRemoveInfo->HasProducingFederate = true;
@@ -1131,45 +1106,17 @@ void FdAmb_Hla1516e::removeObjectInstance(
 #pragma endregion
 };
 
-/*
-// 6.15 - Remove Object Instance
-void FdAmb_Hla1516e::removeObjectInstance(rti1516e::ObjectInstanceHandle theObject, rti1516e::VariableLengthData const & theUserSuppliedTag, rti1516e::OrderType sentOrder, rti1516e::SupplementalRemoveInfo theRemoveInfo)
-throw (rti1516e::FederateInternalError) {
-try {
-// Create Event Arguments
-HlaObjectEventArgs ^args = gcnew HlaObjectEventArgs();
-args->ObjectHandle = toULong(theObject.toString());
-//args->Tag = gcnew String(theTag);
-// Decode Time
-RTIfedTime time(theTime);
-args->Time = time.getTime();
-// DeCode RetractionHandle
-args->RetractionHandle->SetRtiRetractionHandle(&theHandle);
-
-args->TraceMessage = "The object (handle: " + theObject + ") is removed." + "Event Timestamp = " + args->Time + ". Event Retraction Handle (Serial No) = " + args->RetractionHandle->SerialNumber;
-args->EventType = RaconEventTypes::ObjectRemoved;
-// Add to the Event Queue
-wrapper->FdAmbEventQueue->Enqueue(args);
-}
-catch (FederateInternalError& e) {
-MessageBox::Show("MSG-(FederateInternalError - discoverObjectInstance):" + Environment::NewLine + gcnew String(e.what().c_str()) + Environment::NewLine, "FdAmb_Hla1516e", MessageBoxButtons::OK, MessageBoxIcon::Error);
-}
-catch (System::Exception^ e) {
-MessageBox::Show("MSG-(discoverObjectInstance):" + Environment::NewLine + e->ToString() + Environment::NewLine, "FdAmb_Hla1516e", MessageBoxButtons::OK, MessageBoxIcon::Warning);
-}
-};
-*/
-
 // 6.20 - Provide Attribute Value Update
-void FdAmb_Hla1516e::provideAttributeValueUpdate(
-  rti1516e::ObjectInstanceHandle theObject,
-  rti1516e::AttributeHandleSet const & theAttributes,
-  rti1516e::VariableLengthData const & theUserSuppliedTag)
+void FdAmb_Hla1516e::provideAttributeValueUpdate(rti1516e::ObjectInstanceHandle theObject, rti1516e::AttributeHandleSet const & theAttributes, rti1516e::VariableLengthData const & theUserSuppliedTag)
   throw (rti1516e::FederateInternalError) {
   try {
     // Create Event Arguments
     HlaObjectEventArgs^ args = gcnew HlaObjectEventArgs();
     args->ObjectInstance->Handle = toULong(theObject.toString());
+    // Tag
+    char *buffer = (char*)malloc(theUserSuppliedTag.size());
+    memcpy(buffer, (void *)(theUserSuppliedTag.data()), theUserSuppliedTag.size()); // Copy data to buffer
+    args->Tag->Data = IntPtr(buffer);
 
     String^ attributeString;
     AttributeHandleSet::const_iterator iterator;
@@ -1200,9 +1147,7 @@ void FdAmb_Hla1516e::provideAttributeValueUpdate(
 
 // 6.21 - turnUpdatesOnForObjectInstance
 //  Turn Updates On/Off is missing. !!! Not supported by OpenRti 0.8.0
-void FdAmb_Hla1516e::turnUpdatesOnForObjectInstance(
-  rti1516e::ObjectInstanceHandle theObject,
-  rti1516e::AttributeHandleSet const & theAttributes)
+void FdAmb_Hla1516e::turnUpdatesOnForObjectInstance(rti1516e::ObjectInstanceHandle theObject, rti1516e::AttributeHandleSet const & theAttributes)
   throw (
     rti1516e::FederateInternalError) {
   try {
@@ -1237,10 +1182,7 @@ void FdAmb_Hla1516e::turnUpdatesOnForObjectInstance(
 #pragma endregion
 };
 // updateRateDesignator - not implemented
-void FdAmb_Hla1516e::turnUpdatesOnForObjectInstance(
-  rti1516e::ObjectInstanceHandle theObject,
-  rti1516e::AttributeHandleSet const & theAttributes,
-  std::wstring const & updateRateDesignator)
+void FdAmb_Hla1516e::turnUpdatesOnForObjectInstance(rti1516e::ObjectInstanceHandle theObject, rti1516e::AttributeHandleSet const & theAttributes, std::wstring const & updateRateDesignator)
   throw (
     rti1516e::FederateInternalError) {
   try {
@@ -1369,8 +1311,7 @@ throw (rti1516e::FederateInternalError) {
 
 #pragma region Ownership Management Services
 // 7.4 - requestAttributeOwnershipAssumption
-void FdAmb_Hla1516e::requestAttributeOwnershipAssumption(rti1516e::ObjectInstanceHandle theObject,
-  rti1516e::AttributeHandleSet const & offeredAttributes,
+void FdAmb_Hla1516e::requestAttributeOwnershipAssumption(rti1516e::ObjectInstanceHandle theObject, rti1516e::AttributeHandleSet const & offeredAttributes,
   rti1516e::VariableLengthData const & theUserSuppliedTag)
   throw (rti1516e::FederateInternalError)
 {
@@ -1378,7 +1319,10 @@ void FdAmb_Hla1516e::requestAttributeOwnershipAssumption(rti1516e::ObjectInstanc
     // Create Event Arguments
     HlaOwnershipManagementEventArgs ^args = gcnew HlaOwnershipManagementEventArgs();
     args->ObjectHandle = toULong(theObject.toString());
-    args->Tag = gcnew String((char*)(theUserSuppliedTag.data()));
+    // Tag
+    char *buffer = (char*)malloc(theUserSuppliedTag.size());
+    memcpy(buffer, (void *)(theUserSuppliedTag.data()), theUserSuppliedTag.size()); // Copy data to buffer
+    args->Tag->Data = IntPtr(buffer);
     String^ attributeString;
     AttributeHandleSet::const_iterator iterator;
     for (iterator = offeredAttributes.begin(); iterator != offeredAttributes.end(); iterator++)
@@ -1443,9 +1387,7 @@ throw (rti1516e::FederateInternalError)
 };
 
 // 7.7 - attributeOwnershipAcquisitionNotification
-void FdAmb_Hla1516e::attributeOwnershipAcquisitionNotification(rti1516e::ObjectInstanceHandle theObject,
-  rti1516e::AttributeHandleSet const & securedAttributes,
-  rti1516e::VariableLengthData const & theUserSuppliedTag)
+void FdAmb_Hla1516e::attributeOwnershipAcquisitionNotification(rti1516e::ObjectInstanceHandle theObject, rti1516e::AttributeHandleSet const & securedAttributes, rti1516e::VariableLengthData const & theUserSuppliedTag)
   throw (rti1516e::FederateInternalError)
 {
   try {
@@ -1461,6 +1403,10 @@ void FdAmb_Hla1516e::attributeOwnershipAcquisitionNotification(rti1516e::ObjectI
       args->AttributeSet->Add(attr);
       attributeString += attr->Handle + ",";
     }
+    // Tag
+    char *buffer = (char*)malloc(theUserSuppliedTag.size());
+    memcpy(buffer, (void *)(theUserSuppliedTag.data()), theUserSuppliedTag.size()); // Copy data to buffer
+    args->Tag->Data = IntPtr(buffer);
 
     args->TraceMessage = "The ownership of a set of attributes (handles: {" + attributeString + "}) of the object (" + args->ObjectHandle + ") has been acquired.";
     args->EventType = RaconEventTypes::AttributeOwnershipAcquisitionNotified;
@@ -1480,8 +1426,7 @@ void FdAmb_Hla1516e::attributeOwnershipAcquisitionNotification(rti1516e::ObjectI
 };
 
 // 7.10 - attributeOwnershipUnavailable
-void FdAmb_Hla1516e::attributeOwnershipUnavailable(rti1516e::ObjectInstanceHandle theObject,
-  rti1516e::AttributeHandleSet const & theAttributes)
+void FdAmb_Hla1516e::attributeOwnershipUnavailable(rti1516e::ObjectInstanceHandle theObject, rti1516e::AttributeHandleSet const & theAttributes)
   throw (
     rti1516e::FederateInternalError)
 {
@@ -1517,9 +1462,7 @@ void FdAmb_Hla1516e::attributeOwnershipUnavailable(rti1516e::ObjectInstanceHandl
 };
 
 // 7.11 - requestAttributeOwnershipRelease
-void FdAmb_Hla1516e::requestAttributeOwnershipRelease(rti1516e::ObjectInstanceHandle theObject,
-  rti1516e::AttributeHandleSet const & candidateAttributes,
-  rti1516e::VariableLengthData const & theUserSuppliedTag)
+void FdAmb_Hla1516e::requestAttributeOwnershipRelease(rti1516e::ObjectInstanceHandle theObject, rti1516e::AttributeHandleSet const & candidateAttributes, rti1516e::VariableLengthData const & theUserSuppliedTag)
   throw (RTI::FederateInternalError) {
   try {
     // Create Event Arguments
@@ -1534,6 +1477,10 @@ void FdAmb_Hla1516e::requestAttributeOwnershipRelease(rti1516e::ObjectInstanceHa
       args->AttributeSet->Add(attr);
       attributeString += attr->Handle + ",";
     }
+    // Tag
+    char *buffer = (char*)malloc(theUserSuppliedTag.size());
+    memcpy(buffer, (void *)(theUserSuppliedTag.data()), theUserSuppliedTag.size()); // Copy data to buffer
+    args->Tag->Data = IntPtr(buffer);
 
     args->TraceMessage = "A request for attribute ownership release for candidate attributes (handles: {" + attributeString + "}) of the object (" + args->ObjectHandle + ") is received.";
     args->EventType = RaconEventTypes::AttributeOwnershipReleaseRequested;
@@ -1589,9 +1536,7 @@ void FdAmb_Hla1516e::confirmAttributeOwnershipAcquisitionCancellation(rti1516e::
 };
 
 // 7.18 - informAttributeOwnership
-void FdAmb_Hla1516e::informAttributeOwnership(rti1516e::ObjectInstanceHandle theObject,
-  rti1516e::AttributeHandle theAttribute,
-  rti1516e::FederateHandle theOwner)
+void FdAmb_Hla1516e::informAttributeOwnership(rti1516e::ObjectInstanceHandle theObject, rti1516e::AttributeHandle theAttribute, rti1516e::FederateHandle theOwner)
   throw (
     rti1516e::FederateInternalError)
 {
@@ -1624,8 +1569,7 @@ void FdAmb_Hla1516e::informAttributeOwnership(rti1516e::ObjectInstanceHandle the
 };
 
 // 7.18 - attributeIsNotOwned
-void FdAmb_Hla1516e::attributeIsNotOwned(rti1516e::ObjectInstanceHandle theObject,
-  rti1516e::AttributeHandle theAttribute)
+void FdAmb_Hla1516e::attributeIsNotOwned(rti1516e::ObjectInstanceHandle theObject, rti1516e::AttributeHandle theAttribute)
   throw (
     rti1516e::FederateInternalError)
 {
@@ -1656,8 +1600,7 @@ void FdAmb_Hla1516e::attributeIsNotOwned(rti1516e::ObjectInstanceHandle theObjec
 
 // 7.18 - attributeOwnedByRTI
 // Typically a MOM object or internal RTI object
-void FdAmb_Hla1516e::attributeIsOwnedByRTI(rti1516e::ObjectInstanceHandle theObject,
-  rti1516e::AttributeHandle theAttribute)
+void FdAmb_Hla1516e::attributeIsOwnedByRTI(rti1516e::ObjectInstanceHandle theObject, rti1516e::AttributeHandle theAttribute)
   throw (
     rti1516e::FederateInternalError)
 {

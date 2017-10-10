@@ -47,6 +47,7 @@
     <Compile Include="HlaDimension.cs" />
     <Compile Include="Helpers.cs" />
     <Compile Include="CallbackManager.cs" />
+    <Compile Include="VariablelengthData.cs" />
     <Compile Include="HlaRegion.cs" />
     <Compile Include="SupplementalInfo.cs" />
     <Compile Include="HlaProperty.cs" />

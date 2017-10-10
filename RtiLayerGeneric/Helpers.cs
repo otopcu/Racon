@@ -19,6 +19,9 @@ You should have received a copy of the GNU Lesser General Public License
 along with this program.If not, see <http://www.gnu.org/licenses/>.
 */
 
+using System;
+using System.Runtime.InteropServices;
+
 namespace Racon
 {
   /// <summary>
@@ -105,4 +108,83 @@ namespace Racon
     OFF = 5
   };
 
+  /// <summary>
+  /// Encoder for data exchange through the RTI.
+  /// </summary>
+  public static class Encoder
+  {
+    /// <summary>
+    /// Data Marshaling: encodes data and gives its size
+    /// 
+    /// Supported Data types: String, DateTime (non-blittable), Value types (Only Blittables) 
+    /// Value Types: (1) Structs (2) Enumerations (as System.Int32)
+    /// Structs: (1) Numeric Types (2) bool (System.Boolean) (3) User-defined Structs
+    /// Numeric Types: (1) Integral types (2) Floating-point Types (3) decimal (System.Decimal)
+    /// Integral Types: sbyte, byte, char, short, ushort, int, uint, long, ulong 
+    /// Floating-point Types: float (System.Single), double (System.Double) 
+    /// </summary>
+    public static IntPtr Encode<_type>(_type value, out int size)
+    {
+      IntPtr data;
+
+      if (typeof(_type) == typeof(string))
+      {
+        data = Marshal.StringToHGlobalAnsi((value as string));
+        size = (value as string).Length + 1;
+      }
+      else if (typeof(_type) == typeof(DateTime))
+      {
+        size = ((DateTime)(object)value).ToString("o").Length + 1;
+        return Marshal.StringToHGlobalAnsi(((DateTime)(object)value).ToString("o"));
+      }
+      else
+      {
+        Type outputType = typeof(_type).IsEnum ? Enum.GetUnderlyingType(typeof(_type)) : typeof(_type);
+        int outBufferSize = Marshal.SizeOf(typeof(_type));
+        data = Marshal.AllocHGlobal(outBufferSize);
+        Marshal.StructureToPtr(value, data, false);
+        size = outBufferSize;
+      }
+      return data;
+    }
+
+    /// <summary>
+    /// Decodes the data
+    /// </summary>
+    public static _type Decode<_type>(IntPtr value)
+    {
+      try
+      {
+        _type data;
+        // String
+        if (typeof(_type) == typeof(string))
+        {
+          data = (_type)Convert.ChangeType(Marshal.PtrToStringAnsi(value), typeof(_type));
+        }
+        // DateTime
+        else if (typeof(_type) == typeof(DateTime))
+        {
+          data = (_type)Convert.ChangeType(DateTime.Parse(Marshal.PtrToStringAnsi(value)), typeof(_type));
+        }
+        // Value Types (only blittables)
+        else
+        {
+          Type outputType = typeof(_type).IsEnum ? Enum.GetUnderlyingType(typeof(_type)) : typeof(_type);
+          data = (_type)(Marshal.PtrToStructure(value, outputType));
+        }
+        return data;
+      }
+      catch (ArgumentException)
+      {
+        //System.Diagnostics.Debug.WriteLine("Racon-ArgumentException (GetParameterValue): Data type (" + typeof(_type) + ") for decoding is not supported in the current version. Data type must be blittable. For enumerations, cast it to uint." + Environment.NewLine);
+        throw;
+      }
+      catch (InvalidCastException)
+      {
+        //MessageBox.Show("Racon-InvalidCastException (GetParameterValue): Data type (" + typeof(_type) + ") for decoding is not supported in the current version. Contact Racon support site" + Environment.NewLine, "Racon-HlaInteraction.h", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        throw;
+      }
+    }
+
+  }
 }

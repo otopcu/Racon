@@ -994,14 +994,14 @@ bool RtiAmb_Hla1516e::unsubscribeInteractionClass(HlaInteractionClass ^ic) {
 #pragma region Object Management
 
 // 6.10 - Update Attribute Values
-bool RtiAmb_Hla1516e::updateAttributeValues(HlaObject ^object) {
+bool RtiAmb_Hla1516e::updateAttributeValues(HlaObject ^object, VariableLengthDataWrapper^ userTag) {
   try {
     String^ msg = "";
     // Pack attribute values
     rti1516e::AttributeHandleValueMap attributes;
     // Create Tag
-    char* tagData = (char *)Marshal::StringToHGlobalAnsi(object->Tag).ToPointer();
-    VariableLengthData tag(tagData, ((strlen(tagData) + 1) * sizeof(char)));
+    VariableLengthData tag(userTag->Data.ToPointer(), userTag->Size);
+
     for each (HlaAttribute^ var in object->Attributes)
     {
       char* _pVal = (char*)var->Value.ToPointer();
@@ -1015,7 +1015,7 @@ bool RtiAmb_Hla1516e::updateAttributeValues(HlaObject ^object) {
     // Update attribute values using RTI
     rti1516e::ObjectInstanceHandle ohandle = nom->Objects[object->Handle];
     (void)rti->updateAttributeValues(ohandle, attributes, tag);
-    msg = "Attribute values of object instance (handle: " + object->Handle + ") are updated.";
+    msg = "Attribute values of object instance (handle: " + object->Handle + ") are updated. Reason: " + userTag->ToString();
     this->OnRTIEventOccured(gcnew RaconEventArgs(msg));
     return true;
   }
@@ -1060,13 +1060,12 @@ bool RtiAmb_Hla1516e::updateAttributeValues(HlaObject ^object) {
 };
 
 // 6.10 - Update Attribute Values with Timestamp
-MessageRetraction^ RtiAmb_Hla1516e::updateAttributeValues(HlaObject ^object, Double timestamp) {
+MessageRetraction^ RtiAmb_Hla1516e::updateAttributeValues(HlaObject ^object, VariableLengthDataWrapper^ userTag, Double timestamp) {
   try {
     // Pack attribute values
     rti1516e::AttributeHandleValueMap attributes;
     // Create Tag
-    char* tagData = (char *)Marshal::StringToHGlobalAnsi(object->Tag).ToPointer();
-    VariableLengthData tag(tagData, ((strlen(tagData) + 1) * sizeof(char)));
+    VariableLengthData tag(userTag->Data.ToPointer(), userTag->Size);
     for each (HlaAttribute^ var in object->Attributes)
     {
       char* _pVal = (char*)var->Value.ToPointer();
@@ -1084,60 +1083,59 @@ MessageRetraction^ RtiAmb_Hla1516e::updateAttributeValues(HlaObject ^object, Dou
     MessageRetraction^ retraction = gcnew MessageRetraction(toULong(mrh.toString()));
     nom->RetractionHandles[retraction->Handle] = mrh;
     // Report
-    String^ msg = "Attribute values of object instance (handle: " + object->Handle + ") are updated." + " Retraction handle = " + gcnew String(mrh.toString().c_str());
+    String^ msg = "Attribute values of object instance (handle: " + object->Handle + ") are updated." + " Retraction handle = " + gcnew String(mrh.toString().c_str())+ ". Reason: " + userTag->ToString();
     this->OnRTIEventOccured(gcnew RaconEventArgs(msg));
     return retraction;
   }
 #pragma region exceptions
   catch (ObjectInstanceNotKnown& e) {
-    String^ msg = "RtiAmb_Hla1516e-(ObjectInstanceNotKnown - updateAttributeValues). Reason: " + gcnew String(e.what().c_str());
+    String^ msg = "RtiAmb_Hla1516e-(ObjectInstanceNotKnown - updateAttributeValues2). Reason: " + gcnew String(e.what().c_str());
     this->OnRTIEventOccured(gcnew RaconEventArgs(msg));
   }
   catch (AttributeNotDefined& e) {
-    String^ msg = "RtiAmb_Hla1516e-(AttributeNotDefined - updateAttributeValues). Reason: " + gcnew String(e.what().c_str());
+    String^ msg = "RtiAmb_Hla1516e-(AttributeNotDefined - updateAttributeValues2). Reason: " + gcnew String(e.what().c_str());
     this->OnRTIEventOccured(gcnew RaconEventArgs(msg));
   }
   catch (AttributeNotOwned& e) {
-    String^ msg = "RtiAmb_Hla1516e-(AttributeNotOwned - updateAttributeValues). Reason: " + gcnew String(e.what().c_str());
+    String^ msg = "RtiAmb_Hla1516e-(AttributeNotOwned - updateAttributeValues2). Reason: " + gcnew String(e.what().c_str());
     this->OnRTIEventOccured(gcnew RaconEventArgs(msg));
   }
   catch (FederateNotExecutionMember& e) {
-    String^ msg = "RtiAmb_Hla1516e-(FederateNotExecutionMember - updateAttributeValues).Reason: " + gcnew String(e.what().c_str());
+    String^ msg = "RtiAmb_Hla1516e-(FederateNotExecutionMember - updateAttributeValues2).Reason: " + gcnew String(e.what().c_str());
     this->OnRTIEventOccured(gcnew RaconEventArgs(msg));
   }
   catch (SaveInProgress& e) {
-    String^ msg = "RtiAmb_Hla1516e-(SaveInProgress - updateAttributeValues). Reason: " + gcnew String(e.what().c_str());
+    String^ msg = "RtiAmb_Hla1516e-(SaveInProgress - updateAttributeValues2). Reason: " + gcnew String(e.what().c_str());
     this->OnRTIEventOccured(gcnew RaconEventArgs(msg));
   }
   catch (RestoreInProgress& e) {
-    String^ msg = "RtiAmb_Hla1516e-(RestoreInProgress - updateAttributeValues). Reason: " + gcnew String(e.what().c_str());
+    String^ msg = "RtiAmb_Hla1516e-(RestoreInProgress - updateAttributeValues2). Reason: " + gcnew String(e.what().c_str());
     this->OnRTIEventOccured(gcnew RaconEventArgs(msg));
   }
   catch (NotConnected& e) {
-    String^ msg = "RtiAmb_Hla1516e-(NotConnected - updateAttributeValues). Reason: " + gcnew String(e.what().c_str());
+    String^ msg = "RtiAmb_Hla1516e-(NotConnected - updateAttributeValues2). Reason: " + gcnew String(e.what().c_str());
     this->OnNotConnected(gcnew RaconEventArgs(msg));
   }
   catch (RTIinternalError& e) {
-    String^ msg = "RtiAmb_Hla1516e-(RTIinternalError - updateAttributeValues). Reason: " + gcnew String(e.what().c_str());
+    String^ msg = "RtiAmb_Hla1516e-(RTIinternalError - updateAttributeValues2). Reason: " + gcnew String(e.what().c_str());
     this->OnRTIEventOccured(gcnew RaconEventArgs(msg, LogLevel::ERROR));
   }
   catch (System::Exception^ e) {
-    String^ msg = "RtiAmb_Hla1516e-(Exception - updateAttributeValues). Reason: " + gcnew String(e->ToString());
+    String^ msg = "RtiAmb_Hla1516e-(Exception - updateAttributeValues2). Reason: " + gcnew String(e->ToString());
     this->OnRTIEventOccured(gcnew RaconEventArgs(msg, LogLevel::ERROR));
   }
 #pragma endregion
 };
 
 // 6.12 - Send Interaction
-bool RtiAmb_Hla1516e::sendInteraction(HlaInteraction ^interaction) {
+bool RtiAmb_Hla1516e::sendInteraction(HlaInteraction ^interaction, VariableLengthDataWrapper^ userTag) {
   try {
     String ^msg = "";
     unsigned int chandle = interaction->ClassHandle;
     rti1516e::InteractionClassHandle handle = nom->InteractionClasses[chandle];
 
     // Create Tag
-    char* tagData = (char *)Marshal::StringToHGlobalAnsi(interaction->Tag).ToPointer();
-    VariableLengthData tag(tagData, ((strlen(tagData) + 1) * sizeof(char)));
+    VariableLengthData tag(userTag->Data.ToPointer(), userTag->Size);
     // Pack parameter values
     rti1516e::ParameterHandleValueMap Parameters;
     for each (HlaParameter^ var in interaction->Parameters)
@@ -1150,52 +1148,52 @@ bool RtiAmb_Hla1516e::sendInteraction(HlaInteraction ^interaction) {
     }
 
     rti->sendInteraction(handle, Parameters, tag);
-    msg += "Interaction (handle: " + interaction->ClassHandle + ") is sent.";
+    msg += "Interaction (handle: " + interaction->ClassHandle + ") is sent. Reason: " + userTag->ToString();
     this->OnRTIEventOccured(gcnew RaconEventArgs(msg));
     return true;
   }
 #pragma region exceptions
   catch (InteractionClassNotPublished &e) {
-    String^ msg = "RtiAmb_Hla1516e-(InteractionClassNotPublished - sendInteraction2): " + gcnew String(e.what().c_str());
+    String^ msg = "RtiAmb_Hla1516e-(InteractionClassNotPublished - sendInteraction): " + gcnew String(e.what().c_str());
     this->OnRTIEventOccured(gcnew RaconEventArgs(msg, LogLevel::WARN));
     return false;
   }
   catch (InteractionParameterNotDefined &e) {
-    String^ msg = "RtiAmb_Hla1516e-(InteractionParameterNotDefined - sendInteraction2): " + gcnew String(e.what().c_str());
+    String^ msg = "RtiAmb_Hla1516e-(InteractionParameterNotDefined - sendInteraction): " + gcnew String(e.what().c_str());
     this->OnRTIEventOccured(gcnew RaconEventArgs(msg, LogLevel::WARN));
     return false;
   }
   catch (InteractionClassNotDefined &e) {
-    String^ msg = "RtiAmb_Hla1516e-(InteractionClassNotDefined - sendInteraction2): " + gcnew String(e.what().c_str());
+    String^ msg = "RtiAmb_Hla1516e-(InteractionClassNotDefined - sendInteraction): " + gcnew String(e.what().c_str());
     this->OnRTIEventOccured(gcnew RaconEventArgs(msg, LogLevel::WARN));
     return false;
   }
   catch (SaveInProgress& e) {
-    String^ msg = "RtiAmb_Hla1516e-(SaveInProgress - sendInteraction2): " + gcnew String(e.what().c_str());
+    String^ msg = "RtiAmb_Hla1516e-(SaveInProgress - sendInteraction): " + gcnew String(e.what().c_str());
     this->OnRTIEventOccured(gcnew RaconEventArgs(msg, LogLevel::WARN));
     return false;
   }
   catch (RestoreInProgress& e) {
-    String^ msg = "RtiAmb_Hla1516e-(RestoreInProgress - sendInteraction2): " + gcnew String(e.what().c_str());
+    String^ msg = "RtiAmb_Hla1516e-(RestoreInProgress - sendInteraction): " + gcnew String(e.what().c_str());
     this->OnRTIEventOccured(gcnew RaconEventArgs(msg, LogLevel::WARN));
     return false;
   }
   catch (FederateNotExecutionMember& e) {
-    String^ msg = "RtiAmb_Hla1516e-(FederateNotExecutionMember - sendInteraction2): " + gcnew String(e.what().c_str());
+    String^ msg = "RtiAmb_Hla1516e-(FederateNotExecutionMember - sendInteraction): " + gcnew String(e.what().c_str());
     this->OnRTIEventOccured(gcnew RaconEventArgs(msg, LogLevel::WARN));
     return false;
   }
   catch (NotConnected& e) {
-    String^ msg = "RtiAmb_Hla1516e-(NotConnected - sendInteraction2). Reason: " + gcnew String(e.what().c_str());
+    String^ msg = "RtiAmb_Hla1516e-(NotConnected - sendInteraction). Reason: " + gcnew String(e.what().c_str());
     this->OnNotConnected(gcnew RaconEventArgs(msg));
   }
   catch (RTIinternalError& e) {
-    String^ msg = "RtiAmb_Hla1516e-(RTIinternalError - sendInteraction2). Reason: " + gcnew String(e.what().c_str());
+    String^ msg = "RtiAmb_Hla1516e-(RTIinternalError - sendInteraction). Reason: " + gcnew String(e.what().c_str());
     this->OnRTIEventOccured(gcnew RaconEventArgs(msg, LogLevel::ERROR));
     return false;
   }
   catch (System::Exception^ e) {
-    String^ msg = "RtiAmb_Hla1516e-(Exception - sendInteraction2). Reason: " + gcnew String(e->ToString());
+    String^ msg = "RtiAmb_Hla1516e-(Exception - sendInteraction). Reason: " + gcnew String(e->ToString());
     this->OnRTIEventOccured(gcnew RaconEventArgs(msg, LogLevel::ERROR));
     return false;
   }
@@ -1203,15 +1201,14 @@ bool RtiAmb_Hla1516e::sendInteraction(HlaInteraction ^interaction) {
 };
 
 // 6.12 - Send Interaction with Timestamp
-MessageRetraction^ RtiAmb_Hla1516e::sendInteraction(HlaInteraction ^interaction, Double time) {
+MessageRetraction^ RtiAmb_Hla1516e::sendInteraction(HlaInteraction ^interaction, VariableLengthDataWrapper^ userTag, Double time) {
   try {
     String ^msg = "";
     unsigned int chandle = interaction->ClassHandle;
     rti1516e::InteractionClassHandle handle = nom->InteractionClasses[chandle];
 
     // Create Tag
-    char* tagData = (char *)Marshal::StringToHGlobalAnsi(interaction->Tag).ToPointer();
-    VariableLengthData tag(tagData, ((strlen(tagData) + 1) * sizeof(char)));
+    VariableLengthData tag(userTag->Data.ToPointer(), userTag->Size);
     // Create timestamp
     rti1516e::HLAfloat64Time timestamp(time);
     // Pack parameter values
@@ -1228,7 +1225,7 @@ MessageRetraction^ RtiAmb_Hla1516e::sendInteraction(HlaInteraction ^interaction,
     MessageRetraction^ retraction = gcnew MessageRetraction(toULong(mrh.toString()));
     nom->RetractionHandles[retraction->Handle] = mrh;
     // Report
-    msg += "Interaction (handle: " + interaction->ClassHandle + ") is sent with timestamp: " + timestamp.getTime() + ". Retraction handle: " + gcnew String(mrh.toString().c_str());
+    msg += "Interaction (handle: " + interaction->ClassHandle + ") is sent with timestamp: " + timestamp.getTime() + ". Retraction handle: " + gcnew String(mrh.toString().c_str()) + ". Reason: " + userTag->ToString();
     this->OnRTIEventOccured(gcnew RaconEventArgs(msg));
     return retraction;
   }
@@ -1277,19 +1274,18 @@ MessageRetraction^ RtiAmb_Hla1516e::sendInteraction(HlaInteraction ^interaction,
 };
 
 // 6.14 - Delete an Object Instance
-bool RtiAmb_Hla1516e::deleteObjectInstance(HlaObject ^obj) {
+bool RtiAmb_Hla1516e::deleteObjectInstance(HlaObject ^obj, VariableLengthDataWrapper^ userTag) {
   try {
     // Get handle
     rti1516e::ObjectInstanceHandle ohandle = nom->Objects[obj->Handle];
     // Create Tag
-    char* tagData = (char *)Marshal::StringToHGlobalAnsi(obj->Tag).ToPointer();
-    VariableLengthData tag(tagData, ((strlen(tagData) + 1) * sizeof(char)));
+    VariableLengthData tag(userTag->Data.ToPointer(), userTag->Size);
     // Delete object
     rti->deleteObjectInstance(ohandle, tag);
     // Update Nom
     nom->Objects.erase(obj->Handle);
     // Report
-    String^ msg = "Object (handle: " + obj->Handle + ") is deleted by this federate";
+    String^ msg = "Object (handle: " + obj->Handle + ") is deleted by this federate. Reason: " + userTag->ToString();
     this->OnRTIEventOccured(gcnew RaconEventArgs(msg));
     return true;
   }
@@ -1330,16 +1326,14 @@ bool RtiAmb_Hla1516e::deleteObjectInstance(HlaObject ^obj) {
 };
 
 // 6.14 - Delete an Object Instance with Timestamp
-MessageRetraction^ RtiAmb_Hla1516e::deleteObjectInstance(HlaObject ^obj, Double time) {
+MessageRetraction^ RtiAmb_Hla1516e::deleteObjectInstance(HlaObject ^obj, VariableLengthDataWrapper^ userTag, Double theTime) {
   try {
     // Get handle
     rti1516e::ObjectInstanceHandle ohandle = nom->Objects[obj->Handle];
     // Create Tag
-    char* tagData = (char *)Marshal::StringToHGlobalAnsi(obj->Tag).ToPointer();
-    VariableLengthData tag(tagData, ((strlen(tagData) + 1) * sizeof(char)));
+    VariableLengthData tag(userTag->Data.ToPointer(), userTag->Size);
     // Create logical timestamp
-    HLAfloat64Time timestamp(time);
-
+    HLAfloat64Time timestamp(theTime);
     // Delete object
     rti1516e::MessageRetractionHandle mrh = rti->deleteObjectInstance(ohandle, tag, timestamp);
     // Update Nom
@@ -1349,11 +1343,15 @@ MessageRetraction^ RtiAmb_Hla1516e::deleteObjectInstance(HlaObject ^obj, Double 
     MessageRetraction^ retraction = gcnew MessageRetraction(0);
     nom->RetractionHandles[retraction->Handle] = mrh;
     // Report
-    String^ msg = "Object (handle: " + obj->Handle + ") is deleted by this federate" + " Retraction handle = NOT supported by OpenRTI. " + gcnew String(mrh.toString().c_str());
+    String^ msg = "Object (handle: " + obj->Handle + ") is deleted by this federate. Reason: " + userTag->ToString() + ". Retraction handle: " + gcnew String(mrh.toString().c_str());
     this->OnRTIEventOccured(gcnew RaconEventArgs(msg));
     return retraction;
   }
 #pragma region exceptions
+  catch (InvalidLogicalTime& e) {
+    String^ msg = "RtiAmb_Hla1516e-(InvalidLogicalTime - deleteObjectInstance2). Reason: " + gcnew String(e.what().c_str());
+    this->OnRTIEventOccured(gcnew RaconEventArgs(msg));
+  }
   catch (DeletePrivilegeNotHeld& e) {
     String^ msg = "RtiAmb_Hla1516e-(DeletePrivilegeNotHeld - deleteObjectInstance2). Reason: " + gcnew String(e.what().c_str());
     this->OnRTIEventOccured(gcnew RaconEventArgs(msg));
@@ -1390,7 +1388,7 @@ MessageRetraction^ RtiAmb_Hla1516e::deleteObjectInstance(HlaObject ^obj, Double 
 };
 
 // 6.19 - Request Attribute Value Update - oc
-bool RtiAmb_Hla1516e::requestAttributeValueUpdate(HlaObjectClass ^oc, List<HlaAttribute^>^ attributes) {
+bool RtiAmb_Hla1516e::requestAttributeValueUpdate(HlaObjectClass ^oc, List<HlaAttribute^>^ attributes, VariableLengthDataWrapper^ userTag) {
   try {
     // Create Attribute Handle Set 
     rti1516e::AttributeHandleSet ahs;
@@ -1401,8 +1399,7 @@ bool RtiAmb_Hla1516e::requestAttributeValueUpdate(HlaObjectClass ^oc, List<HlaAt
 
     rti1516e::ObjectClassHandle ocHandle = nom->ObjectClasses[oc->Handle];
     // Create Tag
-    char* tagData = (char *)Marshal::StringToHGlobalAnsi(oc->Tag).ToPointer();
-    VariableLengthData tag(tagData, ((strlen(tagData) + 1) * sizeof(char)));
+    VariableLengthData tag(userTag->Data.ToPointer(), userTag->Size);
 
     this->rti->requestAttributeValueUpdate(ocHandle, ahs, tag);
 
@@ -1448,7 +1445,7 @@ bool RtiAmb_Hla1516e::requestAttributeValueUpdate(HlaObjectClass ^oc, List<HlaAt
 };
 
 // 6.19 - Request Attribute Value Update - object
-bool RtiAmb_Hla1516e::requestAttributeValueUpdate(HlaObject ^obj, List<HlaAttribute^>^ attributes) {
+bool RtiAmb_Hla1516e::requestAttributeValueUpdate(HlaObject ^obj, List<HlaAttribute^>^ attributes, VariableLengthDataWrapper^ userTag) {
   try {
     // Create Attribute Handle Set 
     rti1516e::AttributeHandleSet ahs;
@@ -1459,8 +1456,7 @@ bool RtiAmb_Hla1516e::requestAttributeValueUpdate(HlaObject ^obj, List<HlaAttrib
 
     rti1516e::ObjectInstanceHandle oHandle = nom->Objects[obj->Handle];
     // Create Tag
-    char* tagData = (char *)Marshal::StringToHGlobalAnsi(obj->Tag).ToPointer();
-    VariableLengthData tag(tagData, ((strlen(tagData) + 1) * sizeof(char)));
+    VariableLengthData tag(userTag->Data.ToPointer(), userTag->Size);
 
     this->rti->requestAttributeValueUpdate(oHandle, ahs, tag);
 
@@ -1566,7 +1562,7 @@ bool RtiAmb_Hla1516e::unconditionalAttributeOwnershipDivestiture(HlaObject ^obje
 };
 
 // 7.3 - negotiatedAttributeOwnershipDivestiture
-bool RtiAmb_Hla1516e::negotiatedAttributeOwnershipDivestiture(HlaObject ^object, List<HlaAttribute^>^ attributes, String^ tag) {
+bool RtiAmb_Hla1516e::negotiatedAttributeOwnershipDivestiture(HlaObject ^object, List<HlaAttribute^>^ attributes, VariableLengthDataWrapper^ userTag) {
   try {
     // Create Attribute Handle Set 
     rti1516e::AttributeHandleSet _ahs;
@@ -1574,12 +1570,11 @@ bool RtiAmb_Hla1516e::negotiatedAttributeOwnershipDivestiture(HlaObject ^object,
       rti1516e::AttributeHandle handle = nom->Attributes[attributes[j]->Handle];
       _ahs.insert(handle);
     }
-    // tag
-    char const * _pVal = (char*)Marshal::StringToHGlobalAnsi(tag).ToPointer();
-    rti1516e::VariableLengthData _tag(_pVal, ((strlen(_pVal) + 1) * sizeof(char)));
+    // Create Tag
+    VariableLengthData tag(userTag->Data.ToPointer(), userTag->Size);
 
     rti1516e::ObjectInstanceHandle _oHandle = nom->Objects[object->Handle];
-    (void)rti->negotiatedAttributeOwnershipDivestiture(_oHandle, _ahs, _tag);
+    (void)rti->negotiatedAttributeOwnershipDivestiture(_oHandle, _ahs, tag);
 
     String^ list = String::Join(", ", attributes);// attributes to string
     String^ msg = "The release for the negotiated Attribute Ownership Divestiture of object (handle: " + object->Handle + ") is attempted. The attributes: " + list;
@@ -1631,7 +1626,7 @@ bool RtiAmb_Hla1516e::negotiatedAttributeOwnershipDivestiture(HlaObject ^object,
 };
 
 // 7.6 - confirmDivestiture
-bool RtiAmb_Hla1516e::confirmDivestiture(HlaObject ^object, List<HlaAttribute^>^ attributes, String^ tag) {
+bool RtiAmb_Hla1516e::confirmDivestiture(HlaObject ^object, List<HlaAttribute^>^ attributes, VariableLengthDataWrapper^ userTag) {
   try {
     // Create Attribute Handle Set 
     rti1516e::AttributeHandleSet _ahs;
@@ -1639,12 +1634,11 @@ bool RtiAmb_Hla1516e::confirmDivestiture(HlaObject ^object, List<HlaAttribute^>^
       rti1516e::AttributeHandle handle = nom->Attributes[attributes[j]->Handle];
       _ahs.insert(handle);
     }
-    // tag
-    char const * _pVal = (char*)Marshal::StringToHGlobalAnsi(tag).ToPointer();
-    rti1516e::VariableLengthData _tag(_pVal, ((strlen(_pVal) + 1) * sizeof(char)));
+    // Create Tag
+    VariableLengthData tag(userTag->Data.ToPointer(), userTag->Size);
 
     rti1516e::ObjectInstanceHandle _oHandle = nom->Objects[object->Handle];
-    (void)rti->confirmDivestiture(_oHandle, _ahs, _tag);
+    (void)rti->confirmDivestiture(_oHandle, _ahs, tag);
 
     String^ list = String::Join(", ", attributes);// attributes to string
     String^ msg = "The joined federate wants to vomplete negotiated divestiture for the attributes of object (handle: " + object->Handle + "). The attributes: " + list;
@@ -1700,7 +1694,7 @@ bool RtiAmb_Hla1516e::confirmDivestiture(HlaObject ^object, List<HlaAttribute^>^
 };
 
 // 7.8 - attributeOwnershipAcquisition
-bool RtiAmb_Hla1516e::attributeOwnershipAcquisition(HlaObject ^object, List<HlaAttribute^>^ attributes, String^ tag) {
+bool RtiAmb_Hla1516e::attributeOwnershipAcquisition(HlaObject ^object, List<HlaAttribute^>^ attributes, VariableLengthDataWrapper^ userTag) {
   try {
     // Create Attribute Handle Set 
     rti1516e::AttributeHandleSet _ahs;
@@ -1708,12 +1702,11 @@ bool RtiAmb_Hla1516e::attributeOwnershipAcquisition(HlaObject ^object, List<HlaA
       rti1516e::AttributeHandle handle = nom->Attributes[attributes[j]->Handle];
       _ahs.insert(handle);
     }
-    // tag
-    char const * _pVal = (char*)Marshal::StringToHGlobalAnsi(tag).ToPointer();
-    rti1516e::VariableLengthData _tag(_pVal, ((strlen(_pVal) + 1) * sizeof(char)));
+    // Create Tag
+    VariableLengthData tag(userTag->Data.ToPointer(), userTag->Size);
 
     rti1516e::ObjectInstanceHandle _oHandle = nom->Objects[object->Handle];
-    (void)rti->attributeOwnershipAcquisition(_oHandle, _ahs, _tag);
+    (void)rti->attributeOwnershipAcquisition(_oHandle, _ahs, tag);
 
     String^ list = String::Join(", ", attributes);// attributes to string
     String^ msg = "The ownership of the attributes of the object (handle: " + object->Handle + ") is requested. The desired attributes: " + list;
@@ -2788,93 +2781,6 @@ bool RtiAmb_Hla1516e::unsubscribeObjectClassWithRegions(HlaObjectClass ^oc, RtiL
 #pragma endregion
 };
 
-// 9.13 - requestClassAttributeValueUpdateWithRegion
-bool RtiAmb_Hla1516e::requestClassAttributeValueUpdateWithRegions(HlaObjectClass ^oc, RtiLayer::AttributeHandleSetRegionHandleSetPairVector ^list, String ^tag) {
-  try {
-    rti1516e::ObjectClassHandle _handle = nom->ObjectClasses[oc->Handle];
-    rti1516e::AttributeHandleSetRegionHandleSetPairVector _pairs;
-    // tag
-    char const * _pVal = (char*)Marshal::StringToHGlobalAnsi(tag).ToPointer();
-    rti1516e::VariableLengthData _tag(_pVal, ((strlen(_pVal) + 1) * sizeof(char)));
-
-    // Convert Rom => Nom
-    for each (KeyValuePair<List<HlaAttribute^>^, List<HlaRegion^>^> ^pair in list->Pairs)
-    {
-      rti1516e::AttributeHandleSet ahs;
-      for each (HlaAttribute^ attribute in pair->Key)
-        if ((attribute->AttributePS == PSKind::Subscribe) || (attribute->AttributePS == PSKind::PublishSubscribe))
-          ahs.insert(nom->Attributes[attribute->Handle]);
-      rti1516e::RegionHandleSet rhs;
-      for each (HlaRegion^ region in pair->Value)
-        rhs.insert(nom->Regions[region->Handle]);
-      rti1516e::AttributeHandleSetRegionHandleSetPair _pair(ahs, rhs); // create a pair
-      _pairs.push_back(_pair); // insert pair to vector
-    }
-
-    rti->requestAttributeValueUpdateWithRegions(_handle, _pairs, _tag);
-
-    String^ msg = "Object Class (" + oc->Name + ") is unsubscribed with all its subscribeable attributes. Class handle: " + Handle2Long(_handle).ToString() + ",  Attribute-Region pairs: " + list->ToString();
-    this->OnHLAClassPublished(gcnew RaconEventArgs(msg));
-    return true;
-  }
-#pragma region exceptions
-  catch (InvalidRegionContext& e) {
-    String^ msg = "MSG-(InvalidRegionContext - requestClassAttributeValueUpdateWithRegions):" + " Reason: " + gcnew String(e.what().c_str());
-    this->OnRTIEventOccured(gcnew RaconEventArgs(msg));
-    return false;
-  }
-  catch (RegionNotCreatedByThisFederate& e) {
-    String^ msg = "MSG-(RegionNotCreatedByThisFederate - requestClassAttributeValueUpdateWithRegions):" + " Reason: " + gcnew String(e.what().c_str());
-    this->OnRTIEventOccured(gcnew RaconEventArgs(msg));
-    return false;
-  }
-  catch (InvalidRegion& e) {
-    String^ msg = "MSG-(InvalidRegion - requestClassAttributeValueUpdateWithRegions):" + " Reason: " + gcnew String(e.what().c_str());
-    this->OnRTIEventOccured(gcnew RaconEventArgs(msg));
-    return false;
-  }
-  catch (AttributeNotDefined& e) {
-    String^ msg = "RtiAmb_Hla1516e-(AttributeNotDefined - requestClassAttributeValueUpdateWithRegions). Reason: " + gcnew String(e.what().c_str());
-    this->OnRTIEventOccured(gcnew RaconEventArgs(msg));
-    return false;
-  }
-  catch (ObjectClassNotDefined& e) {
-    String^ msg = "RtiAmb_Hla1516e-(ObjectClassNotDefined - requestClassAttributeValueUpdateWithRegions). Reason: " + gcnew String(e.what().c_str());
-    this->OnRTIEventOccured(gcnew RaconEventArgs(msg));
-    return false;
-  }
-  catch (SaveInProgress& e) {
-    String^ msg = "RtiAmb_Hla1516e-(SaveInProgress - requestClassAttributeValueUpdateWithRegions). Reason: " + gcnew String(e.what().c_str());
-    this->OnRTIEventOccured(gcnew RaconEventArgs(msg));
-    return false;
-  }
-  catch (RestoreInProgress& e) {
-    String^ msg = "RtiAmb_Hla1516e-(RestoreInProgress - requestClassAttributeValueUpdateWithRegions). Reason: " + gcnew String(e.what().c_str());
-    this->OnRTIEventOccured(gcnew RaconEventArgs(msg));
-    return false;
-  }
-  catch (FederateNotExecutionMember& e) {
-    String^ msg = "RtiAmb_Hla1516e-(FederateNotExecutionMember - requestClassAttributeValueUpdateWithRegions).Reason: " + gcnew String(e.what().c_str());
-    this->OnRTIEventOccured(gcnew RaconEventArgs(msg));
-    return false;
-  }
-  catch (NotConnected& e) {
-    String^ msg = "RtiAmb_Hla1516e-(NotConnected - requestClassAttributeValueUpdateWithRegions). Reason: " + gcnew String(e.what().c_str());
-    this->OnNotConnected(gcnew RaconEventArgs(msg));
-    return false;
-  }
-  catch (RTIinternalError& e) {
-    String^ msg = "RtiAmb_Hla1516e-(RTIinternalError - requestClassAttributeValueUpdateWithRegions). Reason: " + gcnew String(e.what().c_str());
-    this->OnRTIEventOccured(gcnew RaconEventArgs(msg, LogLevel::ERROR));
-    return false;
-  }
-  catch (System::Exception^ e) {
-    String^ msg = "RtiAmb_Hla1516e-(Exception - requestClassAttributeValueUpdateWithRegions). Reason: " + gcnew String(e->ToString());
-    this->OnRTIEventOccured(gcnew RaconEventArgs(msg, LogLevel::ERROR));
-    return false;
-  }
-#pragma endregion
-};
 
 // 9.10 - subscribe IC with Region
 bool RtiAmb_Hla1516e::subscribeInteractionClass(HlaInteractionClass ^ic, List<HlaRegion^>^ regions, bool indicator) {
@@ -3028,13 +2934,12 @@ bool RtiAmb_Hla1516e::unsubscribeInteractionClass(HlaInteractionClass ^ic, List<
 };
 
 // 9.12 - Send Interaction With Region
-bool RtiAmb_Hla1516e::sendInteractionWithRegions(HlaInteraction ^interaction, List<HlaRegion^>^ regions, String^ tag) {
+bool RtiAmb_Hla1516e::sendInteractionWithRegions(HlaInteraction ^interaction, List<HlaRegion^>^ regions, VariableLengthDataWrapper^ userTag) {
   try {
     rti1516e::InteractionClassHandle _handle = nom->InteractionClasses[interaction->ClassHandle];
 
     // Create Tag
-    char* tagData = (char *)Marshal::StringToHGlobalAnsi(tag).ToPointer();
-    VariableLengthData _tag(tagData, ((strlen(tagData) + 1) * sizeof(char)));
+    VariableLengthData tag(userTag->Data.ToPointer(), userTag->Size);
     // Pack parameter values
     rti1516e::ParameterHandleValueMap _parameters;
     for each (HlaParameter^ var in interaction->Parameters)
@@ -3049,7 +2954,7 @@ bool RtiAmb_Hla1516e::sendInteractionWithRegions(HlaInteraction ^interaction, Li
     for each (HlaRegion ^region in regions)
       _regions.insert(nom->Regions[region->Handle]);
 
-    rti->sendInteractionWithRegions(_handle, _parameters, _regions, _tag);
+    rti->sendInteractionWithRegions(_handle, _parameters, _regions, tag);
     // Report
     String ^msg = "Interaction (handle: " + interaction->ClassHandle + ") is sent with regions";
     this->OnRTIEventOccured(gcnew RaconEventArgs(msg));
@@ -3125,14 +3030,13 @@ bool RtiAmb_Hla1516e::sendInteractionWithRegions(HlaInteraction ^interaction, Li
 };
 
 // 9.12 - Send Interaction With Region and time
-MessageRetraction^ RtiAmb_Hla1516e::sendInteractionWithRegions(HlaInteraction ^interaction, List<HlaRegion^>^ regions, String^ tag, double time) {
+MessageRetraction^ RtiAmb_Hla1516e::sendInteractionWithRegions(HlaInteraction ^interaction, List<HlaRegion^>^ regions, VariableLengthDataWrapper^ userTag, double time) {
   try {
     String ^msg = "";
     rti1516e::InteractionClassHandle _handle = nom->InteractionClasses[interaction->ClassHandle];
 
     // Create Tag
-    char* tagData = (char *)Marshal::StringToHGlobalAnsi(tag).ToPointer();
-    VariableLengthData _tag(tagData, ((strlen(tagData) + 1) * sizeof(char)));
+    VariableLengthData tag(userTag->Data.ToPointer(), userTag->Size);
     // Create timestamp
     rti1516e::HLAfloat64Time _timestamp(time);
     // Pack parameter values
@@ -3149,7 +3053,7 @@ MessageRetraction^ RtiAmb_Hla1516e::sendInteractionWithRegions(HlaInteraction ^i
     for each (HlaRegion ^region in regions)
       _regions.insert(nom->Regions[region->Handle]);
 
-    rti1516e::MessageRetractionHandle _mrh = rti->sendInteractionWithRegions(_handle, _parameters, _regions, _tag, _timestamp);
+    rti1516e::MessageRetractionHandle _mrh = rti->sendInteractionWithRegions(_handle, _parameters, _regions, tag, _timestamp);
     // create retraction
     MessageRetraction^ retraction = gcnew MessageRetraction(toULong(_mrh.toString()));
     nom->RetractionHandles[retraction->Handle] = _mrh;
@@ -3222,6 +3126,93 @@ MessageRetraction^ RtiAmb_Hla1516e::sendInteractionWithRegions(HlaInteraction ^i
     String^ msg = "RtiAmb_Hla1516e-(Exception - sendInteractionWithRegions). Reason: " + gcnew String(e->ToString());
     this->OnRTIEventOccured(gcnew RaconEventArgs(msg, LogLevel::ERROR));
     return nullptr;
+  }
+#pragma endregion
+};
+
+// 9.13 - requestClassAttributeValueUpdateWithRegion
+bool RtiAmb_Hla1516e::requestClassAttributeValueUpdateWithRegions(HlaObjectClass ^oc, RtiLayer::AttributeHandleSetRegionHandleSetPairVector ^list, VariableLengthDataWrapper^ userTag) {
+  try {
+    rti1516e::ObjectClassHandle _handle = nom->ObjectClasses[oc->Handle];
+    rti1516e::AttributeHandleSetRegionHandleSetPairVector _pairs;
+    // Create Tag
+    VariableLengthData tag(userTag->Data.ToPointer(), userTag->Size);
+
+    // Convert Rom => Nom
+    for each (KeyValuePair<List<HlaAttribute^>^, List<HlaRegion^>^> ^pair in list->Pairs)
+    {
+      rti1516e::AttributeHandleSet ahs;
+      for each (HlaAttribute^ attribute in pair->Key)
+        if ((attribute->AttributePS == PSKind::Subscribe) || (attribute->AttributePS == PSKind::PublishSubscribe))
+          ahs.insert(nom->Attributes[attribute->Handle]);
+      rti1516e::RegionHandleSet rhs;
+      for each (HlaRegion^ region in pair->Value)
+        rhs.insert(nom->Regions[region->Handle]);
+      rti1516e::AttributeHandleSetRegionHandleSetPair _pair(ahs, rhs); // create a pair
+      _pairs.push_back(_pair); // insert pair to vector
+    }
+
+    rti->requestAttributeValueUpdateWithRegions(_handle, _pairs, tag);
+
+    String^ msg = "Object Class (" + oc->Name + ") is unsubscribed with all its subscribeable attributes. Class handle: " + Handle2Long(_handle).ToString() + ",  Attribute-Region pairs: " + list->ToString();
+    this->OnHLAClassPublished(gcnew RaconEventArgs(msg));
+    return true;
+  }
+#pragma region exceptions
+  catch (InvalidRegionContext& e) {
+    String^ msg = "MSG-(InvalidRegionContext - requestClassAttributeValueUpdateWithRegions):" + " Reason: " + gcnew String(e.what().c_str());
+    this->OnRTIEventOccured(gcnew RaconEventArgs(msg));
+    return false;
+  }
+  catch (RegionNotCreatedByThisFederate& e) {
+    String^ msg = "MSG-(RegionNotCreatedByThisFederate - requestClassAttributeValueUpdateWithRegions):" + " Reason: " + gcnew String(e.what().c_str());
+    this->OnRTIEventOccured(gcnew RaconEventArgs(msg));
+    return false;
+  }
+  catch (InvalidRegion& e) {
+    String^ msg = "MSG-(InvalidRegion - requestClassAttributeValueUpdateWithRegions):" + " Reason: " + gcnew String(e.what().c_str());
+    this->OnRTIEventOccured(gcnew RaconEventArgs(msg));
+    return false;
+  }
+  catch (AttributeNotDefined& e) {
+    String^ msg = "RtiAmb_Hla1516e-(AttributeNotDefined - requestClassAttributeValueUpdateWithRegions). Reason: " + gcnew String(e.what().c_str());
+    this->OnRTIEventOccured(gcnew RaconEventArgs(msg));
+    return false;
+  }
+  catch (ObjectClassNotDefined& e) {
+    String^ msg = "RtiAmb_Hla1516e-(ObjectClassNotDefined - requestClassAttributeValueUpdateWithRegions). Reason: " + gcnew String(e.what().c_str());
+    this->OnRTIEventOccured(gcnew RaconEventArgs(msg));
+    return false;
+  }
+  catch (SaveInProgress& e) {
+    String^ msg = "RtiAmb_Hla1516e-(SaveInProgress - requestClassAttributeValueUpdateWithRegions). Reason: " + gcnew String(e.what().c_str());
+    this->OnRTIEventOccured(gcnew RaconEventArgs(msg));
+    return false;
+  }
+  catch (RestoreInProgress& e) {
+    String^ msg = "RtiAmb_Hla1516e-(RestoreInProgress - requestClassAttributeValueUpdateWithRegions). Reason: " + gcnew String(e.what().c_str());
+    this->OnRTIEventOccured(gcnew RaconEventArgs(msg));
+    return false;
+  }
+  catch (FederateNotExecutionMember& e) {
+    String^ msg = "RtiAmb_Hla1516e-(FederateNotExecutionMember - requestClassAttributeValueUpdateWithRegions).Reason: " + gcnew String(e.what().c_str());
+    this->OnRTIEventOccured(gcnew RaconEventArgs(msg));
+    return false;
+  }
+  catch (NotConnected& e) {
+    String^ msg = "RtiAmb_Hla1516e-(NotConnected - requestClassAttributeValueUpdateWithRegions). Reason: " + gcnew String(e.what().c_str());
+    this->OnNotConnected(gcnew RaconEventArgs(msg));
+    return false;
+  }
+  catch (RTIinternalError& e) {
+    String^ msg = "RtiAmb_Hla1516e-(RTIinternalError - requestClassAttributeValueUpdateWithRegions). Reason: " + gcnew String(e.what().c_str());
+    this->OnRTIEventOccured(gcnew RaconEventArgs(msg, LogLevel::ERROR));
+    return false;
+  }
+  catch (System::Exception^ e) {
+    String^ msg = "RtiAmb_Hla1516e-(Exception - requestClassAttributeValueUpdateWithRegions). Reason: " + gcnew String(e->ToString());
+    this->OnRTIEventOccured(gcnew RaconEventArgs(msg, LogLevel::ERROR));
+    return false;
   }
 #pragma endregion
 };

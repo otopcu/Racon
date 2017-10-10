@@ -741,29 +741,63 @@ bool RtiAmb_Hla13::unsubscribeObjectClass(HlaObjectClass ^oc) {
 #pragma region Object Management
 
 // Delete an Object Instance
-bool RtiAmb_Hla13::deleteObjectInstance(HlaObject ^obj) {
+bool RtiAmb_Hla13::deleteObjectInstance(HlaObject ^obj, String^ tag) {
   try {
-    rti->deleteObjectInstance(obj->Handle, (char*)Marshal::StringToHGlobalAnsi(obj->Tag).ToPointer());
-    String^ msg = "Object (handle: " + obj->Handle + ") is deleted by this federate";
+    rti->deleteObjectInstance(obj->Handle, (char*)Marshal::StringToHGlobalAnsi(tag).ToPointer());
+    String^ msg = "Object (handle: " + obj->Handle + ") is deleted by this federate. Reason: " + tag;
     this->OnRTIEventOccured(gcnew RaconEventArgs(msg));
     return true;
   }
-	catch (System::Exception^ e) {
-		String^ msg = "RtiAmb_Hla13-(Exception - connect). Reason: " + gcnew String(e->ToString());
-		this->OnRTIEventOccured(gcnew RaconEventArgs(msg, LogLevel::ERROR));
+#pragma region exceptions
+  catch (RTI::ObjectNotKnown &e) {
+    String^ msg = "RtiAmb_Hla13-(Notspecified - Notspecified). Reason: " + gcnew String(e._reason);
+    this->OnRTIEventOccured(gcnew RaconEventArgs(msg, LogLevel::WARN));
+  }
+  catch (RTI::DeletePrivilegeNotHeld &e) {
+    String^ msg = "RtiAmb_Hla13-(Notspecified - Notspecified). Reason: " + gcnew String(e._reason);
+    this->OnRTIEventOccured(gcnew RaconEventArgs(msg, LogLevel::WARN));
+  }
+  catch (RTI::InvalidFederationTime &e) {
+    String^ msg = "RtiAmb_Hla13-(Notspecified - Notspecified). Reason: " + gcnew String(e._reason);
+    this->OnRTIEventOccured(gcnew RaconEventArgs(msg, LogLevel::WARN));
+  }
+  catch (RTI::FederateNotExecutionMember& e) {
+    String^ msg = "RtiAmb_Hla13-(Notspecified - Notspecified). Reason: " + gcnew String(e._reason);
+    this->OnRTIEventOccured(gcnew RaconEventArgs(msg, LogLevel::WARN));
+  }
+  catch (RTI::ConcurrentAccessAttempted& e) {
+    String^ msg = "RtiAmb_Hla13-(Notspecified - Notspecified). Reason: " + gcnew String(e._reason);
+    this->OnRTIEventOccured(gcnew RaconEventArgs(msg, LogLevel::WARN));
+  }
+  catch (RTI::SaveInProgress& e) {
+    String^ msg = "RtiAmb_Hla13-(Notspecified - Notspecified). Reason: " + gcnew String(e._reason);
+    this->OnRTIEventOccured(gcnew RaconEventArgs(msg, LogLevel::WARN));
+  }
+  catch (RTI::RestoreInProgress& e) {
+    String^ msg = "RtiAmb_Hla13-(Notspecified - Notspecified). Reason: " + gcnew String(e._reason);
+    this->OnRTIEventOccured(gcnew RaconEventArgs(msg, LogLevel::WARN));
+  }
+  catch (RTI::RTIinternalError& e) {
+    String^ msg = "RtiAmb_Hla13-(Notspecified - Notspecified). Reason: " + gcnew String(e._reason);
+    this->OnRTIEventOccured(gcnew RaconEventArgs(msg, LogLevel::WARN));
+  }
+  catch (System::Exception^ e) {
+    String^ msg = "RtiAmb_Hla13-(Exception - connect). Reason: " + gcnew String(e->ToString());
+    this->OnRTIEventOccured(gcnew RaconEventArgs(msg, LogLevel::ERROR));
 		return false;
-	}
+  }
+#pragma endregion
 };
 
 // Delete an Object Instance with Time
-MessageRetraction^ RtiAmb_Hla13::deleteObjectInstance(HlaObject ^obj, Double time) {
+MessageRetraction^ RtiAmb_Hla13::deleteObjectInstance(HlaObject ^obj, Double time, String^ tag) {
   try {
     RTIfedTime time(time);
     RTI::FedTime& theTime = time;
 
-    RTI::EventRetractionHandle theHandle = rti->deleteObjectInstance(obj->Handle, theTime, (char*)Marshal::StringToHGlobalAnsi(obj->Tag).ToPointer());
+    RTI::EventRetractionHandle theHandle = rti->deleteObjectInstance(obj->Handle, theTime, (char*)Marshal::StringToHGlobalAnsi(tag).ToPointer());
 		MessageRetraction^ retraction = gcnew MessageRetraction(theHandle.theSerialNumber, theHandle.sendingFederate);
-    String^ msg = "Object (handle: " + obj->Handle + ") is scheduled for deletion by this federate at time = " + time.getTime() + ". Retraction Serial No = " + retraction->SerialNumber + ".";
+    String^ msg = "Object (handle: " + obj->Handle + ") is scheduled for deletion by this federate at time = " + time.getTime() + ". Retraction Serial No = " + retraction->SerialNumber + ". Reason: " + tag;
     this->OnRTIEventOccured(gcnew RaconEventArgs(msg));
     return retraction;
   }
