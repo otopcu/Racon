@@ -13,6 +13,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "License", "License", "{D364
 		Copyright.txt = Copyright.txt
 		LICENSE.lesser.txt = LICENSE.lesser.txt
 		LICENSE.txt = LICENSE.txt
+		README.md = README.md
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Racon.RtiLayer", "RtiLayerGeneric\Racon.RtiLayer.csproj", "{BF7B1E1D-55EB-4581-8009-5E2757F9C8C6}"
