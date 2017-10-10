@@ -3,7 +3,7 @@ https://sites.google.com/site/okantopcu/racon
 =============================================
 
 
-Copyright @ Okan Topçu, 2009-2016
+Copyright @ Okan Topçu, 2009-2017
 otot.support@outlook.com
 
 The RTI abstraction component for MS.NET (RACoN) deals with the HLA runtime infrastructure (RTI) level communication 
@@ -13,12 +13,12 @@ The RACoN provides the .NET wrapper classes for the RTI and RTI-specific data st
 As it offers more maintainable, robust, and portable methods, developing an abstraction layer (wrapper) over RTI 
 is a popular approach in many HLA-based projects.
 
-What's New?
-0.0.2.4 (07.06.17):
+## What's New?
+### 0.0.2.4 (07.06.17):
 Support for all user-supplied tags. Now, RACoN can encode/decode all tags in various datatypes.
 Encoding/decoding mechanism is restructured.
 
-0.0.2.3 (29.04.17):
+### 0.0.2.3 (29.04.17):
 HLA1516e Ownership management services are implemented.
 DDM services are re-implemented for HLA Evolved.
 GetDimensionHandle() and GetDimensionName() services are implemented.
