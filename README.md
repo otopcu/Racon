@@ -38,3 +38,8 @@ This means that a new version may not work with an older version of the library,
 
 You can influence this project by sending your feedback. Please, contact project owner(s) and feel free 
 for any comments, offers, remarks, ideas, etc. 
+
+Sample Federations:
+- Chat Federation (Basic): https://github.com/otopcu/Chat
+- Chat Federation (DDM): https://github.com/otopcu/Chat/tree/DDM
+- Strait Traffic Monitoring Simulation: https://github.com/otopcu/STMS
