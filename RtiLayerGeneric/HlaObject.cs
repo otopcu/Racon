@@ -3,7 +3,7 @@
 Racon - RTI abstraction component for MS.NET (Racon)
 https://sites.google.com/site/okantopcu/racon
 
-Copyright © Okan Topçu, 2009-2017
+Copyright © Okan Topçu, 2009-2019
 otot.support@outlook.com
 
 This program is free software : you can redistribute it and / or modify
@@ -40,7 +40,7 @@ namespace Racon.RtiLayer
     /// </summary>
     public uint Handle { get; set; }
     /// <summary>
-    ///  Object tag
+    ///  Object tag used for HLA13 compability
     /// </summary>
     public string Tag { get; set; }
     /// <summary>

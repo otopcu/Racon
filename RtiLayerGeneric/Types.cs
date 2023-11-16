@@ -21,7 +21,7 @@ along with this program.If not, see <http://www.gnu.org/licenses/>.
 
 using System;
 
-namespace Racon
+namespace Racon.RtiLayer
 {
   /// <summary>
   /// The RTI abstraction component for .NET (RACoN).
@@ -35,7 +35,7 @@ namespace Racon
   {
     // This class is only for documentation of Namespace: RACoN.ObjectModel in Sandcastle
   }
-
+  /*
   /// <summary>
   /// Represents type of RTI library wrapped by RACoN. Default is HLA13_DMSO
   /// </summary>
@@ -62,7 +62,7 @@ namespace Racon
     /// </summary>
     HLA1516e_OpenRti,
   };
-  /*
+*/
   /// <summary>
   /// Enum Federation States
   /// Fedexec typical cycle: Initial -> Created -> Initial
@@ -78,7 +78,7 @@ namespace Racon
     /// </summary>
     FEDEX_EXISTS 
   } ;
-  */
+/*
   /// <summary>
   /// Enum Federate States
   /// Federate typical cycle: Initial -> joined -> ready -> running -> Initial
@@ -143,5 +143,5 @@ namespace Racon
     /// </summary>
     TimeStamp = 2
   };
-
+*/
 }

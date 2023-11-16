@@ -3,7 +3,7 @@
 Racon - RTI abstraction component for MS.NET (Racon)
 https://sites.google.com/site/okantopcu/racon
 
-Copyright © Okan Topçu, 2009-2017
+Copyright © Okan Topçu, 2009-2019
 otot.support@outlook.com
 
 This program is free software : you can redistribute it and / or modify
@@ -39,6 +39,10 @@ namespace Racon.RtiLayer
 
     #region Events- related to the RTI-initiated services
     #region FM Events
+    /// <summary>
+    /// Federation state change event.
+    /// </summary>
+    public event EventHandler<CFederationStateEventArgs> FederationStateChanged;
     /// <summary>
     /// 4.4
     /// </summary>
@@ -222,6 +226,11 @@ namespace Racon.RtiLayer
     }
 
     #region FM
+    /// <summary>
+    /// Wraps the event in a protected virtual method to enable derived classes to raise the event.
+    /// </summary>
+    protected virtual void OnFederationStateChanged(CFederationStateEventArgs e) => FederationStateChanged?.Invoke(this, e);// Raise the event.
+
     /// <summary>
     /// 
     /// </summary>
@@ -465,7 +474,7 @@ namespace Racon.RtiLayer
     }
     #endregion
 
-    // TM
+    #region TM
     /// <summary>
     /// 
     /// </summary>
@@ -499,7 +508,8 @@ namespace Racon.RtiLayer
       RequestRetraction?.Invoke(this, e);// Raise the event.
     }
 
-
+    #endregion
+    
     #endregion
 
     #region Constructors

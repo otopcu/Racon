@@ -7,7 +7,7 @@
 RACoN - RTI abstraction component for MS.NET (RACoN)
 https://sites.google.com/site/okantopcu/racon
 
-Copyright © Okan Topçu, 2009-2017
+Copyright © Okan Topçu, 2009-2019
 otot.support@outlook.com
 
 This program is free software : you can redistribute it and / or modify
@@ -91,7 +91,7 @@ namespace Racon
     }
 
     /// <summary>
-    /// Current federation execution state. When it is set, it raises <see cref="Racon.CGenericFederate.FederationStateChanged"/> Event.
+    /// Current federation execution state. When it is set, it raises FederationStateChanged Event.
     /// </summary>
     public FederationExecutionStates FederationExecutionState
     {
@@ -105,7 +105,7 @@ namespace Racon
     }
 
     /// <summary>
-    /// The log message RACoN. When it is set, it raises <see cref="Racon.CGenericFederate.StatusMessageChanged"/> Event.
+    /// The log message RACoN. When it is set, it raises <see cref="StatusMessageChanged"/> Event.
     /// </summary>
     public string StatusMessage
     {
@@ -216,10 +216,6 @@ namespace Racon
     /// Federate state change event.
     /// </summary>
     public event EventHandler<CFederateStateEventArgs> FederateStateChanged;
-    /// <summary>
-    /// Federation state change event.
-    /// </summary>
-    public event EventHandler<CFederationStateEventArgs> FederationStateChanged;
     #endregion // Events
 
     #region EventRaisers
@@ -237,14 +233,6 @@ namespace Racon
     protected virtual void OnFederateStateChanged(CFederateStateEventArgs e)
     {
       FederateStateChanged?.Invoke(this, e);// Raise the event.
-    }
-
-    /// <summary>
-    /// Wraps the event in a protected virtual method to enable derived classes to raise the event.
-    /// </summary>
-    protected virtual void OnFederationStateChanged(CFederationStateEventArgs e)
-    {
-      FederationStateChanged?.Invoke(this, e);// Raise the event.
     }
 
     #endregion // Event Raisers
@@ -1063,6 +1051,77 @@ namespace Racon
       //EventLog::WriteEntry("ExPFd","Exception Type: "+e->GetType()->FullName+"\r\nError Message: "+e->Message+"\r\nStack: "+e->StackTrace+""+Environment.NewLine,EventLogEntryType::Warning);
     }
 
+    /// <summary>
+    /// Declares capability of a federate in terms of Publish/Subscribe:
+    /// (1) Enables object class relevance advisory switch.
+    /// (2) Gets object class and attribute handles.
+    /// (3) Publishes/subscribes all the object classes in SOM according to their PS status.
+    /// (4) Enables interaction relevance advisory switch.
+    /// (5) Gets interaction class and parameter handles.
+    /// (6) Publishes/subscribes all the interaction classes in SOM according to their PS status.
+    /// </summary>
+    /// <returns>True if method call is succesfull.</returns>
+    virtual public bool DeclareCapability()
+    {
+      try
+      {
+        // Enable advisory switches
+        EnableObjectClassRelevanceAdvisorySwitch();
+        EnableInteractionRelevanceAdvisorySwitch();
+        EnableAttributeRelevanceAdvisorySwitch();
+
+        // Publish and Subscribe the OC using Federate's OC List
+        foreach (var oc in _som.OCList)
+        {
+          // Get Class Handle
+          _rtiAmb.getClassHandleFromRti(oc);
+          // Get All Attribute Handles
+          _rtiAmb.getAttributeHandlesFromRti(oc);
+          // Publish and/or Subscribe
+          switch (oc.ClassPS)
+          {
+            case PSKind.Publish:
+              PublishObjectClass(oc);
+              break;
+            case PSKind.Subscribe:
+              SubscribeObjectClass(oc);
+              break;
+            case PSKind.PublishSubscribe:
+              PublishObjectClass(oc);
+              SubscribeObjectClass(oc);
+              break;
+          };
+        }
+        // Publish and Subscribe the IC using Federate's IC List
+        foreach (var ic in _som.ICList)
+        {
+          // Get Class Handle
+          _rtiAmb.getClassHandleFromRti(ic);
+          // Get All Attribute Handles
+          _rtiAmb.getParameterHandlesFromRti(ic);
+          // Publish and/or Subscribe
+          switch (ic.ClassPS)
+          {
+            case PSKind.Publish:
+              _rtiAmb.publishInteractionClass(ic);
+              break;
+            case PSKind.Subscribe:
+              _rtiAmb.subscribeInteractionClass(ic);
+              break;
+            case PSKind.PublishSubscribe:
+              _rtiAmb.publishInteractionClass(ic);
+              _rtiAmb.subscribeInteractionClass(ic);
+              break;
+          };
+        }
+        return true;
+      }
+      catch (Exception)
+      {
+        return false;
+      }
+    }
+
     #endregion // High-Level Services
 
     #region RtiAmb Function Wrappers
@@ -1129,9 +1188,20 @@ namespace Racon
       Contract.Ensures(FederationExecutionState.HasFlag(FederationExecutionStates.FEDEX_EXISTS), " at CreateFederationExecution().");
       #endregion
 
+      // Call createFederation
       if (FederationExecutionState.HasFlag(FederationExecutionStates.FEDEX_DOESNOTEXIST))
         _rtiAmb.createFederation(fedexName, fomModule, logicalTimeImplementationName);
-      return FederationExecutionState.HasFlag(FederationExecutionStates.FEDEX_EXISTS) ? true : false;
+      return FederationExecutionState.HasFlag(FederationExecutionStates.FEDEX_EXISTS);
+
+      /*
+      // Report the result - Better to report this in native rti
+      if (FederationExecutionState.HasFlag(FederationExecutionStates.FEDEX_EXISTS))
+      {
+        logger.Add("Federation execution (name: " + fedexName + ") is created.FDD: \"" + fomModule + "\"", LogLevel.INFO);
+        return true;
+      }
+      else return false;
+      */
     }
 
     /// <summary>
@@ -1192,7 +1262,7 @@ namespace Racon
     /// IEEE1516.1-2010 4.9: Joins a federation execution 
     /// </summary>
     /// <param name="federateType">Type of the joined federate. The federate type is used to distinguish federate categories in federation save-and-restore operation. </param>
-    /// <param name="federationExecutionName">Name of the Federation Execution to be joined.</param>
+    /// <param name="federationExecutionName">Name of the federation execution to be joined.</param>
     /// <param name="fomModules">The FOM module designators are optional and are used to provide additional FDD. The contents cannot conflict with the current FDD specified in federa-tion execution creation.</param>
     /// <returns>True if method call is succesfull.</returns>
     /// <remarks>Federate joins a federation execution.
@@ -1209,6 +1279,8 @@ namespace Racon
       #endregion
 
       FederateHandle = _rtiAmb.joinFederationExecution(federateType, federationExecutionName, fomModules);
+      // RTI automatically assigns a name to the federate
+      //FederationExecution.FederateName = GetFederateName(FederateHandle);
       return FederateState.HasFlag(FederateStates.JOINED) ? true : false;
     }
 
@@ -1231,8 +1303,16 @@ namespace Racon
       Contract.Ensures(FederateState.HasFlag(FederateStates.JOINED), " at JoinFederationExecution().");
       #endregion
 
-      FederateHandle = _rtiAmb.joinFederationExecution(federateName, federateType, federationExecutionName, fomModules);
-      return FederateState.HasFlag(FederateStates.JOINED) ? true : false;
+      try
+      {
+        FederateHandle = _rtiAmb.joinFederationExecution(federateName, federateType, federationExecutionName, fomModules);
+        return true;
+        //return FederateState.HasFlag(FederateStates.JOINED) ? true : false;
+      }
+      catch (Exception)
+      {
+        return false;
+      }
     }
     /// <summary>
     /// HLA13 - join federation
@@ -1426,79 +1506,11 @@ namespace Racon
 
     #region Declaration Management
     /// <summary>
-    /// Declares capability of a federate in terms of Publish/Subscribe:
-    /// (1) Enables object class relevance advisory switch.
-    /// (2) Gets object class and attribute handles.
-    /// (3) Publishes/subscribes all the object classes in SOM according to their PS status.
-    /// (4) Enables interaction relevance advisory switch.
-    /// (5) Gets interaction class and parameter handles.
-    /// (6) Publishes/subscribes all the interaction classes in SOM according to their PS status.
+    /// IEEE1516.1-2010 5.2: PublishObjectClass
     /// </summary>
-    /// <returns>True if method call is succesfull.</returns>
-    virtual public bool DeclareCapability()
-    {
-      try
-      {
-        // Enable advisory switches
-        EnableObjectClassRelevanceAdvisorySwitch();
-        EnableInteractionRelevanceAdvisorySwitch();
-        EnableAttributeRelevanceAdvisorySwitch();
-
-        // Publish and Subscribe the OC using Federate's OC List
-        foreach (var oc in _som.OCList)
-        {
-          // Get Class Handle
-          _rtiAmb.getClassHandleFromRti(oc);
-          // Get All Attribute Handles
-          _rtiAmb.getAttributeHandlesFromRti(oc);
-          // Publish and/or Subscribe
-          switch (oc.ClassPS)
-          {
-            case PSKind.Publish:
-              PublishObjectClass(oc);
-              break;
-            case PSKind.Subscribe:
-              SubscribeObjectClass(oc);
-              break;
-            case PSKind.PublishSubscribe:
-              PublishObjectClass(oc);
-              SubscribeObjectClass(oc);
-              break;
-          };
-        }
-        // Publish and Subscribe the IC using Federate's IC List
-        foreach (var ic in _som.ICList)
-        {
-          // Get Class Handle
-          _rtiAmb.getClassHandleFromRti(ic);
-          // Get All Attribute Handles
-          _rtiAmb.getParameterHandlesFromRti(ic);
-          // Publish and/or Subscribe
-          switch (ic.ClassPS)
-          {
-            case PSKind.Publish:
-              _rtiAmb.publishInteractionClass(ic);
-              break;
-            case PSKind.Subscribe:
-              _rtiAmb.subscribeInteractionClass(ic);
-              break;
-            case PSKind.PublishSubscribe:
-              _rtiAmb.publishInteractionClass(ic);
-              _rtiAmb.subscribeInteractionClass(ic);
-              break;
-          };
-        }
-        return true;
-      }
-      catch (Exception)
-      {
-        return false;
-      }
-    }
-
-    /// <summary>
-    /// Publish OC - With its all subscribable attributes 
-    /// </summary>
+    /// <remarks>
+    /// Publish OC - With its all publishable attributes 
+    /// </remarks>
     /// <param name="oc">Object class</param>
     /// <returns>True if method call is succesfull.</returns>
     virtual public bool PublishObjectClass(HlaObjectClass oc)
@@ -1507,8 +1519,11 @@ namespace Racon
     }
 
     /// <summary>
-    /// Publish OC - With some selected attributes 
+    /// IEEE1516.1-2010 5.2: PublishObjectClass
     /// </summary>
+    /// <remarks>
+    /// Publish OC - With some selected attributes 
+    /// </remarks>
     /// <param name="oc">Object class</param>
     /// <param name="attributes">Attributes</param>
     /// <returns>True if method call is succesfull.</returns>
@@ -1519,8 +1534,63 @@ namespace Racon
     }
 
     /// <summary>
-    /// Subscribes OC - With its all subscribable attributes 
+    /// IEEE1516.1-2010 5.3: UnpublishObjectClass
     /// </summary>
+    /// <remarks>
+    /// Unpublish Object Class - With its all attributes 
+    /// </remarks>
+    /// <param name="oc">Object class</param>
+    /// <returns>True if method call is succesfull.</returns>
+    virtual public bool UnpublishObjectClass(HlaObjectClass oc)
+    {
+      return UnpublishObjectClass(oc, oc.Attributes);
+    }
+
+    /// <summary>
+    /// IEEE1516.1-2010 5.3: UnpublishObjectClass
+    /// </summary>
+    /// <remarks>
+    /// Unpublish Object Class - With some selected attributes 
+    /// </remarks>
+    /// <param name="oc">Object class</param>
+    /// <param name="attributes"></param>
+    /// <returns>True if method call is succesfull.</returns>
+    virtual public bool UnpublishObjectClass(HlaObjectClass oc, List<HlaAttribute> attributes)
+    {
+      return _rtiAmb.unpublishObjectClass(oc, attributes);
+    }
+
+    /// <summary>
+    /// IEEE1516.1-2010 5.4: PublishInteractionClass
+    /// </summary>
+    /// <remarks>
+    /// Publishes IC 
+    /// </remarks>
+    /// <param name="ic">Interaction class</param>
+    /// <returns>True if method call is succesfull.</returns>
+    virtual public bool PublishInteractionClass(HlaInteractionClass ic)
+    {
+      return _rtiAmb.publishInteractionClass(ic);
+    }
+
+    /// <summary>
+    /// IEEE1516.1-2010 5.5: UnpublishInteractionClass
+    /// </summary>
+    /// <remarks>
+    /// UnpublishInteractionClass 
+    /// </remarks>
+    /// <returns>True if method call is succesfull.</returns>
+    virtual public bool UnpublishInteractionClass(HlaInteractionClass ic)
+    {
+      return _rtiAmb.unpublishInteractionClass(ic);
+    }
+
+    /// <summary>
+    /// IEEE1516.1-2010 5.6: SubscribeObjectClass
+    /// </summary>
+    /// <remarks>
+    /// Subscribes OC - With its all subscribable attributes 
+    /// </remarks>
     /// <param name="oc">Object class</param>
     /// <returns>True if method call is succesfull.</returns>
     virtual public bool SubscribeObjectClass(HlaObjectClass oc)
@@ -1529,33 +1599,71 @@ namespace Racon
     }
 
     /// <summary>
-    /// Subscribe OC - With some selected attributes 
+    /// IEEE1516.1-2010 5.6: SubscribeObjectClass
     /// </summary>
+    /// <remarks>
+    /// Subscribes OC - With some selected attributes 
+    /// </remarks>
     /// <param name="oc">Object class</param>
     /// <param name="attributes">Attributes</param>
-    /// <param name="active">default is true</param>
-    /// <returns>True if method call is succesfull.</returns>
-    virtual public bool SubscribeObjectClass(HlaObjectClass oc, List<HlaAttribute> attributes, bool active = true)
+    /// <param name="active">Passive subscription indicator. Optional. Default is true.</param>
+    /// <param name="updateRate">Update rate name. Optional. Default is "".</param>
+    /// <returns>True/False.</returns>
+    virtual public bool SubscribeObjectClass(HlaObjectClass oc, List<HlaAttribute> attributes, bool active = true, string updateRate = "")
     {
-      return _rtiAmb.subscribeObjectClass(oc, attributes, active);
+      if (RTILibrary == RTILibraryType.HLA13_DMSO || RTILibrary == RTILibraryType.HLA13_OpenRti || RTILibrary == RTILibraryType.HLA13_Portico)
+        return _rtiAmb.subscribeObjectClass(oc, attributes, active);
+      else
+        return _rtiAmb.subscribeObjectClass(oc, attributes, active, updateRate);
     }
 
     /// <summary>
-    /// UnsubscribeInteractionClass 
+    /// IEEE1516.1-2010 5.7: UnsubscribeObjectClass
     /// </summary>
+    /// <remarks>
+    /// UnsubscribeObjectClass - For all attributes of an object class
+    /// </remarks>
+    /// <returns>True if method call is succesfull.</returns>
+    virtual public bool UnsubscribeObjectClass(HlaObjectClass oc)
+    {
+      return UnsubscribeObjectClass(oc, oc.Attributes);
+    }
+
+    /// <summary>
+    /// IEEE1516.1-2010 5.7: UnsubscribeObjectClass
+    /// </summary>
+    /// <remarks>
+    /// UnsubscribeObjectClass - With some selected attributes
+    /// </remarks>
+    /// <returns>True if method call is succesfull.</returns>
+    virtual public bool UnsubscribeObjectClass(HlaObjectClass oc, List<HlaAttribute> attributes)
+    {
+      return _rtiAmb.unsubscribeObjectClass(oc, attributes);
+    }
+
+    /// <summary>
+    /// IEEE1516.1-2010 5.8: SubscribeInteractionClass
+    /// </summary>
+    /// <remarks>
+    /// Subscribes to an interaction class 
+    /// </remarks>
+    /// <param name="ic">Interaction class</param>
+    /// <returns>True if method call is succesfull.</returns>
+    virtual public bool SubscribeInteractionClass(HlaInteractionClass ic)
+    {
+      return _rtiAmb.subscribeInteractionClass(ic);
+    }
+
+    /// <summary>
+    /// IEEE1516.1-2010 5.9: UnsubscribeInteractionClass
+    /// </summary>
+    /// <remarks>
+    /// UnsubscribeInteractionClass 
+    /// </remarks>
     /// <returns>True if method call is succesfull.</returns>
     virtual public bool UnsubscribeInteractionClass(HlaInteractionClass ic)
     {
       return _rtiAmb.unsubscribeInteractionClass(ic);
-    }
-
-    /// <summary>
-    /// UnsubscribeObjectClass - For all attributes of an object class
-    /// </summary>
-    /// <returns>True if method call is succesfull.</returns>
-    virtual public bool UnsubscribeObjectClass(HlaObjectClass oc)
-    {
-      return _rtiAmb.unsubscribeObjectClass(oc);
     }
 
     #endregion // Declaration Management
@@ -1826,13 +1934,14 @@ namespace Racon
     /// <param name="oc"></param>
     /// <param name="pairs"></param>
     /// <param name="passiveSubscriptionIndicator"></param>
-    public virtual bool subscribeObjectClassAttributesWithRegions(HlaObjectClass oc, AttributeHandleSetRegionHandleSetPairVector pairs, bool passiveSubscriptionIndicator = true)
+    /// <param name="updateRate">Update rate name. Optional. Default is "".</param>
+    public virtual bool subscribeObjectClassAttributesWithRegions(HlaObjectClass oc, AttributeHandleSetRegionHandleSetPairVector pairs, bool passiveSubscriptionIndicator = true, string updateRate = "")
     {
-      return _rtiAmb.subscribeObjectClassAttributesWithRegions(oc, pairs, passiveSubscriptionIndicator);
+      return _rtiAmb.subscribeObjectClassAttributesWithRegions(oc, pairs, passiveSubscriptionIndicator, updateRate);
     }
 
     /// <summary>
-    /// // Subscribe Object Class With Region
+    /// // HLA13 - Subscribe Object Class With Region
     /// </summary>
     /// <returns>True if method call is succesfull.</returns>
     virtual public bool subscribeObjectClassAttributesWithRegion(HlaObjectClass oc, List<HlaAttribute> attributes, HlaRegion region, bool active = true)
@@ -2502,8 +2611,7 @@ namespace Racon
     /// </summary>
     /// <param name="theObject"></param>
     /// <param name="attributeSet"></param>
-    /// <param name="tag"></param>
-    /// <returns></returns>
+    /// <returns>True or False</returns>
     virtual public bool AttributeOwnershipAcquisition(HlaObject theObject, List<HlaAttribute> attributeSet)
     {
       return _rtiAmb.attributeOwnershipAcquisition(theObject, attributeSet, theObject.Tag);
@@ -2996,6 +3104,28 @@ namespace Racon
 
     #region Supporting Services
     /// <summary>
+    /// IEEE1516.1-2010 10.2: GetAutomaticResignDirective
+    /// </summary>
+    /// <remarks>
+    /// return the current Automatic Resign Directive for the federation execution.
+    /// </remarks>
+    public virtual ResignAction GetAutomaticResignDirective()
+    {
+      return _rtiAmb.getAutomaticResignDirective();
+    }
+
+    /// <summary>
+    /// IEEE1516.1-2010 10.3: SetAutomaticResignDirective
+    /// </summary>
+    /// <remarks>
+    /// set the Automatic Resign Directive for the federation execution.
+    /// </remarks>
+    public virtual bool SetAutomaticResignDirective(ResignAction action)
+    {
+      return _rtiAmb.setAutomaticResignDirective((int)action);
+    }
+
+    /// <summary>
     /// IEEE1516.1-2010 10.4: getFederateHandle
     /// </summary>
     /// <param name="federateName"></param>
@@ -3004,6 +3134,7 @@ namespace Racon
     {
       return _rtiAmb.getFederateHandle(federateName);
     }
+
     /// <summary>
     /// IEEE1516.1-2010 10.5: getFederateName
     /// </summary>
@@ -3012,6 +3143,27 @@ namespace Racon
     public virtual string GetFederateName(uint federateHandle)
     {
       return _rtiAmb.getFederateName(federateHandle);
+    }
+
+    /// <summary>
+    /// IEEE1516.1-2010 10.13: GetUpdateRateValue
+    /// </summary>
+    /// <param name="updateRateDesignator"> Update rate name. Note that this must be specified in the FOM.</param>
+    /// <returns>the maximum update rate value for the specified update rate.</returns>
+    public virtual double GetUpdateRateValue(string updateRateDesignator)
+    {
+      return _rtiAmb.getUpdateRateValue(updateRateDesignator);
+    }
+
+    /// <summary>
+    /// IEEE1516.1-2010 10.14: GetUpdateRateValueForAttribute
+    /// </summary>
+    /// <param name="objectInstance">Object instance handle.</param>
+    /// <param name="attribute">Attribute handle.</param>
+    /// <returns>the maximum update rate value for the specified update rate.</returns>
+    public virtual double GetUpdateRateValueForAttribute(HlaObject objectInstance, HlaAttribute attribute)
+    {
+      return _rtiAmb.getUpdateRateValueForAttribute(objectInstance, attribute);
     }
 
     /// <summary>
@@ -3057,12 +3209,62 @@ namespace Racon
     {
       _rtiAmb.setRangeBounds(regionHandle, dimensionHandle, lowerBound, upperBound);
     }
+
     /// <summary>
-    /// IEEE1516.1-2010 10.35: Enable Attribute Relevance Advisory Switch enables the generation of the Attribute Relevance Advisory Switch service advisory 
+    /// IEEE1516.1-2010 10.31: normalizeFederateHandle
     /// </summary>
+    /// <param name="federateHandle"></param>
+    /// <returns></returns>
+    public virtual ulong NormalizeFederateHandle(uint federateHandle)
+    {
+      return _rtiAmb.normalizeFederateHandle(federateHandle);
+    }
+
+    /// <summary>
+    /// IEEE1516.1-2010 10.33: EnableObjectClassRelevanceAdvisorySwitch
+    /// </summary>
+    /// <remarks>
+    /// Enable Object Class Relevance Advisory Switch enables the generation of the Start/Stop Registration For Object Class service advisory 
+    /// </remarks>
+    virtual public bool EnableObjectClassRelevanceAdvisorySwitch()
+    {
+      if (_rtiAmb.enableObjectClassRelevanceAdvisorySwitch()) return true;
+      else return false;
+    }
+
+    /// <summary>
+    /// IEEE1516.1-2010 10.34: DisableObjectClassRelevanceAdvisorySwitch
+    /// </summary>
+    /// <remarks>
+    /// Disable Object Class Relevance Advisory Switch disables the generation of the Start/Stop Registration For Object Class service advisory 
+    /// </remarks>
+    virtual public bool DisableObjectClassRelevanceAdvisorySwitch()
+    {
+      if (_rtiAmb.disableObjectClassRelevanceAdvisorySwitch()) return true;
+      else return false;
+    }
+
+    /// <summary>
+    /// IEEE1516.1-2010 10.35: EnableAttributeRelevanceAdvisorySwitch
+    /// </summary>
+    /// <remarks>
+    /// Enable Attribute Relevance Advisory Switch enables the generation of the Attribute Relevance Advisory Switch service advisory  
+    /// </remarks>
     virtual public bool EnableAttributeRelevanceAdvisorySwitch()
     {
       if (_rtiAmb.enableAttributeRelevanceAdvisorySwitch()) return true;
+      else return false;
+    }
+
+    /// <summary>
+    /// IEEE1516.1-2010 10.36: DisableAttributeRelevanceAdvisorySwitch
+    /// </summary>
+    /// <remarks>
+    /// Disable Attribute Relevance Advisory Switch disables the generation of the Attribute Relevance Advisory Switch service advisory
+    /// </remarks>
+    virtual public bool DisableAttributeRelevanceAdvisorySwitch()
+    {
+      if (_rtiAmb.disableAttributeRelevanceAdvisorySwitch()) return true;
       else return false;
     }
 
@@ -3076,34 +3278,7 @@ namespace Racon
     }
 
     /// <summary>
-    /// IEEE1516.1-2010 10.39: EnableInteractionRelevanceAdvisorySwitch
-    /// </summary>
-    virtual public bool EnableInteractionRelevanceAdvisorySwitch()
-    {
-      if (_rtiAmb.enableInteractionRelevanceAdvisorySwitch()) return true;
-      else return false;
-    }
-
-    /// <summary>
-    /// Enable Object Class Relevance Advisory Switch enables the generation of the Start/Stop Registration For Object Class service advisory 
-    /// </summary>
-    virtual public bool EnableObjectClassRelevanceAdvisorySwitch()
-    {
-      if (_rtiAmb.enableObjectClassRelevanceAdvisorySwitch()) return true;
-      else return false;
-    }
-
-    /// <summary>
-    /// Disable Attribute Relevance Advisory Switch disables the generation of the Attribute Relevance Advisory Switch service advisory
-    /// </summary>
-    virtual public bool DisableAttributeRelevanceAdvisorySwitch()
-    {
-      if (_rtiAmb.disableAttributeRelevanceAdvisorySwitch()) return true;
-      else return false;
-    }
-
-    /// <summary>
-    /// DisableAttributeScopeAdvisorySwitch
+    /// IEEE1516.1-2010 10.38: DisableAttributeScopeAdvisorySwitch
     /// </summary>
     virtual public bool DisableAttributeScopeAdvisorySwitch()
     {
@@ -3112,17 +3287,23 @@ namespace Racon
     }
 
     /// <summary>
-    /// Disable Object Class Relevance Advisory Switch disables the generation of the Start/Stop Registration For Object Class service advisory 
+    /// IEEE1516.1-2010 10.39: EnableInteractionRelevanceAdvisorySwitch
     /// </summary>
-    virtual public bool DisableObjectClassRelevanceAdvisorySwitch()
+    /// <remarks>
+    /// 
+    /// </remarks>
+    virtual public bool EnableInteractionRelevanceAdvisorySwitch()
     {
-      if (_rtiAmb.disableObjectClassRelevanceAdvisorySwitch()) return true;
+      if (_rtiAmb.enableInteractionRelevanceAdvisorySwitch()) return true;
       else return false;
     }
 
     /// <summary>
-    /// DisableInteractionRelevanceAdvisorySwitch
+    /// IEEE1516.1-2010 10.40: DisableInteractionRelevanceAdvisorySwitch
     /// </summary>
+    /// <remarks>
+    /// DisableInteractionRelevanceAdvisorySwitch
+    /// </remarks>
     virtual public bool DisableInteractionRelevanceAdvisorySwitch()
     {
       if (_rtiAmb.disableInteractionRelevanceAdvisorySwitch()) return true;
@@ -3130,23 +3311,53 @@ namespace Racon
     }
 
     /// <summary>
+    /// IEEE1516.1-2010 10.41: EvokeCallback
+    /// </summary>
+    /// <remarks>
     /// Evoke Callback
     /// <param name="approximateMinimumTimeInSeconds">this service invocation shall wait for the duration indicated by this argument. Default is 0.01 sec (1 msec)</param>
-    /// </summary>
+    /// </remarks>
     virtual public void EvokeCallback(double approximateMinimumTimeInSeconds = 0.01)
     {
       _rtiAmb.evokeCallback(approximateMinimumTimeInSeconds);
     }
 
     /// <summary>
+    /// IEEE1516.1-2010 10.42: EvokeMultipleCallbacks
+    /// </summary>
+    /// <remarks>
     /// Instructs the RTI that the invoking federate is prepared to receive multiple federate callbacks.The service shall continue to process available callbacks until the minimum specified wall-clock time. At that wall-clock time, if there are no additional callbacks to be delivered to the federate, the service shall complete. If, after the minimum specified wall-clock time, there continue to be callbacks, the RTI shall continue to deliver those callbacks until the maximum specified wall-clock time is exceeded.
     /// <param name="approximateMinimumTimeInSeconds">Min amount of wallclock time. </param>
     /// <param name="approximateMaximumTimeInSeconds">Max amount of wallclock time.</param>
-    /// </summary>
+    /// </remarks>
     virtual public void EvokeMultipleCallbacks(double approximateMinimumTimeInSeconds, double approximateMaximumTimeInSeconds)
     {
       _rtiAmb.evokeMultipleCallbacks(approximateMinimumTimeInSeconds, approximateMaximumTimeInSeconds);
     }
+
+    /// <summary>
+    /// IEEE1516.1-2010 10.43: EnableCallbacks
+    /// </summary>
+    /// <remarks>
+    /// In the EVOKED callback model, the Enable Callbacks service instructs the RTI to deliver any available callbacks processed through the Evoke Callback and Evoke Multiple Callbacks services.
+    /// In the IMMEDIATE callback model, the Enable Callbacks service instructs the RTI to deliver any available callbacks processed immediately when they are available.The default state for a federate is that callbacks are enabled.
+    /// </remarks>
+    public virtual bool EnableCallbacks()
+    {
+      return _rtiAmb.enableCallbacks();
+    }
+
+    /// <summary>
+    /// IEEE1516.1-2010 10.44: DisableCallbacks
+    /// </summary>
+    /// <remarks>
+    /// The Disable Callbacks service instructs the RTI to defer the delivery of any available callbacks. This service can be used to implement a guard mechanism to control when callbacks are delivered to the federate.
+    /// </remarks>
+    public virtual bool DisableCallbacks()
+    {
+      return _rtiAmb.disableCallbacks();
+    }
+
     /// <summary>
     /// Tick() is alias for Evoke Callback
     /// </summary>

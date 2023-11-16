@@ -2,7 +2,7 @@
 Racon - RTI abstraction component for MS.NET (Racon)
 https://sites.google.com/site/okantopcu/racon
 
-Copyright © Okan Topçu, 2009-2017
+Copyright © Okan Topçu, 2009-2019
 otot.support@outlook.com
 
 This program is free software : you can redistribute it and / or modify
@@ -74,11 +74,13 @@ namespace Racon {
 #pragma region Declaration Management
 			public:
 				virtual void publishObjectClass(HlaObjectClass ^, List<HlaAttribute^>^) override;
-				virtual void subscribeInteractionClass(HlaInteractionClass ^) override;
-				virtual bool subscribeObjectClass(HlaObjectClass ^, List<HlaAttribute^>^, Boolean) override;
+				bool unpublishObjectClass(HlaObjectClass^, List<HlaAttribute^>^) override;
+				virtual bool publishInteractionClass(HlaInteractionClass ^) override;
+				virtual bool unpublishInteractionClass(HlaInteractionClass^) override;
+				bool subscribeObjectClass(HlaObjectClass ^, List<HlaAttribute^>^, Boolean) override;
+				virtual bool unsubscribeObjectClass(HlaObjectClass ^, List<HlaAttribute^>^) override;
+				bool subscribeInteractionClass(HlaInteractionClass ^) override;
 				virtual bool unsubscribeInteractionClass(HlaInteractionClass ^) override;
-				virtual bool unsubscribeObjectClass(HlaObjectClass ^) override;
-				virtual void publishInteractionClass(HlaInteractionClass ^) override;
 #pragma endregion	// Declaration Management		
 
 #pragma region Object Management
@@ -155,7 +157,7 @@ namespace Racon {
 				};
 				String^  getFederateName(unsigned int federateHandle) override {
 					// !!! Not implemented
-					return "";
+					return "!!! Not implemented";
 				};
 
 				virtual bool disableAttributeRelevanceAdvisorySwitch(void) override;

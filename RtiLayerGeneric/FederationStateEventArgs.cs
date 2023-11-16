@@ -19,48 +19,33 @@ You should have received a copy of the GNU Lesser General Public License
 along with this program.If not, see <http://www.gnu.org/licenses/>.
 */
 
-namespace Racon.ObjectModel
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+
+namespace Racon.RtiLayer
 {
   /// <summary>
-  /// CExtent
+  /// Encapsulates event arguments for Federation State changed event.
   /// </summary>
-  public class CExtent
-  {
-    #region Fields
-    #endregion
-
-    #region Properties
+  /// <remarks>This class inherits the EventArgs class. It is used in delegates and event handlers.
+  /// </remarks>
+  /// 
+  public class CFederationStateEventArgs : EventArgs
+	{
     /// <summary>
-    /// Lower bound.
+    /// Federation Execution State
     /// </summary>
-    public ulong LowerBound { get; set; }
-
+    public FederationExecutionStates FedExecState;
     /// <summary>
-    /// Upper bound.
+    /// Constructor
     /// </summary>
-    public ulong UpperBound { get; set; }
-
-    /// <summary>
-    /// Dimension.
-    /// </summary>
-    public CDimension Dimension { get; set; }
-    #endregion
-
-    #region Constructors
-    /// <summary>
-    /// CExtent constructor.
-    /// </summary>
-    public CExtent(CDimension dimension, ulong lowerBound, ulong upperBound)
-    {
-      LowerBound = lowerBound;
-      UpperBound = upperBound;
-      Dimension = dimension;
-    }
-    #endregion
-
-    #region Methods
-
-    #endregion
-
-  }
+    /// <param name="state">Federation State</param>
+    /// 
+    public CFederationStateEventArgs(FederationExecutionStates state)
+		{
+			FedExecState = state;
+		}
+	};
 }

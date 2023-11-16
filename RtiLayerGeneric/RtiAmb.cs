@@ -2,7 +2,7 @@
 Racon - RTI abstraction component for MS.NET (Racon)
 https://sites.google.com/site/okantopcu/racon
 
-Copyright © Okan Topçu, 2009-2017
+Copyright © Okan Topçu, 2009-2019
 otot.support@outlook.com
 
 This program is free software : you can redistribute it and / or modify
@@ -112,10 +112,7 @@ namespace Racon.RtiLayer
     /// OnNotConnected
     /// </summary>
     /// <param name="_val"></param>
-    protected void OnNotConnected(RaconEventArgs _val)
-    {
-      NoConnection(this, _val);
-    }
+    protected void OnNotConnected(RaconEventArgs _val) => NoConnection?.Invoke(this, _val);
     /// <summary>
     /// OnFederationExecutionCreated
     /// </summary>
@@ -379,41 +376,81 @@ namespace Racon.RtiLayer
 
     #region Declaration Management
     /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="ic"></param>
-    public abstract void publishInteractionClass(HlaInteractionClass ic);
-    /// <summary>
-    /// 
+    /// IEEE1516.1-2010 5.2
     /// </summary>
     /// <param name="oc"></param>
     /// <param name="list"></param>
     public abstract void publishObjectClass(HlaObjectClass oc, List<HlaAttribute> list);
+
     /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="ic"></param>
-    public abstract void subscribeInteractionClass(HlaInteractionClass ic);
-    /// <summary>
-    /// 
+    /// IEEE1516.1-2010 5.3
     /// </summary>
     /// <param name="oc"></param>
-    /// <param name="list"></param>
-    /// <param name="p"></param>
+    /// <param name="attributes"></param>
     /// <returns></returns>
-    public abstract bool subscribeObjectClass(HlaObjectClass oc, List<HlaAttribute> list, bool p);
+    public abstract bool unpublishObjectClass(HlaObjectClass oc, List<HlaAttribute> attributes);
+
     /// <summary>
-    /// 
+    /// IEEE1516.1-2010 5.4
+    /// </summary>
+    /// <param name="ic"></param>
+    public abstract bool publishInteractionClass(HlaInteractionClass ic);
+
+    /// <summary>
+    /// IEEE1516.1-2010 5.5
+    /// </summary>
+    /// <param name="ic"></param>
+    /// <returns></returns>
+    public abstract bool unpublishInteractionClass(HlaInteractionClass ic);
+
+    /// <summary>
+    /// IEEE1516.1-2010 5.6
+    /// </summary>
+    /// <param name="oc">Object class</param>
+    /// <param name="attributes">Attributes</param>
+    /// <param name="active">Passive subscription indicator. Optional. Default is true.</param>
+    /// <param name="updateRate">Update rate name. Optional. Default is "".</param>
+    /// <returns></returns>
+    public virtual bool subscribeObjectClass(HlaObjectClass oc, List<HlaAttribute> attributes, bool active, string updateRate)
+    {
+      // Default implementation - so, native classes do not need to override
+      OnRTIEventOccured(new RaconEventArgs("subscribeObjectClass(HlaObjectClass oc, List<HlaAttribute> attributes, bool active, string updateRate) is IEEE1516.1-2010 specific. Use other overload methods for HLA13.", LogLevel.ERROR));
+      return false;
+    }
+    /// <summary>
+    /// HLA13
+    /// </summary>
+    /// <param name="oc">Object class</param>
+    /// <param name="attributes">Attributes</param>
+    /// <param name="active">Passive subscription indicator. Optional. Default is true.</param>
+    /// <returns></returns>
+    public virtual bool subscribeObjectClass(HlaObjectClass oc, List<HlaAttribute> attributes, bool active)
+    {
+      OnRTIEventOccured(new RaconEventArgs("subscribeObjectClass(HlaObjectClass oc, List<HlaAttribute> attributes, bool active) is HLA13 specific. Use other overload methods for IEEE1516.", LogLevel.ERROR));
+      return false;
+    }
+
+    /// <summary>
+    /// IEEE1516.1-2010 5.7
+    /// </summary>
+    /// <param name="oc"></param>
+    /// <param name="attributes"></param>
+    /// <returns></returns>
+    public abstract bool unsubscribeObjectClass(HlaObjectClass oc, List<HlaAttribute> attributes);
+
+    /// <summary>
+    /// IEEE1516.1-2010 5.8
+    /// </summary>
+    /// <param name="ic"></param>
+    public abstract bool subscribeInteractionClass(HlaInteractionClass ic);
+
+    /// <summary>
+    /// IEEE1516.1-2010 5.9
     /// </summary>
     /// <param name="ic"></param>
     /// <returns></returns>
     public abstract bool unsubscribeInteractionClass(HlaInteractionClass ic);
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="oc"></param>
-    /// <returns></returns>
-    public abstract bool unsubscribeObjectClass(HlaObjectClass oc);
+
     #endregion // Declaration Management
 
     #region Object Management
@@ -885,7 +922,8 @@ namespace Racon.RtiLayer
     /// <param name="oc"></param>
     /// <param name="pairs"></param>
     /// <param name="indicator"></param>
-    public virtual bool subscribeObjectClassAttributesWithRegions(HlaObjectClass oc, AttributeHandleSetRegionHandleSetPairVector pairs, bool indicator)
+    /// <param name="updateRate">Update rate name. Optional. Default is "".</param>
+    public virtual bool subscribeObjectClassAttributesWithRegions(HlaObjectClass oc, AttributeHandleSetRegionHandleSetPairVector pairs, bool indicator, string updateRate)
     {
       // Default implementation - so, native classes do not need to override
       OnRTIEventOccured(new RaconEventArgs("subscribeObjectClassAttributesWithRegions is only used for IEEE1516-2010. Use other overloaded methods for HLA13.", LogLevel.WARN));
@@ -1277,17 +1315,64 @@ namespace Racon.RtiLayer
 
     #region Support Services
     /// <summary>
+    /// IEEE1516.1-2010 10.2: getAutomaticResignDirective
+    /// </summary>
+    /// <returns></returns>
+    public virtual ResignAction getAutomaticResignDirective()
+    {
+      OnRTIEventOccured(new RaconEventArgs("getAutomaticResignDirective() is IEEE1516.1-2010 specific.", LogLevel.WARN));
+      return ResignAction.NO_ACTION;
+    }
+
+    /// <summary>
+    /// IEEE1516.1-2010 10.3: setAutomaticResignDirective
+    /// </summary>
+    /// <returns></returns>
+    public virtual bool setAutomaticResignDirective(int action)
+    {
+      OnRTIEventOccured(new RaconEventArgs("setAutomaticResignDirective(ResignAction action) is IEEE1516.1-2010 specific.", LogLevel.WARN));
+      return false;
+    }
+
+    /// <summary>
     /// IEEE1516.1-2010 10.4: getFederateHandle
     /// </summary>
     /// <param name="federateName"></param>
     /// <returns></returns>
     public abstract uint getFederateHandle(string federateName);
+
     /// <summary>
     /// IEEE1516.1-2010 10.5: getFederateName
     /// </summary>
     /// <param name="federateHandle"></param>
     /// <returns></returns>
     public abstract string getFederateName(uint federateHandle);
+
+    /// <summary>
+    /// IEEE1516.1-2010 10.13
+    /// </summary>
+    /// <param name="name">Update rate name</param>
+    /// <returns></returns>
+    public virtual double getUpdateRateValue(string name)
+    {
+      // Default implementation - so, native classes do not need to override
+      OnRTIEventOccured(new RaconEventArgs("getUpdateRateValue(string name) is IEEE1516.1-2010 specific.", LogLevel.ERROR));
+      return 0;//sentinel value
+    }
+
+    /// <summary>
+    /// IEEE1516.1-2010 10.14
+    /// </summary>
+    /// <param name="objectInstance">Object instance handle.</param>
+    /// <param name="attribute">Attribute handle.</param>
+    /// <returns></returns>
+    public virtual double getUpdateRateValueForAttribute(HlaObject objectInstance, HlaAttribute attribute)
+    {
+      // Default implementation - so, native classes do not need to override
+      OnRTIEventOccured(new RaconEventArgs("getUpdateRateValue(string name) is IEEE1516.1-2010 specific.", LogLevel.ERROR));
+      return 0.0;//sentinel value
+    }
+
     /// <summary>
     /// IEEE1516.1-2010 10.25
     /// </summary>
@@ -1339,6 +1424,18 @@ namespace Racon.RtiLayer
     }
 
     /// <summary>
+    /// IEEE1516.1-2010 10.31: normalizeFederateHandle
+    /// </summary>
+    /// <param name="federateHandle"></param>
+    /// <returns></returns>
+    public virtual uint normalizeFederateHandle(uint federateHandle)
+    {
+      // Default implementation - so, native classes do not need to override
+      OnRTIEventOccured(new RaconEventArgs("normalizeFederateHandle(uint federateHandle) is IEEE1516.1-2010 specific. Not implemented !!!", LogLevel.ERROR));
+      return 0;//sentinel value
+    }
+
+    /// <summary>
     /// IEEE1516.1-2010: 10.33 enableObjectClassRelevanceAdvisorySwitch
     /// </summary>
     /// <returns></returns>
@@ -1383,12 +1480,34 @@ namespace Racon.RtiLayer
     /// </summary>
     /// <param name="approximateMinimumTimeInSeconds"></param>
     public abstract void evokeCallback(double approximateMinimumTimeInSeconds);
+
     /// <summary>
     /// IEEE1516.1-2010: 10.42 evokeMultipleCallbacks
     /// </summary>
     /// <param name="approximateMinimumTimeInSeconds"></param>
     /// <param name="approximateMaximumTimeInSeconds"></param>
-    public abstract void evokeMultipleCallbacks(double approximateMinimumTimeInSeconds, double approximateMaximumTimeInSeconds);//10.42
+    public abstract void evokeMultipleCallbacks(double approximateMinimumTimeInSeconds, double approximateMaximumTimeInSeconds);
+
+    /// <summary>
+    /// IEEE1516.1-2010: 10.43 enableCallbacks
+    /// </summary>
+    public virtual bool enableCallbacks()
+    {
+      // Default implementation - so, native classes do not need to override
+      OnRTIEventOccured(new RaconEventArgs("enableCallbacks() is IEEE1516.1-2010 specific.", LogLevel.WARN));
+      return false;
+    }
+
+    /// <summary>
+    /// IEEE1516.1-2010: 10.44 disableCallbacks
+    /// </summary>
+    public virtual bool disableCallbacks()
+    {
+      // Default implementation - so, native classes do not need to override
+      OnRTIEventOccured(new RaconEventArgs("disableCallbacks() is IEEE1516.1-2010 specific.", LogLevel.WARN));
+      return false;
+    }
+
     /// <summary>
     /// HLA13 - getSpaceHandle
     /// </summary>

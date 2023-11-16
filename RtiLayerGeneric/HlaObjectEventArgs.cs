@@ -2,7 +2,7 @@
 Racon - RTI abstraction component for MS.NET (Racon)
 https://sites.google.com/site/okantopcu/racon
 
-Copyright © Okan Topçu, 2009-2017
+Copyright © Okan Topçu, 2009-2019
 otot.support@outlook.com
 
 This program is free software : you can redistribute it and / or modify
@@ -54,6 +54,10 @@ namespace Racon.RtiLayer
     ///  User-Supplied Tag.
     /// </summary>
     public VariableLengthDataWrapper Tag { get; set; }
+    /// <summary>
+    ///  Update rate designator (name) - maximum update rate value
+    /// </summary>
+    public string UpdateRateDesignator { get; set; }
     #endregion
 
     #region Constructors
@@ -67,6 +71,7 @@ namespace Racon.RtiLayer
       SupplementalReflectInfo = new SupplementalReflectInfo();
       SupplementalRemoveInfo = new SupplementalRemoveInfo();
       Tag = new VariableLengthDataWrapper();
+      UpdateRateDesignator = "";
     }
     #endregion
 

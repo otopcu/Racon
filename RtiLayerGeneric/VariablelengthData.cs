@@ -3,7 +3,7 @@
 Racon - RTI abstraction component for MS.NET (Racon)
 https://sites.google.com/site/okantopcu/racon
 
-Copyright © Okan Topçu, 2009-2017
+Copyright © Okan Topçu, 2009-2019
 otot.support@outlook.com
 
 This program is free software : you can redistribute it and / or modify
@@ -58,8 +58,8 @@ namespace Racon.RtiLayer
     /// <summary>
     /// Encode data
     /// </summary>
-    /// <typeparam name="_type"></typeparam>
-    /// <param name="value"></param>
+    /// <typeparam name="_type">Generic type</typeparam>
+    /// <param name="value">Value</param>
     public void AddData<_type>(_type value)
     {
       Data = Encoder.Encode(value, out Size);// encodes data and gives its size
@@ -96,6 +96,10 @@ namespace Racon.RtiLayer
       else if (type == typeof(bool))
       {
         return (Marshal.PtrToStructure(Data, typeof(bool))).ToString();
+      }
+      else if (type == typeof(DateTime))
+      {
+        return Marshal.PtrToStringAnsi(Data);
       }
       else if (type.IsValueType)
       {

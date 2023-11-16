@@ -7,7 +7,7 @@
 Racon - RTI abstraction component for MS.NET (Racon)
 https://sites.google.com/site/okantopcu/racon
 
-Copyright © Okan Topçu, 2009-2017
+Copyright © Okan Topçu, 2009-2019
 otot.support@outlook.com
 
 This program is free software : you can redistribute it and / or modify
@@ -88,12 +88,13 @@ namespace Racon
 #pragma region Declaration Management
       public:
         virtual void publishObjectClass(HlaObjectClass ^, List<HlaAttribute^>^) override;
-        virtual void publishInteractionClass(HlaInteractionClass ^) override;
-        virtual void subscribeInteractionClass(HlaInteractionClass ^) override;
-        virtual bool subscribeObjectClass(HlaObjectClass ^, List<HlaAttribute^>^, Boolean) override;
+				virtual bool unpublishObjectClass(HlaObjectClass^, List<HlaAttribute^>^) override;
+				virtual bool publishInteractionClass(HlaInteractionClass ^) override;
+        virtual bool unpublishInteractionClass(HlaInteractionClass ^) override;
+        bool subscribeObjectClass(HlaObjectClass ^, List<HlaAttribute^>^, Boolean, String^) override;
+        virtual bool unsubscribeObjectClass(HlaObjectClass ^, List<HlaAttribute^>^) override;
+        bool subscribeInteractionClass(HlaInteractionClass ^) override;
         virtual bool unsubscribeInteractionClass(HlaInteractionClass ^) override;
-        virtual bool unsubscribeObjectClass(HlaObjectClass ^) override;
-        //virtual void publishInteractionClass(HlaInteractionClass ^) override;
 #pragma endregion	// Declaration Management		
 
 #pragma region Object Management
@@ -128,7 +129,7 @@ namespace Racon
         virtual unsigned int createRegion(HlaRegion^, List<HlaDimension^>^) override;
         virtual void deleteRegion(HlaRegion^) override;
         virtual void registerObjectInstanceWithRegions(HlaObject ^, AttributeHandleSetRegionHandleSetPairVector ^pairs) override;
-        virtual bool subscribeObjectClassAttributesWithRegions(HlaObjectClass ^oc, AttributeHandleSetRegionHandleSetPairVector ^list, bool indicator) override;
+        bool subscribeObjectClassAttributesWithRegions(HlaObjectClass ^oc, AttributeHandleSetRegionHandleSetPairVector ^list, bool indicator, String^) override;
         virtual bool unsubscribeObjectClassWithRegions(HlaObjectClass ^, AttributeHandleSetRegionHandleSetPairVector ^list) override;
         virtual bool subscribeInteractionClass(HlaInteractionClass ^, List<HlaRegion^>^, bool indicator) override;
         virtual bool unsubscribeInteractionClass(HlaInteractionClass ^, List<HlaRegion^>^) override;
@@ -202,18 +203,27 @@ namespace Racon
 
 #pragma region Support Services
       public:
-        void  setRangeBounds(unsigned int regionHandle, unsigned int dimensionHandle, unsigned int lowerBound, unsigned int upperBound) override;// 10.30
-        virtual bool enableObjectClassRelevanceAdvisorySwitch(void) override;// !!! Not implemented in Portico
-        virtual bool disableObjectClassRelevanceAdvisorySwitch(void) override; // !!! Not implemented in Portico
-        virtual bool enableAttributeRelevanceAdvisorySwitch(void) override; // !!! Not implemented in Portico
-        virtual bool disableAttributeRelevanceAdvisorySwitch(void) override; // !!! Not implemented in Portico
-        virtual bool enableAttributeScopeAdvisorySwitch(void) override;// !!! Not implemented in Portico
-        virtual bool disableAttributeScopeAdvisorySwitch(void) override; // !!! Not implemented in Portico
-        virtual bool enableInteractionRelevanceAdvisorySwitch(void) override;// !!! Not implemented in Portico
-        virtual bool disableInteractionRelevanceAdvisorySwitch(void) override;// !!! Not implemented in Portico
+				Racon::ResignAction getAutomaticResignDirective() override; // 10.2
+				bool setAutomaticResignDirective(int) override; // 10.3
+				double getUpdateRateValue(String^ name) override; // 10.13
+				double getUpdateRateValueForAttribute(HlaObject^ objectInstance, HlaAttribute^ attribute) override; // 10.14
+				void  setRangeBounds(unsigned int regionHandle, unsigned int dimensionHandle, unsigned int lowerBound, unsigned int upperBound) override;// 10.30
+				// 10.31
+				// 10.32
+        virtual bool enableObjectClassRelevanceAdvisorySwitch(void) override;// 10.33 !!! Not implemented in Portico
+        virtual bool disableObjectClassRelevanceAdvisorySwitch(void) override; // 10.34 !!! Not implemented in Portico
+        virtual bool enableAttributeRelevanceAdvisorySwitch(void) override; // 10.35 !!! Not implemented in Portico
+        virtual bool disableAttributeRelevanceAdvisorySwitch(void) override; // 10.36 !!! Not implemented in Portico
+        virtual bool enableAttributeScopeAdvisorySwitch(void) override;// 10.37 !!! Not implemented in Portico
+        virtual bool disableAttributeScopeAdvisorySwitch(void) override; // 10.38 !!! Not implemented in Portico
+        virtual bool enableInteractionRelevanceAdvisorySwitch(void) override;// 10.39 !!! Not implemented in Portico
+        virtual bool disableInteractionRelevanceAdvisorySwitch(void) override;// 10.40 !!! Not implemented in Portico
         //virtual unsigned int getDimensionHandle(String ^, unsigned int) override;
-        virtual void evokeCallback(double) override;
-        virtual void evokeMultipleCallbacks(double, double) override;
+        virtual void evokeCallback(double) override;// 10.41
+        virtual void evokeMultipleCallbacks(double, double) override;// 10.42
+				bool enableCallbacks() override;// 10.43
+				bool disableCallbacks() override;// 10.44
+
 #pragma endregion
 
 #pragma region Helpers

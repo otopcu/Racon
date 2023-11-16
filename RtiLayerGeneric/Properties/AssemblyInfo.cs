@@ -11,7 +11,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Okan Topcu")]
 [assembly: AssemblyProduct("RACoN")]
-[assembly: AssemblyCopyright("Copyright © 2009-2017 Okan Topcu")]
+[assembly: AssemblyCopyright("Copyright © 2009-2019 Okan Topcu")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -33,7 +33,7 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("0.0.2.4")]
-[assembly: AssemblyFileVersion("0.0.2.4")]
+[assembly: AssemblyVersion("0.0.2.5")]
+[assembly: AssemblyFileVersion("0.0.2.5")]
 [assembly: NeutralResourcesLanguage("en-US")]
 

@@ -2,7 +2,7 @@
 Racon - RTI abstraction component for MS.NET (Racon)
 https://sites.google.com/site/okantopcu/racon
 
-Copyright © Okan Topçu, 2009-2017
+Copyright © Okan Topçu, 2009-2019
 otot.support@outlook.com
 
 This program is free software : you can redistribute it and / or modify
@@ -19,8 +19,8 @@ You should have received a copy of the GNU Lesser General Public License
 along with this program.If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "StdAfx.h"
-#include "RtiAmb_Hla13.h"
+#include "include\StdAfx.h"
+#include "include\RtiAmb_Hla13.h"
 
 using namespace System;
 using namespace System::Runtime::InteropServices;// For Marshalling
@@ -111,7 +111,7 @@ unsigned int RtiAmb_Hla13::joinFederationExecution(String ^fdName, String ^fedex
 			return federateHandle;
     }
     catch (RTI::FederateAlreadyExecutionMember& e) {
-			String^ msg = "RtiAmb_Hla13-(FederateAlreadyExecutionMember - joinFederation). Federate already is an federation execution member. Reason: ";
+			String^ msg = "RtiAmb_Hla13-(FederateAlreadyExecutionMember - joinFederation). Federate already is an federation execution member. Reason: " + gcnew String(e._reason);
 			this->OnRTIEventOccured(gcnew RaconEventArgs(msg, LogLevel::WARN));
     }
     catch (RTI::FederationExecutionDoesNotExist& e) {
@@ -490,6 +490,58 @@ void RtiAmb_Hla13::publishObjectClass(HlaObjectClass ^oc, List<HlaAttribute^>^ a
 	}
 };
 
+// unpublish OC 
+bool RtiAmb_Hla13::unpublishObjectClass(HlaObjectClass^ oc, List<HlaAttribute^>^ attributes) {
+	try {
+		rti->unpublishObjectClass(oc->Handle);
+		String^ msg = "Object Class (name: " + oc->Name + ", handle:" + oc->Handle + ") is unpublished.";
+		this->OnRTIEventOccured(gcnew RaconEventArgs(msg));
+		return true;
+	}
+#pragma region exceptions
+	catch (RTI::ObjectClassNotDefined & e) {
+		String^ msg = "RtiAmb_Hla13-(ObjectClassNotDefined - unpublishObjectClass). Reason: " + gcnew String(e._reason);
+		this->OnRTIEventOccured(gcnew RaconEventArgs(msg, LogLevel::WARN));
+		return false;
+	}
+	catch (RTI::ObjectClassNotPublished & e) {
+		String^ msg = "RtiAmb_Hla13-(ObjectClassNotPublished - unpublishObjectClass). Reason: " + gcnew String(e._reason);
+		this->OnRTIEventOccured(gcnew RaconEventArgs(msg, LogLevel::WARN));
+		return false;
+	}
+	catch (RTI::FederateNotExecutionMember & e) {
+		String^ msg = "RtiAmb_Hla13-(FederateNotExecutionMember - unpublishObjectClass). Reason: " + gcnew String(e._reason);
+		this->OnRTIEventOccured(gcnew RaconEventArgs(msg, LogLevel::WARN));
+		return false;
+	}
+	catch (RTI::ConcurrentAccessAttempted & e) {
+		String^ msg = "RtiAmb_Hla13-(ConcurrentAccessAttempted - unpublishObjectClass). Reason: " + gcnew String(e._reason);
+		this->OnRTIEventOccured(gcnew RaconEventArgs(msg, LogLevel::WARN));
+		return false;
+	}
+	catch (RTI::SaveInProgress & e) {
+		String^ msg = "RtiAmb_Hla13-(SaveInProgress - unpublishObjectClass). Reason: " + gcnew String(e._reason);
+		this->OnRTIEventOccured(gcnew RaconEventArgs(msg, LogLevel::WARN));
+		return false;
+	}
+	catch (RTI::RestoreInProgress & e) {
+		String^ msg = "RtiAmb_Hla13-(RestoreInProgress - unpublishObjectClass). Reason: " + gcnew String(e._reason);
+		this->OnRTIEventOccured(gcnew RaconEventArgs(msg, LogLevel::WARN));
+		return false;
+	}
+	catch (RTI::RTIinternalError & e) {
+		String^ msg = "RtiAmb_Hla13-(RTIinternalError - unpublishObjectClass). Reason: " + gcnew String(e._reason);
+		this->OnRTIEventOccured(gcnew RaconEventArgs(msg, LogLevel::WARN));
+		return false;
+	}
+	catch (System::Exception ^ e) {
+		String^ msg = "RtiAmb_Hla13-(Exception - unpublishObjectClass). Reason: " + gcnew String(e->ToString());
+		this->OnRTIEventOccured(gcnew RaconEventArgs(msg, LogLevel::ERROR));
+		return false;
+	}
+#pragma endregion
+};
+
 // subscribeOC with selected attributes
 bool RtiAmb_Hla13::subscribeObjectClass(HlaObjectClass ^oc, List<HlaAttribute^>^ attributes, Boolean active) {
   this->getClassHandleFromRti(oc);
@@ -568,8 +620,60 @@ bool RtiAmb_Hla13::subscribeObjectClass(HlaObjectClass ^oc, List<HlaAttribute^>^
 #pragma endregion
 };
 
+// unsubscribe OC 
+bool RtiAmb_Hla13::unsubscribeObjectClass(HlaObjectClass ^oc, List<HlaAttribute^>^ attributes) {
+  try {
+    rti->unsubscribeObjectClass(oc->Handle);
+    String^ msg = "Object Class (name: " + oc->Name + ", handle:" + oc->Handle + ") is unsubscribed.";
+    this->OnRTIEventOccured(gcnew RaconEventArgs(msg));
+    return true;
+  }
+#pragma region exceptions
+  catch (RTI::ObjectClassNotDefined& e) {
+		String^ msg = "RtiAmb_Hla13-(ObjectClassNotDefined - unsubscribeObjectClass). Reason: " + gcnew String(e._reason);
+		this->OnRTIEventOccured(gcnew RaconEventArgs(msg, LogLevel::WARN));
+		return false;
+  }
+  catch (RTI::ObjectClassNotSubscribed &e) {
+		String^ msg = "RtiAmb_Hla13-(ObjectClassNotSubscribed - unsubscribeObjectClass). Reason: " + gcnew String(e._reason);
+		this->OnRTIEventOccured(gcnew RaconEventArgs(msg, LogLevel::WARN));
+		return false;
+  }
+  catch (RTI::FederateNotExecutionMember& e) {
+		String^ msg = "RtiAmb_Hla13-(FederateNotExecutionMember - unsubscribeObjectClass). Reason: " + gcnew String(e._reason);
+		this->OnRTIEventOccured(gcnew RaconEventArgs(msg, LogLevel::WARN));
+		return false;
+  }
+  catch (RTI::ConcurrentAccessAttempted& e) {
+		String^ msg = "RtiAmb_Hla13-(ConcurrentAccessAttempted - unsubscribeObjectClass). Reason: " + gcnew String(e._reason);
+		this->OnRTIEventOccured(gcnew RaconEventArgs(msg, LogLevel::WARN));
+		return false;
+  }
+  catch (RTI::SaveInProgress& e) {
+		String^ msg = "RtiAmb_Hla13-(SaveInProgress - unsubscribeObjectClass). Reason: " + gcnew String(e._reason);
+		this->OnRTIEventOccured(gcnew RaconEventArgs(msg, LogLevel::WARN));
+		return false;
+  }
+  catch (RTI::RestoreInProgress& e) {
+		String^ msg = "RtiAmb_Hla13-(RestoreInProgress - unsubscribeObjectClass). Reason: " + gcnew String(e._reason);
+		this->OnRTIEventOccured(gcnew RaconEventArgs(msg, LogLevel::WARN));
+		return false;
+  }
+  catch (RTI::RTIinternalError& e) {
+		String^ msg = "RtiAmb_Hla13-(RTIinternalError - unsubscribeObjectClass). Reason: " + gcnew String(e._reason);
+		this->OnRTIEventOccured(gcnew RaconEventArgs(msg, LogLevel::WARN));
+		return false;
+  }
+	catch (System::Exception^ e) {
+		String^ msg = "RtiAmb_Hla13-(Exception - unsubscribeObjectClass). Reason: " + gcnew String(e->ToString());
+		this->OnRTIEventOccured(gcnew RaconEventArgs(msg, LogLevel::ERROR));
+		return false;
+	}
+#pragma endregion
+};
+
 // publishIC
-void RtiAmb_Hla13::publishInteractionClass(HlaInteractionClass ^ic) {
+bool RtiAmb_Hla13::publishInteractionClass(HlaInteractionClass ^ic) {
   // Check that interaction is Publishable
   if ((ic->ClassPS == PSKind::Publish) || (ic->ClassPS == PSKind::PublishSubscribe))
     try {
@@ -577,15 +681,72 @@ void RtiAmb_Hla13::publishInteractionClass(HlaInteractionClass ^ic) {
     rti->publishInteractionClass(ic->Handle);
     String^ msg = "Interaction Class (name: " + ic->Name + ") is published. Class handle: " + ic->Handle;
     this->OnHLAClassPublished(gcnew RaconEventArgs(msg));
+		return true;
   }
 	catch (System::Exception^ e) {
 		String^ msg = "RtiAmb_Hla13-(Exception - connect). Reason: " + gcnew String(e->ToString());
 		this->OnRTIEventOccured(gcnew RaconEventArgs(msg, LogLevel::ERROR));
+		return false;
 	}
 };
 
+// unpublishIC
+bool RtiAmb_Hla13::unpublishInteractionClass(HlaInteractionClass^ ic) {
+	try {
+		rti->unpublishInteractionClass(ic->Handle);
+
+		String^ msg = "Interaction Class (name: " + ic->Name + ", handle: " + ic->Handle + ") is unpublished.";
+
+		this->OnRTIEventOccured(gcnew RaconEventArgs(msg));
+		return true;
+	}
+#pragma region exceptions
+	catch (RTI::InteractionClassNotDefined & e) {
+		String^ msg = "RtiAmb_Hla13-(InteractionClassNotDefined - unpublishInteractionClass). Reason: " + gcnew String(e._reason);
+		this->OnRTIEventOccured(gcnew RaconEventArgs(msg, LogLevel::WARN));
+		return false;
+	}
+	catch (RTI::InteractionClassNotPublished & e) {
+		String^ msg = "RtiAmb_Hla13-(InteractionClassNotSuInteractionClassNotPublishedbscribed - unpublishInteractionClass). Reason: " + gcnew String(e._reason);
+		this->OnRTIEventOccured(gcnew RaconEventArgs(msg, LogLevel::WARN));
+		return false;
+	}
+	catch (RTI::FederateNotExecutionMember & e) {
+		String^ msg = "RtiAmb_Hla13-(FederateNotExecutionMember - unpublishInteractionClass). Reason: " + gcnew String(e._reason);
+		this->OnRTIEventOccured(gcnew RaconEventArgs(msg, LogLevel::WARN));
+		return false;
+	}
+	catch (RTI::ConcurrentAccessAttempted & e) {
+		String^ msg = "RtiAmb_Hla13-(ConcurrentAccessAttempted - unpublishInteractionClass). Reason: " + gcnew String(e._reason);
+		this->OnRTIEventOccured(gcnew RaconEventArgs(msg, LogLevel::WARN));
+		return false;
+	}
+	catch (RTI::SaveInProgress & e) {
+		String^ msg = "RtiAmb_Hla13-(SaveInProgress - unpublishInteractionClass). Reason: " + gcnew String(e._reason);
+		this->OnRTIEventOccured(gcnew RaconEventArgs(msg, LogLevel::WARN));
+		return false;
+	}
+	catch (RTI::RestoreInProgress & e) {
+		String^ msg = "RtiAmb_Hla13-(RestoreInProgress - unpublishInteractionClass). Reason: " + gcnew String(e._reason);
+		this->OnRTIEventOccured(gcnew RaconEventArgs(msg, LogLevel::WARN));
+		return false;
+	}
+	catch (RTI::RTIinternalError & e) {
+		String^ msg = "RtiAmb_Hla13-(RTIinternalError - unpublishInteractionClass). Reason: " + gcnew String(e._reason);
+		this->OnRTIEventOccured(gcnew RaconEventArgs(msg, LogLevel::WARN));
+		return false;
+	}
+	catch (System::Exception ^ e) {
+		String^ msg = "RtiAmb_Hla13-(Exception - connect). Reason: " + gcnew String(e->ToString());
+		this->OnRTIEventOccured(gcnew RaconEventArgs(msg, LogLevel::ERROR));
+		return false;
+	}
+#pragma endregion
+};
+
+
 // SubscribeIC
-void RtiAmb_Hla13::subscribeInteractionClass(HlaInteractionClass ^ic) {
+bool RtiAmb_Hla13::subscribeInteractionClass(HlaInteractionClass ^ic) {
 
   String^ msg = "";
   // Check that interaction is Subscribable
@@ -595,47 +756,58 @@ void RtiAmb_Hla13::subscribeInteractionClass(HlaInteractionClass ^ic) {
     msg = "Interaction Class (name: " + ic->Name + ", handle: " + ic->Handle + ") is subscribed.";
     //}
     this->OnHLAClassSubscribed(gcnew RaconEventArgs(msg));
-  }
+		return true;
+	}
 #pragma region exceptions
   catch (RTI::InteractionClassNotDefined& e) {
 		String^ msg = "RtiAmb_Hla13-(Notspecified - Notspecified). Reason: " + gcnew String(e._reason);
 		this->OnRTIEventOccured(gcnew RaconEventArgs(msg, LogLevel::WARN));
+		return false;
 	}
   catch (RTI::RegionNotKnown& e) {
 		String^ msg = "RtiAmb_Hla13-(Notspecified - Notspecified). Reason: " + gcnew String(e._reason);
 		this->OnRTIEventOccured(gcnew RaconEventArgs(msg, LogLevel::WARN));
+		return false;
 	}
   catch (RTI::InvalidRegionContext& e) {
 		String^ msg = "RtiAmb_Hla13-(Notspecified - Notspecified). One or more of the specified attribute handles is not valid within the context of the specified region. Please, check that the interaction class is associated with a routing space in FED file. Reason: " + gcnew String(e._reason);
 		this->OnRTIEventOccured(gcnew RaconEventArgs(msg, LogLevel::WARN));
-  }
+		return false;
+	}
   catch (RTI::FederateLoggingServiceCalls& e) {
 		String^ msg = "RtiAmb_Hla13-(Notspecified - Notspecified). Reason: " + gcnew String(e._reason);
 		this->OnRTIEventOccured(gcnew RaconEventArgs(msg, LogLevel::WARN));
+		return false;
 	}
   catch (RTI::FederateNotExecutionMember& e) {
 		String^ msg = "RtiAmb_Hla13-(Notspecified - Notspecified). Reason: " + gcnew String(e._reason);
 		this->OnRTIEventOccured(gcnew RaconEventArgs(msg, LogLevel::WARN));
+		return false;
 	}
   catch (RTI::ConcurrentAccessAttempted& e) {
 		String^ msg = "RtiAmb_Hla13-(Notspecified - Notspecified). Reason: " + gcnew String(e._reason);
 		this->OnRTIEventOccured(gcnew RaconEventArgs(msg, LogLevel::WARN));
+		return false;
 	}
   catch (RTI::RestoreInProgress& e) {
 		String^ msg = "RtiAmb_Hla13-(Notspecified - Notspecified). Reason: " + gcnew String(e._reason);
 		this->OnRTIEventOccured(gcnew RaconEventArgs(msg, LogLevel::WARN));
+		return false;
 	}
   catch (RTI::SaveInProgress& e) {
 		String^ msg = "RtiAmb_Hla13-(Notspecified - Notspecified). Reason: " + gcnew String(e._reason);
 		this->OnRTIEventOccured(gcnew RaconEventArgs(msg, LogLevel::WARN));
+		return false;
 	}
   catch (RTI::RTIinternalError& e) {
 		String^ msg = "RtiAmb_Hla13-(Notspecified - Notspecified). Reason: " + gcnew String(e._reason);
 		this->OnRTIEventOccured(gcnew RaconEventArgs(msg, LogLevel::WARN));
+		return false;
 	}
 	catch (System::Exception^ e) {
 		String^ msg = "RtiAmb_Hla13-(Exception - connect). Reason: " + gcnew String(e->ToString());
 		this->OnRTIEventOccured(gcnew RaconEventArgs(msg, LogLevel::ERROR));
+		return false;
 	}
 #pragma endregion
 };
@@ -652,82 +824,38 @@ bool RtiAmb_Hla13::unsubscribeInteractionClass(HlaInteractionClass ^ic) {
   catch (RTI::InteractionClassNotDefined& e) {
 		String^ msg = "RtiAmb_Hla13-(Notspecified - Notspecified). Reason: " + gcnew String(e._reason);
 		this->OnRTIEventOccured(gcnew RaconEventArgs(msg, LogLevel::WARN));
+		return false;
 	}
   catch (RTI::InteractionClassNotSubscribed& e) {
 		String^ msg = "RtiAmb_Hla13-(Notspecified - Notspecified). Reason: " + gcnew String(e._reason);
 		this->OnRTIEventOccured(gcnew RaconEventArgs(msg, LogLevel::WARN));
+		return false;
 	}
   catch (RTI::FederateNotExecutionMember& e) {
 		String^ msg = "RtiAmb_Hla13-(Notspecified - Notspecified). Reason: " + gcnew String(e._reason);
 		this->OnRTIEventOccured(gcnew RaconEventArgs(msg, LogLevel::WARN));
+		return false;
 	}
   catch (RTI::ConcurrentAccessAttempted& e) {
 		String^ msg = "RtiAmb_Hla13-(Notspecified - Notspecified). Reason: " + gcnew String(e._reason);
 		this->OnRTIEventOccured(gcnew RaconEventArgs(msg, LogLevel::WARN));
+		return false;
 	}
   catch (RTI::SaveInProgress& e) {
 		String^ msg = "RtiAmb_Hla13-(Notspecified - Notspecified). Reason: " + gcnew String(e._reason);
 		this->OnRTIEventOccured(gcnew RaconEventArgs(msg, LogLevel::WARN));
+		return false;
 	}
   catch (RTI::RestoreInProgress& e) {
 		String^ msg = "RtiAmb_Hla13-(Notspecified - Notspecified). Reason: " + gcnew String(e._reason);
 		this->OnRTIEventOccured(gcnew RaconEventArgs(msg, LogLevel::WARN));
+		return false;
 	}
   catch (RTI::RTIinternalError& e) {
 		String^ msg = "RtiAmb_Hla13-(Notspecified - Notspecified). Reason: " + gcnew String(e._reason);
 		this->OnRTIEventOccured(gcnew RaconEventArgs(msg, LogLevel::WARN));
+		return false;
 	}
-	catch (System::Exception^ e) {
-		String^ msg = "RtiAmb_Hla13-(Exception - connect). Reason: " + gcnew String(e->ToString());
-		this->OnRTIEventOccured(gcnew RaconEventArgs(msg, LogLevel::ERROR));
-	}
-#pragma endregion
-};
-
-// unsubscribe OC 
-bool RtiAmb_Hla13::unsubscribeObjectClass(HlaObjectClass ^oc) {
-  try {
-    rti->unsubscribeObjectClass(oc->Handle);
-    String^ msg = "Object Class (name: " + oc->Name + ", handle:" + oc->Handle + ") is unsubscribed.";
-    this->OnRTIEventOccured(gcnew RaconEventArgs(msg));
-    return true;
-  }
-#pragma region exceptions
-  catch (RTI::ObjectClassNotDefined& e) {
-		String^ msg = "RtiAmb_Hla13-(Notspecified - Notspecified). Reason: " + gcnew String(e._reason);
-		this->OnRTIEventOccured(gcnew RaconEventArgs(msg, LogLevel::WARN));
-		return false;
-  }
-  catch (RTI::ObjectClassNotSubscribed &e) {
-		String^ msg = "RtiAmb_Hla13-(Notspecified - Notspecified). Reason: " + gcnew String(e._reason);
-		this->OnRTIEventOccured(gcnew RaconEventArgs(msg, LogLevel::WARN));
-		return false;
-  }
-  catch (RTI::FederateNotExecutionMember& e) {
-		String^ msg = "RtiAmb_Hla13-(Notspecified - Notspecified). Reason: " + gcnew String(e._reason);
-		this->OnRTIEventOccured(gcnew RaconEventArgs(msg, LogLevel::WARN));
-		return false;
-  }
-  catch (RTI::ConcurrentAccessAttempted& e) {
-		String^ msg = "RtiAmb_Hla13-(Notspecified - Notspecified). Reason: " + gcnew String(e._reason);
-		this->OnRTIEventOccured(gcnew RaconEventArgs(msg, LogLevel::WARN));
-		return false;
-  }
-  catch (RTI::SaveInProgress& e) {
-		String^ msg = "RtiAmb_Hla13-(Notspecified - Notspecified). Reason: " + gcnew String(e._reason);
-		this->OnRTIEventOccured(gcnew RaconEventArgs(msg, LogLevel::WARN));
-		return false;
-  }
-  catch (RTI::RestoreInProgress& e) {
-		String^ msg = "RtiAmb_Hla13-(Notspecified - Notspecified). Reason: " + gcnew String(e._reason);
-		this->OnRTIEventOccured(gcnew RaconEventArgs(msg, LogLevel::WARN));
-		return false;
-  }
-  catch (RTI::RTIinternalError& e) {
-		String^ msg = "RtiAmb_Hla13-(Notspecified - Notspecified). Reason: " + gcnew String(e._reason);
-		this->OnRTIEventOccured(gcnew RaconEventArgs(msg, LogLevel::WARN));
-		return false;
-  }
 	catch (System::Exception^ e) {
 		String^ msg = "RtiAmb_Hla13-(Exception - connect). Reason: " + gcnew String(e->ToString());
 		this->OnRTIEventOccured(gcnew RaconEventArgs(msg, LogLevel::ERROR));

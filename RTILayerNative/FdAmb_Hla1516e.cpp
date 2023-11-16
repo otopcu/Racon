@@ -2,7 +2,7 @@
 Racon - RTI abstraction component for MS.NET (Racon)
 https://sites.google.com/site/okantopcu/racon
 
-Copyright © Okan Topçu, 2009-2017
+Copyright © Okan Topçu, 2009-2019
 otot.support@outlook.com
 
 This program is free software : you can redistribute it and / or modify
@@ -19,12 +19,12 @@ You should have received a copy of the GNU Lesser General Public License
 along with this program.If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "StdAfx.h"
+#include "include\StdAfx.h"
 #include <iostream> // for using std
 #include "RTI/time/HLAfloat64Interval.h"
 #include "RTI/time/HLAfloat64Time.h"
-#include "Helpers_Hla1516e.h"
-#include "FdAmb_Hla1516e.h"
+#include "include\Helpers_Hla1516e.h"
+#include "include\FdAmb_Hla1516e.h"
 
 using namespace System;
 using namespace System::Runtime::InteropServices;
@@ -1181,7 +1181,6 @@ void FdAmb_Hla1516e::turnUpdatesOnForObjectInstance(rti1516e::ObjectInstanceHand
   }
 #pragma endregion
 };
-// updateRateDesignator - not implemented
 void FdAmb_Hla1516e::turnUpdatesOnForObjectInstance(rti1516e::ObjectInstanceHandle theObject, rti1516e::AttributeHandleSet const & theAttributes, std::wstring const & updateRateDesignator)
   throw (
     rti1516e::FederateInternalError) {
@@ -1199,6 +1198,7 @@ void FdAmb_Hla1516e::turnUpdatesOnForObjectInstance(rti1516e::ObjectInstanceHand
       args->ObjectInstance->Attributes->Add(attr);
       attributeString += attr->Handle + ",";
     }
+		args->UpdateRateDesignator = gcnew String(updateRateDesignator.c_str());
 
     args->TraceMessage = "Turn updates on for the attributes (Handles: {" + attributeString + "}) of the object instance (" + args->ObjectInstance->Handle + ").";
     args->EventType = RaconEventTypes::TurnUpdatesOnForObjectInstanceAdvised;

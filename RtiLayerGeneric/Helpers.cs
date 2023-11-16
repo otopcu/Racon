@@ -2,7 +2,7 @@
 Racon - RTI abstraction component for MS.NET (Racon)
 https://sites.google.com/site/okantopcu/racon
 
-Copyright © Okan Topçu, 2009-2017
+Copyright © Okan Topçu, 2009-2019
 otot.support@outlook.com
 
 This program is free software : you can redistribute it and / or modify
@@ -38,6 +38,44 @@ namespace Racon
   {
     // Only for documentation of Namespace: Racon.Federation in Sandcastle
   }
+
+  /// <summary>
+  /// Represents resign actions/directives
+  /// </summary>
+  public enum ResignAction // and Mappings to HLA13
+  {
+    /// <summary>
+    /// Unconditionally divest ownership of all owned instance attributes.
+    /// Corresponds to RELEASE_ATTRIBUTES in HLA 13
+    /// </summary>
+    UNCONDITIONALLY_DIVEST_ATTRIBUTES,
+    /// <summary>
+    /// Delete all object instances for which the joined federate has the delete privilege.
+    /// Corresponds to DELETE_OBJECTS
+    /// </summary>
+    DELETE_OBJECTS,
+    /// <summary>
+    /// Cancel all pending instance attribute ownership acquisitions.
+    /// Corresponds to NO_ACTION in HLA 13
+    /// </summary>
+    CANCEL_PENDING_OWNERSHIP_ACQUISITIONS,
+    /// <summary>
+    /// Perform action (2) and then action (1).
+    /// Corresponds to DELETE_OBJECTS_AND_RELEASE_ATTRIBUTES in HLA 13
+    /// </summary>
+    DELETE_OBJECTS_THEN_DIVEST,
+    /// <summary>
+    /// Perform action (3), action (2), and then action (1).
+    /// Corresponds to N/A - NO_ACTION in HLA 13
+    /// </summary>
+    CANCEL_THEN_DELETE_THEN_DIVEST,
+    /// <summary>
+    /// Perform no actions.
+    /// Corresponds to NO_ACTION in HLA 13
+    /// </summary>
+    NO_ACTION
+  };
+
 
   /// <summary>
   /// Callback model - used in connect() service
@@ -130,7 +168,10 @@ namespace Racon
       if (typeof(_type) == typeof(string))
       {
         data = Marshal.StringToHGlobalAnsi((value as string));
-        size = (value as string).Length + 1;
+        if (value != null) // check string is null or not
+          size = (value as string).Length + 1;
+        else
+          size = 0;
       }
       else if (typeof(_type) == typeof(DateTime))
       {

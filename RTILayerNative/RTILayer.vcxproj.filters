@@ -18,9 +18,6 @@
     <ClCompile Include="AssemblyInfo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Stdafx.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="FdAmb_Hla1516e.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

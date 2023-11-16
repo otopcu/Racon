@@ -7,7 +7,7 @@
 Racon - RTI abstraction component for MS.NET (Racon)
 https://sites.google.com/site/okantopcu/racon
 
-Copyright © Okan Topçu, 2009-2017
+Copyright © Okan Topçu, 2009-2022
 otot.support@outlook.com
 
 This program is free software : you can redistribute it and / or modify
@@ -44,7 +44,7 @@ namespace Racon
       public:
         RtiAmb_OpenRti_1516e(CallbackManager^ eventManager) : RtiAmb_Hla1516e(eventManager) {
           try {
-            RtiVersion = gcnew String(rti1516e::rtiName().c_str()) + " v" + gcnew String(rti1516e::rtiVersion().c_str()) + " (OpenRTI-0.9.0 win64)";// rtiVersion() returns 1.0
+            RtiVersion = gcnew String(rti1516e::rtiName().c_str()) + " v" + gcnew String(rti1516e::rtiVersion().c_str()) + " (OpenRTI-0.10.0 win64)";// rtiVersion() returns 1.0
           }
           catch (System::Exception^ e) {
             String^ msg = "RtiAmb_OpenRti_1516e-(Exception - Ctor). The native rti ambassador pointer creation  is failed. This may indicate a corrupted/a wrong RTI.rid file. Please ensure that RTI.rid is provided by Portico distribution. Reason: " + gcnew String(e->ToString());
@@ -166,8 +166,8 @@ namespace Racon
           }
           catch (NotConnected& e) {
             String^ msg = "MSG-(NotConnected - registerObject):" + " Reason: " + gcnew String(e.what().c_str());
-            this->OnRTIEventOccured(gcnew RaconEventArgs(msg));
-            return false;
+						this->OnNotConnected(gcnew RaconEventArgs(msg, LogLevel::ERROR));
+						return false;
           }
           catch (RTIinternalError& e) {
             String^ msg = "RtiAmb_Hla13-(RTIinternalError - registerObject). Reason: " + gcnew String(e.what().c_str());
@@ -231,8 +231,8 @@ namespace Racon
           }
           catch (NotConnected& e) {
             String^ msg = "MSG-(NotConnected - registerObject2):" + " Reason: " + gcnew String(e.what().c_str());
-            this->OnRTIEventOccured(gcnew RaconEventArgs(msg));
-            return false;
+						this->OnNotConnected(gcnew RaconEventArgs(msg, LogLevel::ERROR));
+						return false;
           }
           catch (RTIinternalError& e) {
             String^ msg = "RtiAmb_Hla13-(RTIinternalError - registerObject2). Reason: " + gcnew String(e.what().c_str());
@@ -283,8 +283,8 @@ namespace Racon
           }
           catch (NotConnected& e) {
             String^ msg = "RtiAmb_OpenRti_1516e-(NotConnected - getFederateHandle): Reason: " + gcnew String(e.what().c_str());
-            this->OnRTIEventOccured(gcnew RaconEventArgs(msg));
-          }
+						this->OnNotConnected(gcnew RaconEventArgs(msg, LogLevel::ERROR));
+					}
           catch (RTIinternalError& e) {
             String^ msg = "RtiAmb_OpenRti_1516e-(RTIinternalError - getFederateHandle). Reason: " + gcnew String(e.what().c_str());
             this->OnRTIEventOccured(gcnew RaconEventArgs(msg, LogLevel::WARN));
@@ -302,26 +302,26 @@ namespace Racon
             // Convert Federate Handle
             std::wstring name = rti->getFederateName(nom->FederateHandle);
             String ^fdName = gcnew String(name.c_str());
-            String^ msg = "Federate name for federate (" + federateHandle + ") is queried. Federate Name: " + fdName;
+            String^ msg = "Federate name is requested for the federate id: " + federateHandle + ". Federate Name: " + fdName;
             this->OnRTIEventOccured(gcnew RaconEventArgs(msg));
             return fdName;
           }
 #pragma region exceptions
-          catch (NameNotFound& e) {
-            String^ msg = "RtiAmb_OpenRti_1516e-(NameNotFound - getFederateName): Reason: " + gcnew String(e.what().c_str());
+          catch (InvalidFederateHandle & e) {
+            String^ msg = "RtiAmb_OpenRti_1516e-(InvalidFederateHandle - getFederateName): Reason: " + gcnew String(e.what().c_str());
             this->OnRTIEventOccured(gcnew RaconEventArgs(msg, LogLevel::WARN));
           }
-          catch (FederateNotExecutionMember& e) {
-            String^ msg = "RtiAmb_OpenRti_1516e-(FederateNotExecutionMember - getFederateName): Reason: " + gcnew String(e.what().c_str());
+          catch (FederateHandleNotKnown & e) {
+            String^ msg = "RtiAmb_OpenRti_1516e-(FederateHandleNotKnown - getFederateName): Reason: " + gcnew String(e.what().c_str());
             this->OnRTIEventOccured(gcnew RaconEventArgs(msg));
           }
           catch (NotConnected& e) {
             String^ msg = "RtiAmb_OpenRti_1516e-(NotConnected - getFederateName): Reason: " + gcnew String(e.what().c_str());
-            this->OnRTIEventOccured(gcnew RaconEventArgs(msg));
-          }
+						this->OnNotConnected(gcnew RaconEventArgs(msg, LogLevel::ERROR));
+					}
           catch (RTIinternalError& e) {
             String^ msg = "RtiAmb_OpenRti_1516e-(RTIinternalError - getFederateName). Reason: " + gcnew String(e.what().c_str());
-            this->OnRTIEventOccured(gcnew RaconEventArgs(msg, LogLevel::WARN));
+            this->OnRTIEventOccured(gcnew RaconEventArgs(msg, LogLevel::ERROR));
           }
           catch (System::Exception^ e) {
             String^ msg = "RtiAmb_OpenRti_1516e-(Exception - getFederateName). Reason: " + gcnew String(e->ToString());
@@ -330,7 +330,40 @@ namespace Racon
 #pragma endregion
         };
 
-        // getObjectClassHandle
+				// 10.31 - normalizeFederateHandle
+				unsigned int normalizeFederateHandle(unsigned int federateHandle) override {
+					try {
+						// Convert Federate Handle
+						unsigned int nHandle = rti->normalizeFederateHandle(nom->FederateHandle);
+						String^ msg = "Normalized federate handle for federate (" + federateHandle + ") is: " + nHandle;
+						this->OnRTIEventOccured(gcnew RaconEventArgs(msg));
+						return nHandle;
+					}
+#pragma region exceptions
+					catch (NameNotFound & e) {
+						String^ msg = "RtiAmb_OpenRti_1516e-(NameNotFound - getFederateName): Reason: " + gcnew String(e.what().c_str());
+						this->OnRTIEventOccured(gcnew RaconEventArgs(msg, LogLevel::WARN));
+					}
+					catch (FederateNotExecutionMember & e) {
+						String^ msg = "RtiAmb_OpenRti_1516e-(FederateNotExecutionMember - getFederateName): Reason: " + gcnew String(e.what().c_str());
+						this->OnRTIEventOccured(gcnew RaconEventArgs(msg));
+					}
+					catch (NotConnected & e) {
+						String^ msg = "RtiAmb_OpenRti_1516e-(NotConnected - getFederateName): Reason: " + gcnew String(e.what().c_str());
+						this->OnNotConnected(gcnew RaconEventArgs(msg, LogLevel::ERROR));
+					}
+					catch (RTIinternalError & e) {
+						String^ msg = "RtiAmb_OpenRti_1516e-(RTIinternalError - getFederateName). Reason: " + gcnew String(e.what().c_str());
+						this->OnRTIEventOccured(gcnew RaconEventArgs(msg, LogLevel::WARN));
+					}
+					catch (System::Exception ^ e) {
+						String^ msg = "RtiAmb_OpenRti_1516e-(Exception - getFederateName). Reason: " + gcnew String(e->ToString());
+						this->OnRTIEventOccured(gcnew RaconEventArgs(msg, LogLevel::ERROR));
+					}
+#pragma endregion
+				};
+				
+				// getObjectClassHandle
         rti1516e::ObjectClassHandle getObjectClassHandle(HlaObjectClass ^oc) override {
           try {
             pin_ptr<const wchar_t> name = PtrToStringChars(oc->Name);
@@ -352,8 +385,8 @@ namespace Racon
           }
           catch (NotConnected& e) {
             String^ msg = "MSG-(NotConnected - getObjectClassHandle): Reason: " + gcnew String(e.what().c_str());
-            this->OnRTIEventOccured(gcnew RaconEventArgs(msg));
-          }
+						this->OnNotConnected(gcnew RaconEventArgs(msg, LogLevel::ERROR));
+					}
           catch (RTIinternalError& e) {
             String^ msg = "RtiAmb_Hla13-(RTIinternalError - getObjectClassHandle). Reason: " + gcnew String(e.what().c_str());
             this->OnRTIEventOccured(gcnew RaconEventArgs(msg, LogLevel::WARN));
@@ -387,8 +420,8 @@ namespace Racon
           }
           catch (NotConnected& e) {
             String^ msg = "MSG-(NotConnected - getObjectClassHandle): Reason: " + gcnew String(e.what().c_str());
-            this->OnRTIEventOccured(gcnew RaconEventArgs(msg));
-          }
+						this->OnNotConnected(gcnew RaconEventArgs(msg, LogLevel::ERROR));
+					}
           catch (RTIinternalError& e) {
             String^ msg = "RtiAmb_Hla13-(RTIinternalError - getObjectClassHandle). Reason: " + gcnew String(e.what().c_str());
             this->OnRTIEventOccured(gcnew RaconEventArgs(msg, LogLevel::WARN));
@@ -426,8 +459,8 @@ namespace Racon
           }
           catch (NotConnected& e) {
             String^ msg = "MSG-(NotConnected - getAttributeHandle):" + " Reason: " + gcnew String(e.what().c_str());
-            this->OnRTIEventOccured(gcnew RaconEventArgs(msg));
-          }
+						this->OnNotConnected(gcnew RaconEventArgs(msg, LogLevel::ERROR));
+					}
           catch (RTIinternalError& e) {
             String^ msg = "RtiAmb_Hla13-(RTIinternalError - getAttributeHandle). Reason: " + gcnew String(e.what().c_str());
             this->OnRTIEventOccured(gcnew RaconEventArgs(msg, LogLevel::WARN));
@@ -465,8 +498,8 @@ namespace Racon
           }
           catch (NotConnected& e) {
             String^ msg = "MSG-(NotConnected - getParameterHandle):" + " Reason: " + gcnew String(e.what().c_str());
-            this->OnRTIEventOccured(gcnew RaconEventArgs(msg));
-          }
+						this->OnNotConnected(gcnew RaconEventArgs(msg, LogLevel::ERROR));
+					}
           catch (RTIinternalError& e) {
             String^ msg = "RtiAmb_Hla13-(RTIinternalError - getParameterHandle). Reason: " + gcnew String(e.what().c_str());
             this->OnRTIEventOccured(gcnew RaconEventArgs(msg, LogLevel::WARN));
@@ -502,8 +535,8 @@ namespace Racon
           }
           catch (NotConnected& e) {
             String^ msg = "RtiAmb_OpenRti_1516e-(NotConnected - getDimensionHandle): Reason: " + gcnew String(e.what().c_str());
-            this->OnRTIEventOccured(gcnew RaconEventArgs(msg));
-          }
+						this->OnNotConnected(gcnew RaconEventArgs(msg, LogLevel::ERROR));
+					}
           catch (RTIinternalError& e) {
             String^ msg = "RtiAmb_OpenRti_1516e-(RTIinternalError - getDimensionHandle). Reason: " + gcnew String(e.what().c_str());
             this->OnRTIEventOccured(gcnew RaconEventArgs(msg, LogLevel::WARN));
@@ -536,8 +569,8 @@ namespace Racon
           }
           catch (NotConnected& e) {
             String^ msg = "RtiAmb_OpenRti_1516e-(NotConnected - getDimensionName): Reason: " + gcnew String(e.what().c_str());
-            this->OnRTIEventOccured(gcnew RaconEventArgs(msg));
-          }
+						this->OnNotConnected(gcnew RaconEventArgs(msg, LogLevel::ERROR));
+					}
           catch (RTIinternalError& e) {
             String^ msg = "RtiAmb_OpenRti_1516e-(RTIinternalError - getDimensionName). Reason: " + gcnew String(e.what().c_str());
             this->OnRTIEventOccured(gcnew RaconEventArgs(msg, LogLevel::WARN));
