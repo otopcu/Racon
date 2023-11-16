@@ -15,7 +15,9 @@ As it offers more maintainable, robust, and portable methods, developing an abst
 Guide to Distributed Simulation with HLA: https://link.springer.com/book/10.1007/978-3-319-61267-6
 
 ## Sample Federationsb:
-Chat Federation (Basic): https://github.com/otopcu/Chat * Chat Federation (DDM): https://github.com/otopcu/Chat/tree/DDM * Strait Traffic Monitoring Simulation: https://github.com/otopcu/STMS
+* Chat Federation (Basic): https://github.com/otopcu/Chat 
+* Chat Federation (DDM): https://github.com/otopcu/Chat/tree/DDM 
+* Strait Traffic Monitoring Simulation: https://github.com/otopcu/STMS
 
 ## What's New?
 ### 0.0.2.5 (20231116):
