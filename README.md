@@ -14,7 +14,7 @@ As it offers more maintainable, robust, and portable methods, developing an abst
 is a popular approach in many HLA-based projects.
 
 ## Programmer's Guide
-[Guide to Distributed Simulation with HLA](Guide to Distributed Simulation with HLA)
+Guide to Distributed Simulation with HLA: https://link.springer.com/book/10.1007/978-3-319-61267-6
 
 ## What's New?
 ### 0.0.2.4 (10.10.17):
