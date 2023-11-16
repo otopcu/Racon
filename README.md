@@ -1,5 +1,5 @@
 RACoN - RTI abstraction component for MS.NET (RACoN)
-https://sites.google.com/site/okantopcu/racon
+https://sites.google.com/view/okantopcu/racon
 =============================================
 
 
