@@ -16,7 +16,9 @@ Guide to Distributed Simulation with HLA: https://link.springer.com/book/10.1007
 
 ## Sample Federations:
 * Chat Federation (Basic): https://github.com/otopcu/Chat
+* 
 * Chat Federation (DDM): https://github.com/otopcu/Chat/tree/DDM
+* 
 * Strait Traffic Monitoring Simulation: https://github.com/otopcu/STMS
 
 ## What's New?
