@@ -11,7 +11,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Okan Topcu")]
 [assembly: AssemblyProduct("RACoN")]
-[assembly: AssemblyCopyright("Copyright © 2009-2019 Okan Topcu")]
+[assembly: AssemblyCopyright("Copyright © 2009-2024 Okan Topcu")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

@@ -9,20 +9,33 @@
     <description>
       High Level Architecture (HLA) Runtime Infrastructure (RTI) Abstraction Layer for MS.NET
     </description>
-    <projectUrl>https://sites.google.com/site/okantopcu/racon</projectUrl>
+    <projectUrl>https://sites.google.com/view/okantopcu/racon</projectUrl>
     <iconUrl>http://www.ceng.metu.edu.tr/~otopcu/racon/images/image001.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <copyright>
-      Copyright © 2009-2020 Okan Topçu
+      Copyright © 2009-2024 Okan Topçu
     </copyright>
     <tags>
-      Distributed Simulation; HLA
+      Distributed Simulation; High Level Architecture; HLA
     </tags>
     <summary>
       The RTI abstraction component for MS.NET (RACoN) deals with the High Level Architecture (HLA) runtime infrastructure (RTI) communication in order to access the federation-wide data (actually, the objects and interactions exchanged in federation). RTI is middleware broker software that manages the federation execution and object exchange through a federation execution. The RACoN provides the .NET wrapper classes for the RTI and RTI-specific data structures. As it offers more maintainable, robust, and portable methods, developing an abstraction layer (wrapper) over RTI is a popular approach in many HLA-based projects.
     </summary>
     <releaseNotes>
-      * Bug fixes
+      * Compiled with VS 2022 Enterprise and .NET Framework (Racon: 4.8, Racon.RtiLayer:	4.7.2).
+      * Added some missing support services: get/set automatic resign directive, enable/disable callbacks, normalize federate handle
+      •	Added missing declaration management services: unpublish/unsubscribe.
+      * NotConnected exception is now correctly sets the federate state as NOTCONNECTED.
+      * Update rate designator is implemented. Now, it is possible to employ smart update reduction.
+      * Supports OpenRTI v0.10.0
+      * Bug fixes.
     </releaseNotes>
+    <readme>docs\README.md</readme>
   </metadata>
+  <files>
+    <file src="..\Output\bin\Release\Racon.dll" />
+    <file src="..\Output\bin\Release\Racon.RtiLayer.dll" />
+    <file src="..\Output\bin\Release\Racon.RtiLayer.Native.dll" />
+    <file src="..\README.md" target="docs\" />
+  </files>
 </package>

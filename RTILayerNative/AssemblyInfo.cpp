@@ -37,7 +37,7 @@ using namespace System::Security::Permissions;
 [assembly:AssemblyConfigurationAttribute("")];
 [assembly:AssemblyCompanyAttribute("Okan Topcu")];
 [assembly:AssemblyProductAttribute("Racon.RtiLayer.Native")];
-[assembly:AssemblyCopyrightAttribute("Copyright (c) 2009-2019 Okan Topcu")];
+[assembly:AssemblyCopyrightAttribute("Copyright (c) 2009-2024 Okan Topcu")];
 [assembly:AssemblyTrademarkAttribute("")];
 [assembly:AssemblyCultureAttribute("")];
 

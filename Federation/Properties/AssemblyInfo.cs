@@ -11,7 +11,7 @@ using System.Resources;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Okan Topçu")]
 [assembly: AssemblyProduct("Racon")]
-[assembly: AssemblyCopyright("Copyright ©  2009-2019 Okan Topçu")]
+[assembly: AssemblyCopyright("Copyright ©  2009-2024 Okan Topçu")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

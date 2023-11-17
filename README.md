@@ -26,7 +26,7 @@ Guide to Distributed Simulation with HLA: https://link.springer.com/book/10.1007
 •	Added missing declaration management services: unpublish/unsubscribe.
 * NotConnected exception is now correctly sets the federate state as NOTCONNECTED.
 * Update rate designator is implemented. Now, it is possible to employ smart update reduction. 
-* Supports OpenRTI v0.10.0
+* Supports: Native RTI: OpenRTI v0.10.0, C Language Stadard: ISO C17 (2018) Standard (/std:c17), C++ Language Standard: ISO C++17 Standard (/std:c++17)
 * Bug fixes.
 
 ### 0.0.2.4 (20171010):
